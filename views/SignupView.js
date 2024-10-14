@@ -1,20 +1,17 @@
-// src/views/LoginView.js
 import React, { useState } from 'react';
 import { View, TextInput, Button, Text } from 'react-native';
 import { AuthController } from '../controllers/AuthController';
 
-const LoginView = ({ navigation }) => {
+const SignupView = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = async () => {
+  const handleSignup = async () => {
     try {
-      console.log('로그인 요청:', email);
-      await AuthController.signIn(email, password);
-      console.log('로그인에 성공했습니다.');
-      navigation.navigate('Home');
+      await AuthController.signUp(email, password);
+      navigation.navigate('Login');
     } catch (error) {
-      console.error('로그인 에러:', error.message);
+      console.error('회원가입 에러:', error.message);
     }
   };
 
@@ -24,10 +21,9 @@ const LoginView = ({ navigation }) => {
       <TextInput value={email} onChangeText={setEmail} />
       <Text>비밀번호</Text>
       <TextInput value={password} onChangeText={setPassword} secureTextEntry />
-      <Button title="로그인" onPress={handleLogin} />
-      <Button title="회원가입" onPress={() => navigation.navigate('Signup')} />
+      <Button title="회원가입" onPress={handleSignup} />
     </View>
   );
 };
 
-export default LoginView;
+export default SignupView;
