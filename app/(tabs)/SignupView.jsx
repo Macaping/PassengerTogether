@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, TextInput, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import useAuth from '../../hooks/useAuth';
 
 const SignupView = () => {
@@ -7,18 +7,18 @@ const SignupView = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [nickname, setNickname] = useState('');
-  const { handleSignUp } = useAuth(); // Destructure handleSignUp from useAuth
+  const { handleSignUp } = useAuth(); // useAuth에서 handleSignUp 가져오기
 
   const handleSignup = async () => {
     if (password !== confirmPassword) {
-      console.error('비밀번호가 일치하지 않습니다.');
+      Alert.alert('오류', '비밀번호가 일치하지 않습니다.');
       return;
     }
 
     try {
-      await handleSignUp(email, password, nickname);
+      await handleSignUp(email, password, confirmPassword, nickname);
     } catch (error) {
-      console.error('회원가입 에러:', error.message);
+      Alert.alert('회원가입 오류', error.message); // 에러 발생 시 Alert 표시
     }
   };
 
