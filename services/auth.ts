@@ -2,16 +2,17 @@ import { supabase } from "./supabaseClient";
 
 export const signIn = async (email: string, password: string) => {
     try {
-        const user = await supabase.auth.signInWithPassword({email: email, password: password});
+        const user = await supabase.auth.signInWithPassword({ email: email, password: password });
+        const { data, error } = await supabase.auth.getUser();
         return user;
     } catch (error) {
         throw new Error("로그인에 실패했습니다.");
     }
 };
 
-export const signUp = async (email: string, password: string) => {
+export const signUp = async (email: string, password: string, nickname: string) => {
     try {
-        const user = await supabase.auth.signUp({email: email, password: password});
+        const user = await supabase.auth.signUp({ email: email, password: password, options: { data: { nickname: nickname } } });
         return user;
     } catch (error) {
         throw new Error("회원가입에 실패했습니다.");

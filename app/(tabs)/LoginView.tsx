@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, TextInput, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import useAuth from '../../hooks/useAuth';
+import { router } from 'expo-router';
 
 const LoginView = () => {
   const [email, setEmail] = useState('');
@@ -8,13 +9,14 @@ const LoginView = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const { handleSignIn } = useAuth(); // Destructure handleSignIn from useAuth
 
-  const handleLogin = async () => {
+  const onPressed = async () => {
     try {
       if (!email || !password) {
         setErrorMessage('아이디와 비밀번호를 입력해주세요.');
         return;
       }
       await handleSignIn(email, password);
+      router.push('/HomeView')
     } catch (error) {
       setErrorMessage('비밀번호가 일치하지 않습니다.');
     }
@@ -43,12 +45,12 @@ const LoginView = () => {
       />
       {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
 
-      <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+      <TouchableOpacity style={styles.loginButton} onPress={onPressed}>
         <Text style={styles.loginButtonText}>로그인</Text>
       </TouchableOpacity>
 
       <Text style={styles.footerText}>아직 회원이 아니신가요? 
-        <Text style={styles.signupText} onPress={() => navigation.navigate('Signup')}>
+        <Text style={styles.signupText} onPress={() => router.push('/SignupView')}>
           회원가입
         </Text>
       </Text>

@@ -5,7 +5,7 @@ import { useState } from "react";
 const useAuth = () => {
     const [user, setUser] = useState(null);
 
-    const handleSignIn = async (email: string, password: string) => {
+    const handleSignIn = async (email, password) => {
         try {
             const { data, error } = await signIn(email, password);
             if (error) {
@@ -14,15 +14,14 @@ const useAuth = () => {
             setUser(data.user);
             console.log(data.user);
             console.log("로그인 성공!");
-            router.back();
         } catch (error) {
             console.error(error);
         }
     };
 
-    const handleSignUp = async (email: string, password: string) => {
+    const handleSignUp = async (email, password, nickname) => {
         try {
-            const { data, error } = await signUp(email, password);
+            const { data, error } = await signUp(email, password, nickname);
             if (error) {
                 throw new Error(error.message);
             }
@@ -45,7 +44,7 @@ const useAuth = () => {
             console.error(error);
         }
     };
-
+    
     return { user, handleSignIn, handleSignUp, handleSignOut };
 };
 
