@@ -49,9 +49,9 @@ const LoginView = () => {
         <Text style={styles.loginButtonText}>로그인</Text>
       </TouchableOpacity>
 
-      <Text style={styles.footerText}>아직 회원이 아니신가요? 
+      <Text style={styles.footerText}>아직 회원이 아니신가요?
         <Text style={styles.signupText} onPress={() => router.push('/SignupView')}>
-          회원가입
+          {'  '}회원가입
         </Text>
       </Text>
     </View>
