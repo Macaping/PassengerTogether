@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, TextInput, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import useAuth from '../../hooks/useAuth';
+import { router } from 'expo-router';
 
 const LoginView = () => {
   const [email, setEmail] = useState('');
@@ -25,10 +26,10 @@ const LoginView = () => {
       <Text style={styles.title}>Passenger Together.</Text>
       <Text style={styles.subtitle}>Call Van Matching App</Text>
 
-      <Text style={styles.label}>아이디</Text>
+      <Text style={styles.label}>이메일</Text>
       <TextInput
         style={styles.input}
-        placeholder="아이디를 입력하세요"
+        placeholder="이메일을 입력하세요"
         value={email}
         onChangeText={setEmail}
       />
@@ -48,7 +49,7 @@ const LoginView = () => {
       </TouchableOpacity>
 
       <Text style={styles.footerText}>아직 회원이 아니신가요? 
-        <Text style={styles.signupText} onPress={() => navigation.navigate('Signup')}>
+        <Text style={styles.signupText} onPress={() => router.push('/SignupView')}>
           회원가입
         </Text>
       </Text>
