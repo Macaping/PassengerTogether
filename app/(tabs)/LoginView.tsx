@@ -27,10 +27,10 @@ const LoginView = () => {
       <Text style={styles.title}>Passenger Together.</Text>
       <Text style={styles.subtitle}>Call Van Matching App</Text>
 
-      <Text style={styles.label}>아이디</Text>
+      <Text style={styles.label}>이메일</Text>
       <TextInput
         style={styles.input}
-        placeholder="아이디를 입력하세요"
+        placeholder="이메일을 입력하세요"
         value={email}
         onChangeText={setEmail}
       />

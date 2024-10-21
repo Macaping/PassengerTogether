@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Picker } from '@react-native-picker/picker'; // 수정된 임포트
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { StatusBar } from 'react-native-web';
 
 const HomeView = ({ navigation }) => {
   const locations = ['천안역', '천안아산역', '선문대', '탕정역']; // 미리 정의된 장소들
@@ -53,8 +54,9 @@ const HomeView = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      <StatusBar style="light"/>
       <View style={styles.header}>
-        <Text style={styles.headerText}>조회</Text>
+        <Text style={styles.headerText}>가나다</Text>
       </View>
       
       <View style={styles.infoBox}>
