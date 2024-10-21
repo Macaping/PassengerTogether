@@ -12,7 +12,7 @@ const LoginView = () => {
   const onPressed = async () => {
     try {
       if (!email || !password) {
-        setErrorMessage('아이디와 비밀번호를 입력해주세요.');
+        setErrorMessage('이메일과 비밀번호를 입력해주세요.');
         return;
       }
       await handleSignIn(email, password);
