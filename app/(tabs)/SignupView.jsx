@@ -21,7 +21,7 @@ const SignupView = () => {
       console.error('회원가입 에러:', error.message);
     }
   };
-  //dd
+  
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Passenger Together.</Text>
