@@ -1,33 +1,131 @@
-// src/views/LoginView.js
 import React, { useState } from 'react';
-import { View, TextInput, Button, Text } from 'react-native';
+import { View, TextInput, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { AuthController } from '../controllers/AuthController';
 
 const LoginView = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleLogin = async () => {
     try {
-      console.log('로그인 요청:', email);
+      if (!email || !password) {
+        setErrorMessage('아이디와 비밀번호를 입력해주세요.');
+        return;
+      }
       await AuthController.signIn(email, password);
-      console.log('로그인에 성공했습니다.');
       navigation.navigate('Home');
     } catch (error) {
-      console.error('로그인 에러:', error.message);
+      setErrorMessage('비밀번호가 일치하지 않습니다.');
     }
   };
 
   return (
-    <View>
-      <Text>이메일</Text>
-      <TextInput value={email} onChangeText={setEmail} />
-      <Text>비밀번호</Text>
-      <TextInput value={password} onChangeText={setPassword} secureTextEntry />
-      <Button title="로그인" onPress={handleLogin} />
-      <Button title="회원가입" onPress={() => navigation.navigate('Signup')} />
+    <View style={styles.container}>
+      <Text style={styles.title}>Passenger Together.</Text>
+      <Text style={styles.subtitle}>Call Van Matching App</Text>
+
+      <Text style={styles.label}>아이디</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="아이디를 입력하세요"
+        value={email}
+        onChangeText={setEmail}
+      />
+
+      <Text style={styles.label}>비밀번호</Text>
+      <TextInput
+        style={[styles.input, errorMessage ? styles.errorInput : null]}
+        placeholder="비밀번호를 입력하세요"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+      />
+      {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
+
+      <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+        <Text style={styles.loginButtonText}>로그인</Text>
+      </TouchableOpacity>
+
+      <Text style={styles.footerText}>아직 회원이 아니신가요? 
+        <Text style={styles.signupText} onPress={() => navigation.navigate('Signup')}>
+          회원가입
+        </Text>
+      </Text>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#5D3FD3',
+    marginBottom: 8,
+    width: '80%',
+    textAlign: 'left',
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#999999',
+    marginBottom: 24,
+    width: '80%',
+    textAlign: 'left',
+  },
+  label: {
+    width: '80%',
+    textAlign: 'left',
+    fontSize: 14,
+    color: '#000',
+    marginBottom: 4,
+  },
+  input: {
+    width: '80%',
+    height: 50,
+    borderColor: '#CCCCCC',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    marginBottom: 12,
+    backgroundColor: '#fff',
+  },
+  errorInput: {
+    borderColor: '#FF0000',
+  },
+  errorText: {
+    color: '#FF0000',
+    fontSize: 12,
+    marginBottom: 12,
+  },
+  loginButton: {
+    width: '80%',
+    height: 50,
+    backgroundColor: '#5D3FD3',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
+    marginBottom: 12,
+  },
+  loginButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  footerText: {
+    fontSize: 14,
+    color: '#999999',
+    marginTop: 16,
+  },
+  signupText: {
+    color: '#5D3FD3',
+    fontWeight: 'bold',
+  },
+});
 
 export default LoginView;

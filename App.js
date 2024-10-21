@@ -4,11 +4,6 @@ import { SafeAreaView, StyleSheet } from 'react-native';
 import AppNavigator from './navigation/AppNavigator';
 
 const App = () => {
-  const SUPABASE_URL = process.env.SUPABASE_URL;
-  const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
-
-  console.log(SUPABASE_URL);
-  console.log(SUPABASE_ANON_KEY);
 
   return (
     <SafeAreaView style={styles.container}>
