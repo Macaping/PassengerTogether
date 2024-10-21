@@ -12,7 +12,7 @@ const LoginView = () => {
   const onPressed = async () => {
     try {
       if (!email || !password) {
-        setErrorMessage('아이디와 비밀번호를 입력해주세요.');
+        setErrorMessage('이메일과 비밀번호를 입력해주세요.');
         return;
       }
       await handleSignIn(email, password);
@@ -30,7 +30,7 @@ const LoginView = () => {
       <Text style={styles.label}>아이디</Text>
       <TextInput
         style={styles.input}
-        placeholder="아이디를 입력하세요"
+        placeholder="이메일을 입력하세요"
         value={email}
         onChangeText={setEmail}
       />
