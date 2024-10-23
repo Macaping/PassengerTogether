@@ -40,10 +40,10 @@ const listStyles = StyleSheet.create({
     },
     columnCrossline: {
         position: "absolute",
-        borderLeftWidth: 3,
-        borderLeftColor: "#A594F9",
+        borderLeftWidth: 2,
+        borderLeftColor: "#6049E2",
         top: '0%',
-        left: '12.5%',
+        left: '15.6%',
         height: '100%',
     }
 });
@@ -64,16 +64,16 @@ const itemStyles = StyleSheet.create({
     container: {
         flex: 1,
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        justifyContent: 'center',
         backgroundColor: '#ffffff',
-        borderWidth: 1,
+        borderWidth: 0.5,
         borderColor: '#A594F9',
         borderRadius: 8,
         padding: 16,
     },
     시각: {
         color: '#6049E2',
-        fontSize: 16,
+        fontSize: 20,
         fontWeight: 'bold',
     },
     방_번호: {

@@ -103,7 +103,11 @@ const styles = StyleSheet.create({
   errorText: {
     color: '#FF0000',
     fontSize: 12,
-    marginBottom: 12,
+    marginBottom: 24,
+    marginTop:-4,
+    width: '80%',
+    marginLeft:2,
+    textAlign: 'left',
   },
   loginButton: {
     width: '80%',

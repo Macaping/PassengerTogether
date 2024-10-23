@@ -61,8 +61,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#e0f0ff',
   },
   ticketContainer: {
-    width: width * 0.75,   // 화면 너비의 75%로 축소
-    height: height * 0.7,  // 화면 높이의 70%로 축소
+    width: width * 0.9,   // 화면 너비의 75%로 축소
+    height: height * 0.8,  // 화면 높이의 70%로 축소
     padding: 20,
     borderRadius: 10,
     backgroundColor: '#fff',
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 10,  // 상단 왼쪽 모서리 둥글게
     borderTopRightRadius: 10, // 상단 오른쪽 모서리 둥글게
     paddingVertical: height * 0.01,  // 높이 조정
-    alignItems: 'center',
+    alignItems: 'flex-start',
     position: 'absolute',  // 절대 위치
     top: 0,  // 상단에 붙도록 설정
     left: 0,  // 좌측 끝에 붙도록 설정
@@ -84,6 +84,7 @@ const styles = StyleSheet.create({
   ticketId: {
     fontSize: width * 0.05,  // 화면 너비에 따른 텍스트 크기 조정
     fontWeight: 'bold',
+    marginLeft:10,
     color: '#333',
   },
   time: {
@@ -187,8 +188,8 @@ const styles = StyleSheet.create({
   dottedLine: {
     flex: 1,
     borderBottomWidth: 2,
-    borderStyle: 'dotted',
-    borderColor: '#777',
+    borderStyle: 'dashed',
+    borderColor: '#C3C3C3',
     zIndex: 1,  // 동그라미 뒤로 보내기
   },
   leftCircle: {
