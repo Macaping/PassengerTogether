@@ -51,7 +51,7 @@ const HomeView = () => {
     <View style={styles.container}>
       <StatusBar style="light"/>
       <View style={styles.header}>
-        <Text style={styles.headerText}>가나다</Text>
+        <Text style={styles.headerText}>조회</Text>
       </View>
 
       <View style={styles.infoBox}>
