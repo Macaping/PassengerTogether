@@ -33,6 +33,8 @@ const headerStyles = StyleSheet.create({
 const listStyles = StyleSheet.create({
     listContainer: {
         flexGrow: 1,
+    },
+    contentContainer: {
         padding: 16,
     },
     separator: {
@@ -119,8 +121,12 @@ export default function RoomList() {
                 <View style={listStyles.columnCrossline} />
                 <FlatList
                     data={rooms}
+                    // 컴포넌트 자체의 스타일을 정의합니다.
                     style={listStyles.listContainer}
+                    // 아이템들을 구분할 구분선을 정의합니다.
                     ItemSeparatorComponent={() => <View style={listStyles.separator} />}
+                    // 내용물 컨테이너의 스타일을 정의합니다.
+                    contentContainerStyle={listStyles.contentContainer}
                     renderItem={({ item }) => (
                         // Item 컴포넌트에 전달할 props를 정의합니다.
                         <Item

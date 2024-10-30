@@ -15,20 +15,47 @@ export default function TabLayout() {
         headerShown: false,
       }}>
       <Tabs.Screen
+        name="RoomDetailView"
+        options={{
+          title: '나의 티켓',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? 'ticket' : 'ticket-outline'} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
+          title: '홈',
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon name={focused ? 'home' : 'home-outline'} color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="RoomList"
         options={{
-          title: 'Explore',
+          title: '방 리스트',
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
+            <TabBarIcon name={focused ? 'list' : 'list-outline'} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="LoginView"
+        options={{
+          title: '로그인',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? 'log-in' : 'log-in-outline'} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="SignupView"
+        options={{
+          title: '회원가입',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? 'person-add' : 'person-add-outline'} color={color} />
           ),
         }}
       />
