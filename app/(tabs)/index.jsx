@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal, FlatList } from 'react-native';
 import { Link } from 'expo-router';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { StatusBar } from 'react-native-web';
 
 const HomeView = () => {
   const locations = ['천안역', '천안아산역', '선문대', '탕정역'];
@@ -48,8 +49,9 @@ const HomeView = () => {
 
   return (
     <View style={styles.container}>
+      <StatusBar style="light"/>
       <View style={styles.header}>
-        <Text style={styles.headerText}>조회</Text>
+        <Text style={styles.headerText}>가나다</Text>
       </View>
 
       <View style={styles.infoBox}>

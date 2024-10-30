@@ -12,7 +12,7 @@ const LoginView = () => {
   const onPressed = async () => {
     try {
       if (!email || !password) {
-        setErrorMessage('아이디와 비밀번호를 입력해주세요.');
+        setErrorMessage('이메일과 비밀번호를 입력해주세요.');
         return;
       }
       await handleSignIn(email, password);
@@ -27,10 +27,10 @@ const LoginView = () => {
       <Text style={styles.title}>Passenger Together.</Text>
       <Text style={styles.subtitle}>Call Van Matching App</Text>
 
-      <Text style={styles.label}>아이디</Text>
+      <Text style={styles.label}>이메일</Text>
       <TextInput
         style={styles.input}
-        placeholder="아이디를 입력하세요"
+        placeholder="이메일을 입력하세요"
         value={email}
         onChangeText={setEmail}
       />
@@ -49,9 +49,9 @@ const LoginView = () => {
         <Text style={styles.loginButtonText}>로그인</Text>
       </TouchableOpacity>
 
-      <Text style={styles.footerText}>아직 회원이 아니신가요? 
+      <Text style={styles.footerText}>아직 회원이 아니신가요?
         <Text style={styles.signupText} onPress={() => router.push('/SignupView')}>
-          회원가입
+          {'  '}회원가입
         </Text>
       </Text>
     </View>
