@@ -1,22 +1,25 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Picker } from '@react-native-picker/picker'; // 수정된 임포트
+import { View, Text, TouchableOpacity, StyleSheet, Modal, FlatList } from 'react-native';
+import { Link } from 'expo-router';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { StatusBar } from 'react-native-web';
 
-const HomeView = ({ navigation }) => {
-  const locations = ['천안역', '천안아산역', '선문대', '탕정역']; // 미리 정의된 장소들
+const HomeView = () => {
+  const locations = ['천안역', '천안아산역', '선문대', '탕정역'];
   const [selectedDeparture, setSelectedDeparture] = useState(locations[0]);
   const [selectedDestination, setSelectedDestination] = useState(locations[1]);
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [showTimePicker, setShowTimePicker] = useState(false); // 시간 선택 상태 추가
-  const [numPeople, setNumPeople] = useState(1);
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [changingLocationType, setChangingLocationType] = useState('departure');
 
   const handleDateChange = (event, selectedDate) => {
     setShowDatePicker(false);
     if (selectedDate) {
-      setDate(selectedDate);
+      const newDate = new Date(date);
+      newDate.setFullYear(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+      setDate(newDate);
     }
   };
 
@@ -30,62 +33,75 @@ const HomeView = ({ navigation }) => {
     }
   };
 
-
-  const showDateTimePicker = () => {
-    setShowDatePicker(true);
+  const openLocationModal = (type) => {
+    setChangingLocationType(type);
+    setModalVisible(true);
   };
 
-    // 시간 선택용 TimePicker 열기
-    const showTimePickerModal = () => {
-      setShowTimePicker(true);
-    };
-
-  const incrementPeople = () => {
-    if (numPeople < 4) {
-      setNumPeople(numPeople + 1);
+  const handleLocationSelect = (location) => {
+    if (changingLocationType === 'departure') {
+      setSelectedDeparture(location);
+    } else {
+      setSelectedDestination(location);
     }
-  };
-
-  const decrementPeople = () => {
-    if (numPeople > 1) {
-      setNumPeople(numPeople - 1);
-    }
+    setModalVisible(false);
   };
 
   return (
     <View style={styles.container}>
       <StatusBar style="light"/>
       <View style={styles.header}>
-        <Text style={styles.headerText}>가나다</Text>
+        <Text style={styles.headerText}>조회</Text>
       </View>
-      
+
       <View style={styles.infoBox}>
-        <Text style={styles.infoTitle}>출발</Text>
-        <Picker
-          selectedValue={selectedDeparture}
-          style={styles.picker}
-          onValueChange={(itemValue) => setSelectedDeparture(itemValue)}
-        >
-          {locations.map((location) => (
-            <Picker.Item key={location} label={location} value={location} style={styles.pickerItem} />
-          ))}
-        </Picker>
+        <View style={styles.locationSection}>
+          <Text style={styles.locationLabel}>출발</Text>
+          <Text style={styles.locationLabel}>도착</Text>
+        </View>
 
-        <Text style={styles.infoTitle}>도착</Text>
-        <Picker
-          selectedValue={selectedDestination}
-          style={styles.picker}
-          onValueChange={(itemValue) => setSelectedDestination(itemValue)}
-        >
-          {locations.map((location) => (
-            <Picker.Item key={location} label={location} value={location} style={styles.pickerItem} />
-          ))}
-        </Picker>
+        {/* 출발지와 도착지를 한 줄에 표시하면서 각각 선택 가능하게 설정 */}
+        <View style={styles.locationSelector}>
+          <TouchableOpacity onPress={() => openLocationModal('departure')}>
+            <Text style={styles.routeText}>{selectedDeparture}</Text>
+          </TouchableOpacity>
+          <Text style={styles.arrow}> → </Text>
+          <TouchableOpacity onPress={() => openLocationModal('destination')}>
+            <Text style={styles.routeText}>{selectedDestination}</Text>
+          </TouchableOpacity>
+        </View>
 
-        <Text style={styles.infoTitle}>출발 날짜</Text>
-        <TouchableOpacity onPress={showDateTimePicker} style={styles.dateButton}>
-          <Text style={styles.dateText}>{date.toLocaleDateString()}</Text>
-        </TouchableOpacity>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <View style={styles.modalView}>
+            <FlatList
+              data={locations}
+              keyExtractor={(item) => item}
+              renderItem={({ item }) => (
+                <TouchableOpacity style={styles.item} onPress={() => handleLocationSelect(item)}>
+                  <Text style={styles.itemText}>
+                    {item}
+                  </Text>
+                </TouchableOpacity>
+              )}
+              ItemSeparatorComponent={() => <View style={styles.separator} />}
+            />
+          </View>
+        </Modal>
+
+        <Text style={styles.infoTitle}>출발 시간</Text>
+        <View style={styles.dateTimeRow}>
+          <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.dateTimeButton}>
+            <Text style={styles.dateText}>{date.toLocaleDateString()}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setShowTimePicker(true)} style={styles.dateTimeButton}>
+            <Text style={styles.dateText}>{date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Text>
+          </TouchableOpacity>
+        </View>
 
         {showDatePicker && (
           <DateTimePicker
@@ -96,40 +112,31 @@ const HomeView = ({ navigation }) => {
           />
         )}
 
-        <Text style={styles.infoTitle}>출발 시간</Text>
-        <TouchableOpacity onPress={showTimePickerModal} style={styles.dateButton}>
-          <Text style={styles.dateText}>{date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Text>
-        </TouchableOpacity>
-
         {showTimePicker && (
           <DateTimePicker
             value={date}
             mode="time"
             display="default"
-            minuteInterval={5} // 5분 간격으로 시간 설정
+            minuteInterval={5}
             onChange={handleTimeChange}
           />
         )}
-
-        <Text style={styles.infoTitle}>인원 선택</Text>
-        <View style={styles.peopleContainer}>
-          <TouchableOpacity onPress={decrementPeople} disabled={numPeople === 1} style={styles.peopleButton}>
-            <Text style={styles.peopleButtonText}>-</Text>
-          </TouchableOpacity>
-          <Text style={styles.peopleText}>{numPeople}명</Text>
-          <TouchableOpacity onPress={incrementPeople} disabled={numPeople === 4} style={styles.peopleButton}>
-            <Text style={styles.peopleButtonText}>+</Text>
-          </TouchableOpacity>
-        </View>
       </View>
 
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>조회</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>방만들기</Text>
-        </TouchableOpacity>
+        <Link href="/RoomList" style={styles.button}>
+          <Text style={styles.buttonText}>방 탐색</Text>
+        </Link>
+
+        <Link
+          href={{
+            pathname: '/RoomMake',
+            params: { selectedDeparture, selectedDestination, date: date.toISOString() }
+          }}
+          style={styles.button}
+        >
+          <Text style={styles.buttonText}>방장 하기</Text>
+        </Link>
       </View>
     </View>
   );
@@ -138,11 +145,11 @@ const HomeView = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#E8E8F8',
+    backgroundColor: '#FFFFFF',
   },
   header: {
     backgroundColor: '#6B59CC',
-    padding: 16,
+    padding: 20,
     alignItems: 'center',
   },
   headerText: {
@@ -153,59 +160,84 @@ const styles = StyleSheet.create({
   infoBox: {
     backgroundColor: '#FFFFFF',
     padding: 16,
-    margin: 16,
+    margin: 20,
     borderRadius: 8,
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 6,
     elevation: 3,
+    alignItems: 'center',
   },
-  infoTitle: {
-    fontSize: 14,
-    color: '#888',
-    marginTop: 8,
-  },
-  picker: {
-    height: 50,
-    width: '100%',
-  },
-  pickerItem: {
-    color: '#000', // 선택된 텍스트 색상을 검정색으로 설정
-    fontSize: 16,   // 필요에 따라 폰트 크기 조정
-  },
-  timePickerContainer: {
-    flexDirection: 'row',  // 시/분 선택을 위한 컨테이너 추가
+  locationSection: {
+    flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 8,
+    width: '80%',
+    marginBottom: 20,
   },
-  dateButton: {
-    backgroundColor: '#f0f0f0',
-    padding: 10,
-    borderRadius: 5,
-    marginTop: 8,
+  locationLabel: {
+    fontSize: 15,
+    color: '#888',
   },
-  dateText: {
-    fontSize: 16,
-    color: '#000',
-  },
-  peopleContainer: {
+  locationSelector: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 8,
+    marginBottom: 100,
   },
-  peopleButton: {
-    backgroundColor: '#A99CE3',
-    padding: 10,
+  routeText: {
+    fontSize: 30,
+    color: '#6B59CC',
+    fontWeight: 'bold',
+  },
+  arrow: {
+    fontSize: 30,
+    color: '#6B59CC',
+    marginHorizontal: 8,
+  },
+  modalView: {
+    marginHorizontal: 20,
+    marginVertical: 80,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    paddingVertical: 35,
+    paddingHorizontal: 20,
+    alignItems: 'stretch',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  item: {
+    backgroundColor: 'white',
+    padding: 15,
+    marginVertical: 5,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  separator: {
+    height: 1,
+    backgroundColor: '#eee',
+  },
+  dateTimeRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '80%',
+    marginTop: 15,
+  },
+  dateTimeButton: {
+    backgroundColor: '#FFFFFF',
+  //  padding: 10,
     borderRadius: 5,
-    marginHorizontal: 10,
+   // flex: 1,
+    marginHorizontal: 5,
+    alignItems: 'center',
   },
-  peopleButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-  },
-  peopleText: {
-    fontSize: 16,
-    color: '#000',
+  dateText: {
+    fontSize: 25,
+    color: '#6B59CC',
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -218,11 +250,12 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 8,
+    width: '40%',
+    alignItems: 'center',
   },
   buttonText: {
     color: '#FFFFFF',
     fontSize: 16,
-    textAlign: 'center',
   },
 });
 

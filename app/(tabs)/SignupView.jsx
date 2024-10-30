@@ -21,7 +21,7 @@ const SignupView = () => {
       Alert.alert('회원가입 오류', error.message); // 에러 발생 시 Alert 표시
     }
   };
-
+  
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Passenger Together.</Text>
