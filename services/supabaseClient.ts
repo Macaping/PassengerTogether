@@ -1,14 +1,18 @@
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { createClient } from '@supabase/supabase-js'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { createClient } from '@supabase/supabase-js';
+import { Platform } from 'react-native';
 
 const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL || '';
-const SUPABASE_ANON_KEY= process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '';
+const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '';
 
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    auth: {
-      storage: AsyncStorage,
-      autoRefreshToken: true,
-      persistSession: true,
-      detectSessionInUrl: false,
-    },
-  })
+// 환경이 웹인 경우에는 auth 옵션을 제외합니다.
+const options = Platform.OS === 'web' ? {} : {
+  auth: {
+    storage: AsyncStorage,
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: false,
+  },
+};
+
+export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, options);
