@@ -110,12 +110,12 @@ const RoomDetailModal = ({ visible, room, onClose, onJoin }: RoomDetailModalProp
                         <View style={modalStyles.messageContainer}>
                             <Text style={modalStyles.detailText}>상세사항</Text>
                             <Text style={modalStyles.messageText}>
-                                일단 만약 약속거면 알려줘 카톡으로,, 페이지 만들어진다..
+                                아무거나 내용 입력..
                             </Text>
                         </View>
 
                         <View style={modalStyles.inputContainer}>
-                            <Text style={modalStyles.inputLabel}>나의 오차범</Text>
+                            <Text style={modalStyles.inputLabel}>나의 옷차림</Text>
                             <TextInput
                                 style={modalStyles.input}
                                 placeholder="서로를 알아볼 수 있도록 자세히 입력해주세요."
