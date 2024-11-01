@@ -16,7 +16,6 @@ const LoginView = () => {
         return;
       }
       await handleSignIn(email, password);
-      router.push('/HomeView')
     } catch (error) {
       setErrorMessage('비밀번호가 일치하지 않습니다.');
     }
@@ -103,7 +102,11 @@ const styles = StyleSheet.create({
   errorText: {
     color: '#FF0000',
     fontSize: 12,
-    marginBottom: 12,
+    marginBottom: 24,
+    marginTop:-4,
+    width: '80%',
+    marginLeft:2,
+    textAlign: 'left',
   },
   loginButton: {
     width: '80%',
