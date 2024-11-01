@@ -3,6 +3,8 @@ import { View, Text, TouchableOpacity, StyleSheet, Modal, FlatList } from 'react
 import { Link } from 'expo-router';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { StatusBar } from 'react-native-web';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 
 const HomeView = () => {
   const locations = ['천안역', '천안아산역', '선문대', '탕정역'];
@@ -48,7 +50,7 @@ const HomeView = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <StatusBar style="light"/>
       <View style={styles.header}>
         <Text style={styles.headerText}>조회</Text>
@@ -124,7 +126,11 @@ const HomeView = () => {
       </View>
 
       <View style={styles.buttonContainer}>
-        <Link href="/RoomList" style={styles.button}>
+        <Link href={{
+          pathname:"/RoomList", 
+          params: { selectedDeparture, selectedDestination, date: date.toISOString()}
+        }}
+          style={styles.button}>
           <Text style={styles.buttonText}>방 탐색</Text>
         </Link>
 
@@ -138,7 +144,7 @@ const HomeView = () => {
           <Text style={styles.buttonText}>방장 하기</Text>
         </Link>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 

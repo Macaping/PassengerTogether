@@ -16,11 +16,19 @@ import {
     Keyboard
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from 'react-native-vector-icons';
+import { useLocalSearchParams } from 'expo-router';
+
 
 const Header = ({ origin, destination }: { origin: string, destination: string }) => (
     <View style={headerStyles.headerContainer}>
         <Text style={headerStyles.title}>방 리스트</Text>
-        <Text style={headerStyles.locationName}>{origin}  {'->'}  {destination}</Text>
+        <Text style={headerStyles.date}>10월 30일(월)</Text>
+        <View style={headerStyles.routeContainer}>
+            <Text style={headerStyles.locationName}>{origin}</Text>
+            <Ionicons name="arrow-forward" size={24} color="#ffffff" style={headerStyles.arrowIcon} />
+            <Text style={headerStyles.locationName}>{destination}</Text>
+        </View>
     </View>
 );
 
@@ -28,22 +36,50 @@ const headerStyles = StyleSheet.create({
     headerContainer: {
         alignItems: 'center',
         backgroundColor: '#6049E2',
-        padding: 30,
+        height: '22%'
     },
     title: {
-        fontSize: 24,
-        fontWeight: '900',
+        paddingTop: '1%' ,
+        fontSize: 20,
         color: '#ffffff',
-        bottom: 20,
+    },
+    date:{
+        color: '#ffffff',
+        fontSize:20,
+        paddingTop:'5%'
+    },
+
+    routeContainer: {
+        flexDirection: 'row',
+        alignItems: 'stretch',
+        justifyContent:'center',
+        paddingTop:'2%',
+        width: '90%',
+        paddingBottom:'5%'
+       
     },
     locationName: {
-        fontSize: 24,
+        fontSize: 30,
         color: '#ffffff',
-        fontWeight: '900',
+        fontWeight: '600',
+        alignItems: 'center',
+        
+         width: '40%',
+         textAlign:'center'
+
+    },
+    arrowIcon: {
+        marginHorizontal: 10, // 화살표와 텍스트 사이 간격
+        alignSelf:'center',
+        top:'1.5%'
+        
     },
 });
 
 const listStyles = StyleSheet.create({
+    indexContainer:{
+        flexDirection: 'row',
+    },
     listContainer: {
         flexGrow: 1,
     },
@@ -57,7 +93,7 @@ const listStyles = StyleSheet.create({
         position: "absolute",
         borderLeftWidth: 2,
         borderLeftColor: "#6049E2",
-        top: '0%',
+        top: '10%',
         left: '15.6%',
         height: '100%',
     }
@@ -234,7 +270,7 @@ const Item = ({ created_at, departure_time, limit_people, users, status,onPress 
             {new Date(departure_time).getHours().toString().padStart(2, '0')}:
             {new Date(departure_time).getMinutes().toString().padStart(2, '0')}</Text>
         {/* 방 번호 */}
-        <Text style={itemStyles.방_번호}>{"방 번호: "}{created_at.slice(-10, -6)}</Text>
+        <Text style={itemStyles.방_번호}>{created_at.slice(-10, -6)}</Text>
         {/* 현재인원/최대인원 */}
         <Text style={itemStyles.현재인원_최대인원}>{users ? users.length : '0'}/{limit_people}</Text>
         {/* <Text style={itemStyles.현재인원_최대인원}>방 상태: {status}</Text> */}
@@ -250,7 +286,8 @@ const itemStyles = StyleSheet.create({
         borderWidth: 0.5,
         borderColor: '#A594F9',
         borderRadius: 8,
-        padding: 16,
+        padding: 20,
+        top:36
     },
     시각: {
         color: '#6049E2',
@@ -268,13 +305,15 @@ const itemStyles = StyleSheet.create({
         color: '#000000',
         fontSize: 16,
         fontWeight: 'bold',
-    },
+        top:13,
+        left:5   },
 });
 
 export default function RoomList() {
     const { rooms, loading, error } = useLoadRooms();
     const [selectedRoom, setSelectedRoom] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
+    const { selectedDeparture = '기본 출발지', selectedDestination = '기본 도착지', date = new Date().toISOString() } = useLocalSearchParams();
 
     const handleRoomPress = (room) => {
         setSelectedRoom(room);
@@ -308,10 +347,18 @@ export default function RoomList() {
         // Todo: 디자인 검토 필요
         <SafeAreaView style={styles.container}>
             {/* Header 컴포넌트를 사용하여 화면 상단에 제목과 부제목을 표시합니다. */}
-            <Header origin="Everywhere" destination="Everywhere" />
+            <Header origin={selectedDeparture} destination={selectedDestination} />
             {/* FlatList 컴포넌트를 사용하여 방 목록을 표시합니다. */}
             <View style={styles.container}>
+                
                 <View style={listStyles.columnCrossline} />
+                <View style={listStyles.indexContainer}>
+                <Text>출발 시각</Text>
+                <Text>방 내용</Text>
+                <Text>인원수</Text>
+
+                </View>
+                
                 <FlatList
                     data={rooms}
                     // 컴포넌트 자체의 스타일을 정의합니다.
