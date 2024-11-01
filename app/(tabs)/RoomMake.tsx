@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, Modal, FlatList } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { createRoom } from '@/hooks/createRoom';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { useLocalSearchParams } from 'expo-router';
+import React, { useState } from 'react';
+import { FlatList, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 const RoomMake = () => {
   const { selectedDeparture = '기본 출발지', selectedDestination = '기본 도착지', date = new Date().toISOString() } = useLocalSearchParams();
@@ -60,6 +61,17 @@ const RoomMake = () => {
     }
   };
 
+  const handleCreateRoom = async () => {
+    await createRoom({
+      departure_time: selectedDate.toISOString(),
+      origin: departure,
+      destination: destination,
+      limit_people: numPassengers,
+      users: [],
+      details: details,
+    });
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -72,7 +84,7 @@ const RoomMake = () => {
           <Text style={styles.locationLabel}>출발</Text>
           <Text style={styles.locationLabel}>도착</Text>
         </View>
-        
+
         <View style={styles.locationSelectorRow}>
           <TouchableOpacity style={styles.locationButton} onPress={() => openLocationModal('departure')}>
             <Text style={styles.routeText}>{departure}</Text>
@@ -140,7 +152,7 @@ const RoomMake = () => {
       </View>
 
       {/* 방 만들기 버튼 */}
-      <TouchableOpacity style={styles.submitButton}>
+      <TouchableOpacity style={styles.submitButton} onPress={handleCreateRoom}>
         <Text style={styles.submitButtonText}>방만들기</Text>
       </TouchableOpacity>
     </View>
@@ -223,7 +235,7 @@ const styles = StyleSheet.create({
     //padding: 10,
     borderRadius: 5,
     alignItems: 'center',
-   // flex: 1,
+    // flex: 1,
     marginHorizontal: 5,
   },
   dateText: {
