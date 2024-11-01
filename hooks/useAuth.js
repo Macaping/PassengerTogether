@@ -37,7 +37,7 @@ const useAuth = () => {
             }
             setUser(user);
             console.log("회원가입 성공!", user);
-            router.push();
+            router.replace("./LoginView")
         } catch (error) {
             console.error("회원가입 오류:", error);
         }
