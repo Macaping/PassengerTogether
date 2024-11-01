@@ -12,6 +12,7 @@ const useAuth = () => {
             if (!data || !data.user) {  // data 또는 data.user가 없을 경우 처리
                 throw new Error("유효하지 않은 로그인 정보입니다.");
             }
+            router.replace("/(tabs)/")
             setUser(data.user);
         } catch (error) {
             console.error(error.message);
