@@ -18,7 +18,6 @@ const SignupView = () => {
 
     try {
       await handleSignUp(email, password, confirmPassword, nickname);
-      router.replace("./LoginView")
     } catch (error) {
       Alert.alert('회원가입 오류', error.message); // 에러 발생 시 Alert 표시
     }
