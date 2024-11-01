@@ -8,20 +8,18 @@ const useAuth = () => {
     //로그인 처리함수
     const handleSignIn = async (email, password) => {
         try {
-            const { data, error } = await signIn(email, password);
-            if (error) {
-                throw new Error(error.message);
+            const data = await signIn(email, password);
+            if (!data || !data.user) {  // data 또는 data.user가 없을 경우 처리
+                throw new Error("유효하지 않은 로그인 정보입니다.");
             }
             setUser(data.user);
-            console.log(data.user);
-            console.log("로그인 성공!");
         } catch (error) {
-            console.error(error);
+            console.error(error.message);
         }
     };
+    
     //회원가입 처리함수
     const handleSignUp = async (email, password, confirmPassword, nickname) => {
-        // 비밀번호 유효성 검사
         if (password !== confirmPassword) {
             Alert.alert('오류', '비밀번호가 일치하지 않습니다.');
             return;
@@ -33,18 +31,18 @@ const useAuth = () => {
         }
     
         try {
-            const { data, error } = await signUp(email, password, nickname);
+            const { user, error } = await signUp(email, password, nickname);
             if (error) {
                 throw new Error(error.message);
             }
-            setUser(data.user);
-            console.log(data.user);
-            console.log("회원가입 성공!");
-            router.push("/HomeView");
+            setUser(user);
+            console.log("회원가입 성공!", user);
+            router.push();
         } catch (error) {
-            console.error(error);
+            console.error("회원가입 오류:", error);
         }
     };
+    
     
     //비밀번호 특수문자 확인
     const isValidPassword = (password) => {
