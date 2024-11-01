@@ -1,12 +1,9 @@
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as Location from 'expo-location';
 import { Link } from 'expo-router';
-import { default as React, default as React, useEffect, useRef, useState } from 'react';
+import React, { default as React, default as React, useEffect, useRef, useState } from 'react';
 import { FlatList, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MapView, { Marker, Polyline } from 'react-native-maps';
-import { Link } from 'expo-router';
-import React, { useState } from 'react';
-import { FlatList, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { StatusBar } from 'react-native-web';
 
 const HomeView = () => {
