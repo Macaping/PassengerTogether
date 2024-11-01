@@ -1,11 +1,22 @@
-import React, { useState } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal, FlatList } from 'react-native';
 import { Link } from 'expo-router';
+import MapView, { Marker, Polyline } from 'react-native-maps';
+import * as Location from 'expo-location';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { StatusBar } from 'react-native-web';
 
 const HomeView = () => {
-  const locations = ['천안역', '천안아산역', '선문대', '탕정역'];
+  const locations = ['천안역', '천안아산역', '선문대', '탕정역', '두정동 롯데'];
+  const coordinates = {
+    '천안역': { latitude: 36.8089885, longitude: 127.148933 },
+    '천안아산역': { latitude: 36.7946071, longitude: 127.1045608 },
+    '선문대': { latitude: 36.7989764, longitude: 127.0750025 },
+    '탕정역': { latitude: 36.78827, longitude: 127.084638 },
+    '두정동 롯데': { latitude: 36.8261834, longitude: 127.1399744 },
+  };
+
+
   const [selectedDeparture, setSelectedDeparture] = useState(locations[0]);
   const [selectedDestination, setSelectedDestination] = useState(locations[1]);
   const [date, setDate] = useState(new Date());
@@ -13,6 +24,54 @@ const HomeView = () => {
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [changingLocationType, setChangingLocationType] = useState('departure');
+
+  const [location, setLocation] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null);
+  const [route, setRoute] = useState(null);
+  const [distance, setDistance] = useState(null);
+  const [duration, setDuration] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setErrorMsg('위치 권한이 거부되었습니다.');
+        return;
+      }
+      let currentLocation = await Location.getCurrentPositionAsync({});
+      if (currentLocation && currentLocation.coords) {
+        setLocation(currentLocation.coords);
+      } else {
+        setErrorMsg('위치를 가져오는 데 실패했습니다.');
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
+    fetchRouteData();
+  }, [selectedDeparture, selectedDestination]);
+
+  const fetchRouteData = async () => {
+    const departureCoord = coordinates[selectedDeparture];
+    const destinationCoord = coordinates[selectedDestination];
+
+    const MAP_KEY = process.env.EXPO_PUBLIC_MAP_KEY || '';  //길찾기 api 키 가져옴
+    const url = `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${MAP_KEY}&start=${departureCoord.longitude},${departureCoord.latitude}&end=${destinationCoord.longitude},${destinationCoord.latitude}`;
+
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+      const geometry = data.features[0].geometry.coordinates;
+      const polylineCoords = geometry.map(coord => ({ latitude: coord[1], longitude: coord[0] }));
+      setRoute(polylineCoords);
+
+      const summary = data.features[0].properties.summary;
+      setDistance(summary.distance / 1000); // distance in km
+      setDuration(summary.duration / 60); // duration in minutes
+    } catch (error) {
+      console.error('Error fetching route data:', error);
+    }
+  };
 
   const handleDateChange = (event, selectedDate) => {
     setShowDatePicker(false);
@@ -38,6 +97,8 @@ const HomeView = () => {
     setModalVisible(true);
   };
 
+  const mapRef = useRef(null);
+
   const handleLocationSelect = (location) => {
     if (changingLocationType === 'departure') {
       setSelectedDeparture(location);
@@ -45,22 +106,77 @@ const HomeView = () => {
       setSelectedDestination(location);
     }
     setModalVisible(false);
+
+    const selectedCoordinates = coordinates[location];
+    mapRef.current?.animateToRegion(
+      {
+        latitude: selectedCoordinates.latitude,
+        longitude: selectedCoordinates.longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      },
+      1000 // 애니메이션 지속 시간 (1초)
+    );
+
+
   };
 
   return (
     <View style={styles.container}>
-      <StatusBar style="light"/>
+      <StatusBar style="light" />
       <View style={styles.header}>
         <Text style={styles.headerText}>조회</Text>
       </View>
 
+      {/* 지도 상자 */}
+      <View style={styles.mapInfoBox}>
+        {location ? (
+          <MapView
+            ref={mapRef} // 지도 참조 추가
+            style={styles.map}
+            initialRegion={{
+              latitude: location.latitude,
+              longitude: location.longitude,
+              latitudeDelta: 0.05,
+              longitudeDelta: 0.05,
+            }}
+          >
+            <Marker
+              coordinate={{
+                latitude: coordinates[selectedDeparture].latitude,
+                longitude: coordinates[selectedDeparture].longitude,
+              }}
+              title="출발지"
+            />
+            <Marker
+              coordinate={{
+                latitude: coordinates[selectedDestination].latitude,
+                longitude: coordinates[selectedDestination].longitude,
+              }}
+              title="도착지"
+            />
+            {route && (
+              <Polyline
+                coordinates={route}
+                strokeColor="#6B59CC"
+                strokeWidth={4}
+              />
+            )}
+          </MapView>
+        ) : (
+          <View style={styles.loadingContainer}>
+            <Text>위치를 불러오는 중...</Text>
+            {errorMsg ? <Text>{errorMsg}</Text> : null}
+          </View>
+        )}
+      </View>
+
+      {/* 출발지 및 도착지 선택 상자 */}
       <View style={styles.infoBox}>
         <View style={styles.locationSection}>
           <Text style={styles.locationLabel}>출발</Text>
           <Text style={styles.locationLabel}>도착</Text>
         </View>
-
-        {/* 출발지와 도착지를 한 줄에 표시하면서 각각 선택 가능하게 설정 */}
         <View style={styles.locationSelector}>
           <TouchableOpacity onPress={() => openLocationModal('departure')}>
             <Text style={styles.routeText}>{selectedDeparture}</Text>
@@ -79,17 +195,19 @@ const HomeView = () => {
         >
           <View style={styles.modalView}>
             <FlatList
-              data={locations}
+              data={locations.filter(
+                item => (changingLocationType === 'departure' && item !== selectedDestination) ||
+                  (changingLocationType === 'destination' && item !== selectedDeparture)
+              )}
               keyExtractor={(item) => item}
               renderItem={({ item }) => (
                 <TouchableOpacity style={styles.item} onPress={() => handleLocationSelect(item)}>
-                  <Text style={styles.itemText}>
-                    {item}
-                  </Text>
+                  <Text style={styles.itemText}>{item}</Text>
                 </TouchableOpacity>
               )}
               ItemSeparatorComponent={() => <View style={styles.separator} />}
             />
+
           </View>
         </Modal>
 
@@ -121,6 +239,14 @@ const HomeView = () => {
             onChange={handleTimeChange}
           />
         )}
+
+        {/* 경로 정보 표시 */}
+        {distance && duration && (
+          <View style={styles.routeInfo}>
+            <Text>거리: {distance.toFixed(2)} km</Text>
+            <Text>소요 시간: {duration.toFixed(2)} 분</Text>
+          </View>
+        )}
       </View>
 
       <View style={styles.buttonContainer}>
@@ -131,7 +257,7 @@ const HomeView = () => {
         <Link
           href={{
             pathname: '/RoomMake',
-            params: { selectedDeparture, selectedDestination, date: date.toISOString() }
+            params: { selectedDeparture, selectedDestination, date: date.toISOString() },
           }}
           style={styles.button}
         >
@@ -157,11 +283,24 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
+  mapInfoBox: {
+    height: 300, // 지도 높이 조정
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 10,
+    overflow: 'hidden',
+    //  margin: 16,
+  },
+  map: {
+    ...StyleSheet.absoluteFillObject,
+  },
   infoBox: {
     backgroundColor: '#FFFFFF',
-    padding: 16,
+    padding: 50,
     margin: 20,
     borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ccc',
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 6,
@@ -171,7 +310,7 @@ const styles = StyleSheet.create({
   locationSection: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: '80%',
+    width: '70%',
     marginBottom: 20,
   },
   locationLabel: {
@@ -181,7 +320,7 @@ const styles = StyleSheet.create({
   locationSelector: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 100,
+    marginBottom: 20,
   },
   routeText: {
     fontSize: 30,
@@ -194,18 +333,11 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
   },
   modalView: {
-    marginHorizontal: 20,
-    marginVertical: 80,
-    backgroundColor: 'white',
-    borderRadius: 20,
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     paddingVertical: 35,
     paddingHorizontal: 20,
     alignItems: 'stretch',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
   },
   item: {
     backgroundColor: 'white',
@@ -219,21 +351,25 @@ const styles = StyleSheet.create({
   },
   separator: {
     height: 1,
-    backgroundColor: '#eee',
+  },
+  infoTitle: {
+    marginTop: 16,
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: '#888',
   },
   dateTimeRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    //  justifyContent: 'space-between',
+    justifyContent: 'center',
     width: '80%',
     marginTop: 15,
   },
   dateTimeButton: {
     backgroundColor: '#FFFFFF',
-  //  padding: 10,
     borderRadius: 5,
-   // flex: 1,
-    marginHorizontal: 5,
-    alignItems: 'center',
+    marginHorizontal: 10,
+
   },
   dateText: {
     fontSize: 25,
@@ -242,20 +378,28 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginTop: 16,
-    marginHorizontal: 16,
+    //  marginTop: 16,
+    //  marginHorizontal: 16,
   },
   button: {
     backgroundColor: '#A99CE3',
-    paddingVertical: 12,
+    paddingVertical: 20, //버튼 크기
     paddingHorizontal: 24,
     borderRadius: 8,
     width: '40%',
     alignItems: 'center',
+    paddingLeft: 40,
+
   },
   buttonText: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: 20,
+
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
