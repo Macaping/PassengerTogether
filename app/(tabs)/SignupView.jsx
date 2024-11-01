@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, TextInput, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import useAuth from '../../hooks/useAuth';
+import { router } from 'expo-router';
 
 const SignupView = () => {
   const [email, setEmail] = useState('');
@@ -17,6 +18,7 @@ const SignupView = () => {
 
     try {
       await handleSignUp(email, password, confirmPassword, nickname);
+      router.replace("./LoginView")
     } catch (error) {
       Alert.alert('회원가입 오류', error.message); // 에러 발생 시 Alert 표시
     }

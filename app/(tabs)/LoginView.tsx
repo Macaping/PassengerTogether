@@ -16,7 +16,12 @@ const LoginView = () => {
         return;
       }
       await handleSignIn(email, password);
-      router.push('/HomeView')
+      // if (router.canGoBack()) {
+      //   router.back();
+      // }
+      // else {
+      router.replace("/(tabs)/")
+      // }
     } catch (error) {
       setErrorMessage('비밀번호가 일치하지 않습니다.');
     }
