@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, TextInput, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import useAuth from '../../hooks/useAuth';
 import { router } from 'expo-router';
 
@@ -8,21 +8,35 @@ const SignupView = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [nickname, setNickname] = useState('');
-  const { handleSignUp } = useAuth(); // useAuth에서 handleSignUp 가져오기
+  const [errorMessage, setErrorMessage] = useState('');
+  const { handleSignUp } = useAuth();
 
   const handleSignup = async () => {
+    if (!email) {
+      setErrorMessage('이메일을 입력해주세요.');
+      return;
+    }
+    if (!password) {
+      setErrorMessage('비밀번호를 입력해주세요.');
+      return;
+    }
     if (password !== confirmPassword) {
-      Alert.alert('오류', '비밀번호가 일치하지 않습니다.');
+      setErrorMessage('비밀번호가 일치하지 않습니다.');
+      return;
+    }
+    if (!nickname) {
+      setErrorMessage('닉네임을 입력해주세요.');
       return;
     }
 
     try {
       await handleSignUp(email, password, confirmPassword, nickname);
+      setErrorMessage(''); // 성공 시 오류 메시지 초기화
     } catch (error) {
-      Alert.alert('회원가입 오류', error.message); // 에러 발생 시 Alert 표시
+      setErrorMessage('이미 회원가입된 이메일입니다.');
     }
   };
-  
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Passenger Together.</Text>
@@ -54,6 +68,8 @@ const SignupView = () => {
         value={nickname}
         onChangeText={setNickname}
       />
+
+      {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
 
       <TouchableOpacity style={styles.signupButton} onPress={handleSignup}>
         <Text style={styles.signupButtonText}>회원가입</Text>
@@ -93,6 +109,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginBottom: 12,
     backgroundColor: '#fff',
+  },
+  errorText: {
+    color: '#FF0000',
+    fontSize: 12,
+    marginBottom: 12,
+    textAlign: 'left',
+    width: '80%',
   },
   signupButton: {
     width: '80%',
