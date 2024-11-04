@@ -1,6 +1,6 @@
 import { supabase } from "@/services/supabaseClient";
 import { PostgrestError } from "@supabase/supabase-js";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const useLoadRooms = () => {
     const [loading, setLoading] = useState(false);
@@ -10,7 +10,10 @@ const useLoadRooms = () => {
     const fetchRooms = async () => {
         try {
             setLoading(true);
-            let { data, error } = await supabase.from("rooms").select("*");
+            // departure_time 순으로 가져오기
+            let { data, error } = await supabase.from("rooms")
+                .select("*")
+                .order("departure_time", { ascending: true });
 
             if (error) {
                 throw error;
