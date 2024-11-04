@@ -59,6 +59,19 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen //내정보 아이콘 추가
+        name="Mypage"
+        options={{
+          title: '내정보',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? 'person-circle' : 'person-circle-outline'} color={color} />
+          ),
+        }}
+      />
+
+
+
+
     </Tabs>
   );
 }
