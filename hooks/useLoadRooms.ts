@@ -27,7 +27,48 @@ const useLoadRooms = () => {
     };
 
     useEffect(() => {
+        // 리얼타임 데이터베이스 변경 감지
+        const channel = supabase
+            .channel("rooms")
+            .on("postgres_changes",
+                {
+                    event: "*",  // 모든 이벤트 감지 (INSERT, UPDATE, DELETE)
+                    schema: "public",
+                    table: "rooms"
+                },
+                (payload) => {
+                    if (payload.eventType === "INSERT") {
+                        setRooms((current) => {
+                            if (!current) return [payload.new];
+                            const newRooms = [...current, payload.new];
+                            // departure_time으로 정렬
+                            return newRooms.sort((a, b) => 
+                                new Date(a.departure_time).getTime() - new Date(b.departure_time).getTime()
+                            );
+                        });
+                    } 
+                    else if (payload.eventType === "DELETE") {
+                        setRooms((current) => 
+                            current ? current.filter(room => room.id !== payload.old.id) : null
+                        );
+                    }
+                    else if (payload.eventType === "UPDATE") {
+                        setRooms((current) => 
+                            current ? current.map(room => 
+                                room.id === payload.new.id ? payload.new : room
+                            ) : null
+                        );
+                    }
+                }
+            )
+            .subscribe();
+
         fetchRooms();
+
+        // Clean up on unmount
+        return () => {
+            channel.unsubscribe();
+        };
     }, []);
 
     return { loading, rooms, error };
