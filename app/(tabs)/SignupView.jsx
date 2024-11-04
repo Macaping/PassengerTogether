@@ -1,40 +1,17 @@
 import React, { useState } from 'react';
-import { View, TextInput, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import useAuth from '../../hooks/useAuth';
-import { router } from 'expo-router';
 
 const SignupView = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [nickname, setNickname] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
-  const { handleSignUp } = useAuth();
+  const { handleSignUp, errorMessage } = useAuth();
+  
 
   const handleSignup = async () => {
-    if (!email) {
-      setErrorMessage('이메일을 입력해주세요.');
-      return;
-    }
-    if (!password) {
-      setErrorMessage('비밀번호를 입력해주세요.');
-      return;
-    }
-    if (password !== confirmPassword) {
-      setErrorMessage('비밀번호가 일치하지 않습니다.');
-      return;
-    }
-    if (!nickname) {
-      setErrorMessage('닉네임을 입력해주세요.');
-      return;
-    }
-
-    try {
-      await handleSignUp(email, password, confirmPassword, nickname);
-      setErrorMessage(''); // 성공 시 오류 메시지 초기화
-    } catch (error) {
-      setErrorMessage('이미 회원가입된 이메일입니다.');
-    }
+    await handleSignUp(email, password, confirmPassword, nickname);
   };
 
   return (

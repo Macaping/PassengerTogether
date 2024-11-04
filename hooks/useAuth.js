@@ -1,30 +1,30 @@
 import { router } from "expo-router";
-import { checkEmailExists, signIn, signOut, signUp } from "../services/auth";
-import { Alert } from 'react-native';
 import { useState } from "react";
-import { LogBox } from 'react-native';
-
-LogBox.ignoreLogs(['Error during sign-in: Invalid login credentials']); // 특정 오류 메시지 무시
+import { checkEmailExists, signIn, signOut, signUp } from "../services/auth";
 
 const useAuth = () => {
     const [user, setUser] = useState(null);
-    //로그인 처리함수
+    const [errorMessage, setErrorMessage] = useState(''); // 오류 메시지 상태 추가
+    //로그인
     const handleSignIn = async (email, password) => {
         try {
+            if (!email || !password) {
+                setErrorMessage('이메일과 비밀번호를 입력해주세요.');
+                return;
+            }
             const { data, error } = await signIn(email, password);
             if (error || !data?.user) {
-                setErrorMessage("유효하지 않은 로그인 정보입니다.");
+                setErrorMessage("이메일 또는 비밀번호가 일치하지 않습니다.");
                 return;
             }
             setUser(data.user);
+            setErrorMessage(''); // 성공 시 오류 메시지 초기화
             router.replace("/(tabs)/");
         } catch (error) {
             setErrorMessage("로그인에 실패했습니다.");
         }
     };
-    
-    
-    //회원가입 처리함수
+    //회원가입
     const handleSignUp = async (email, password, confirmPassword, nickname) => {
         if (password !== confirmPassword) {
             setErrorMessage('비밀번호가 일치하지 않습니다.');
@@ -36,7 +36,6 @@ const useAuth = () => {
             return;
         }
     
-        // 이메일 중복 확인
         const emailExists = await checkEmailExists(email);
         if (emailExists) {
             setErrorMessage('이미 사용 중인 이메일입니다.');
@@ -49,6 +48,7 @@ const useAuth = () => {
                 throw new Error(error.message);
             }
             setUser(user);
+            setErrorMessage(''); // 성공 시 오류 메시지 초기화
             console.log("회원가입 성공!");
             router.replace("./LoginView");
         } catch (error) {
@@ -56,14 +56,12 @@ const useAuth = () => {
             console.error("회원가입 오류:", error);
         }
     };
-    
-    
-    //비밀번호 특수문자 확인
+
     const isValidPassword = (password) => {
         const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
         return passwordRegex.test(password);
-      };
-    //로그아웃 함수
+    };
+    //로그아웃
     const handleSignOut = async () => {
         try {
             await signOut();
@@ -74,8 +72,8 @@ const useAuth = () => {
             console.error(error);
         }
     };
-    //기능들을 외부로 내보내주는 것
-    return { user, handleSignIn, handleSignUp, handleSignOut };
+
+    return { user, errorMessage, handleSignIn, handleSignUp, handleSignOut };
 };
 
 export default useAuth;
