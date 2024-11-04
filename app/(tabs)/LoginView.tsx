@@ -6,20 +6,12 @@ import { router } from 'expo-router';
 const LoginView = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
-  const { handleSignIn } = useAuth(); // Destructure handleSignIn from useAuth
+  const { handleSignIn, errorMessage } = useAuth();
 
   const onPressed = async () => {
-    try {
-      if (!email || !password) {
-        setErrorMessage('이메일과 비밀번호를 입력해주세요.');
-        return;
-      }
-      await handleSignIn(email, password);
-    } catch (error) {
-      setErrorMessage('비밀번호가 일치하지 않습니다.');
-    }
+    await handleSignIn(email, password);
   };
+
 
   return (
     <View style={styles.container}>
@@ -103,9 +95,9 @@ const styles = StyleSheet.create({
     color: '#FF0000',
     fontSize: 12,
     marginBottom: 24,
-    marginTop:-4,
+    marginTop: -4,
     width: '80%',
-    marginLeft:2,
+    marginLeft: 2,
     textAlign: 'left',
   },
   loginButton: {

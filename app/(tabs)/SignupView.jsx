@@ -1,28 +1,19 @@
 import React, { useState } from 'react';
-import { View, TextInput, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import useAuth from '../../hooks/useAuth';
-import { router } from 'expo-router';
 
 const SignupView = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [nickname, setNickname] = useState('');
-  const { handleSignUp } = useAuth(); // useAuth에서 handleSignUp 가져오기
+  const { handleSignUp, errorMessage } = useAuth();
+  
 
   const handleSignup = async () => {
-    if (password !== confirmPassword) {
-      Alert.alert('오류', '비밀번호가 일치하지 않습니다.');
-      return;
-    }
-
-    try {
-      await handleSignUp(email, password, confirmPassword, nickname);
-    } catch (error) {
-      Alert.alert('회원가입 오류', error.message); // 에러 발생 시 Alert 표시
-    }
+    await handleSignUp(email, password, confirmPassword, nickname);
   };
-  
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Passenger Together.</Text>
@@ -54,6 +45,8 @@ const SignupView = () => {
         value={nickname}
         onChangeText={setNickname}
       />
+
+      {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
 
       <TouchableOpacity style={styles.signupButton} onPress={handleSignup}>
         <Text style={styles.signupButtonText}>회원가입</Text>
@@ -93,6 +86,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginBottom: 12,
     backgroundColor: '#fff',
+  },
+  errorText: {
+    color: '#FF0000',
+    fontSize: 12,
+    marginBottom: 12,
+    textAlign: 'left',
+    width: '80%',
   },
   signupButton: {
     width: '80%',
