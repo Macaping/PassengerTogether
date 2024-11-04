@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import useUserDataManagement from '../../hooks/userDataManagement';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width, height } = Dimensions.get('window');
 
@@ -16,12 +17,15 @@ const RoomDetailView = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.ticketContainer}>
         <View style={styles.ticketHeader}>
           <Text style={styles.ticketId}>{room.id}</Text>
         </View>
-        <Text style={styles.time}>출발 시간: {new Date(room.departure_time).toLocaleString()}</Text>
+        <View style={styles.timeContainer}>
+          <Text style={styles.time}>출발 날짜: {new Date(room.departure_time).toLocaleDateString()}</Text>
+          <Text style={styles.time}>출발 시간: {new Date(room.departure_time).toLocaleTimeString()}</Text>
+        </View>
         <View style={styles.routeContainer}>
           <View style={styles.stationContainer}>
             <Text style={styles.stationTitle}>출발</Text>
@@ -32,10 +36,9 @@ const RoomDetailView = () => {
             <Text style={styles.station}>{room.destination}</Text>
           </View>
         </View>
-
         <Text style={styles.passengerCount}>
           인원수: {room.users.length}/{room.limit_people}
-        </Text> 
+        </Text>
 
         <View style={styles.detailsContainer}>
           <Text style={styles.detailsLabel}></Text>
@@ -43,7 +46,7 @@ const RoomDetailView = () => {
             <Text style={styles.detailsText}>{room.details}</Text>
           </View>
         </View>
-        
+
         <View style={styles.separatorContainer}>
           <View style={styles.dottedLine} />
           <View style={styles.leftCircle} />
@@ -62,7 +65,7 @@ const RoomDetailView = () => {
           </TouchableOpacity>
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -74,7 +77,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#e0f0ff',
   },
   ticketContainer: {
-    width: width * 0.9,
+    width: width * 0.92,
     height: height * 0.8,
     padding: width * 0.05,
     borderRadius: width * 0.02,
@@ -82,7 +85,7 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   ticketHeader: {
-    backgroundColor: '#f8d7da',
+    backgroundColor: '#CDC1FF',
     borderTopLeftRadius: width * 0.02,
     borderTopRightRadius: width * 0.02,
     paddingVertical: height * 0.01,
@@ -100,10 +103,13 @@ const styles = StyleSheet.create({
     marginLeft: width * 0.025,
     color: '#333',
   },
-  time: {
-    fontSize: width * 0.05,
+  timeContainer: {
+    alignItems: 'center',
     marginTop: height * 0.1,
     marginBottom: height * 0.05,
+  },
+  time: {
+    fontSize: width * 0.05,
     color: '#555',
     textAlign: 'center',
   },
