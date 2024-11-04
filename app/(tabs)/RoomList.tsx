@@ -13,11 +13,15 @@ import {
     Platform,
     KeyboardAvoidingView,
     TouchableWithoutFeedback,
-    Keyboard
+    Keyboard,
+    Dimensions
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from 'react-native-vector-icons';
 import { useLocalSearchParams } from 'expo-router';
+
+const { width, height } = Dimensions.get('window');  
+
 
 
 const Header = ({ origin, destination }: { origin: string, destination: string }) => (
@@ -76,28 +80,7 @@ const headerStyles = StyleSheet.create({
     },
 });
 
-const listStyles = StyleSheet.create({
-    indexContainer:{
-        flexDirection: 'row',
-    },
-    listContainer: {
-        flexGrow: 1,
-    },
-    contentContainer: {
-        padding: 16,
-    },
-    separator: {
-        height: 16,
-    },
-    columnCrossline: {
-        position: "absolute",
-        borderLeftWidth: 2,
-        borderLeftColor: "#6049E2",
-        top: '10%',
-        left: '15.6%',
-        height: '100%',
-    }
-});
+
 type Room = {
     created_at: string;
     departure_time: Date;
@@ -266,6 +249,8 @@ const modalStyles = StyleSheet.create({
 const Item = ({ created_at, departure_time, limit_people, users, status,onPress  }: { created_at: string, departure_time: Date, limit_people: number, users: string[], status: string,onPress: () => void }) => (
     <TouchableOpacity onPress={onPress} style={itemStyles.container}>
         {/* 출발 시각 00:00으로 표현 */}
+        <View style={itemStyles.header}>
+        </View>
         <Text style={itemStyles.시각}>
             {new Date(departure_time).getHours().toString().padStart(2, '0')}:
             {new Date(departure_time).getMinutes().toString().padStart(2, '0')}</Text>
@@ -281,14 +266,25 @@ const itemStyles = StyleSheet.create({
     container: {
         flex: 1,
         flexDirection: 'row',
-        justifyContent: 'center',
+        justifyContent: 'space-between',
         backgroundColor: '#ffffff',
         borderWidth: 0.5,
         borderColor: '#A594F9',
         borderRadius: 8,
         padding: 20,
-        top:36
+        top:'-4%'  
     },
+    header: {
+        backgroundColor: '#A594F9',
+        position: 'absolute',
+        top: 0,
+        bottom: 0,  // 추가
+        left: 0,
+        width: '3%',
+        borderTopLeftRadius: 8,  // borderRadius 값을 container와 맞춤
+        borderBottomLeftRadius: 8,  // 하단 왼쪽도 둥글게 처리
+    },
+
     시각: {
         color: '#6049E2',
         fontSize: 20,
@@ -313,7 +309,8 @@ export default function RoomList() {
     const { rooms, loading, error } = useLoadRooms();
     const [selectedRoom, setSelectedRoom] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
-    const { selectedDeparture = '기본 출발지', selectedDestination = '기본 도착지', date = new Date().toISOString() } = useLocalSearchParams();
+    const { selectedDeparture = '출발지', selectedDestination = '도착지', date = new Date().toISOString() } = useLocalSearchParams();
+    
 
     const handleRoomPress = (room) => {
         setSelectedRoom(room);
@@ -350,15 +347,16 @@ export default function RoomList() {
             <Header origin={selectedDeparture} destination={selectedDestination} />
             {/* FlatList 컴포넌트를 사용하여 방 목록을 표시합니다. */}
             <View style={styles.container}>
-                
                 <View style={listStyles.columnCrossline} />
+
                 <View style={listStyles.indexContainer}>
-                <Text>출발 시각</Text>
-                <Text>방 내용</Text>
-                <Text>인원수</Text>
+                <Text style={listStyles.indexText}>출발 시각</Text>
+                <Text style={listStyles.indexText}>방 내용</Text>
+                <Text style={listStyles.indexText}>인원수</Text>
 
                 </View>
-                
+                <View style={listStyles.Container}>
+           
                 <FlatList
                     data={rooms}
                     // 컴포넌트 자체의 스타일을 정의합니다.
@@ -380,6 +378,7 @@ export default function RoomList() {
                     )}
                     keyExtractor={item => item.id}
                 />
+                </View>
             </View>
             <RoomDetailModal
                 visible={modalVisible}
@@ -396,4 +395,43 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#f0f0f0',
     },
+});
+const listStyles = StyleSheet.create({
+    Container:{
+        flex:1,
+        
+    },
+    
+    indexContainer:{
+        flexDirection: 'row',
+        justifyContent:'space-around',
+        paddingTop:'1%',
+        // borderBottomWidth: 1, 
+        paddingBottom:'1%',
+
+    },
+    indexText:{
+        color:"#747474"
+    },
+    listContainer: {
+        flexGrow: 1,
+        
+        
+    },
+    contentContainer: {
+        padding: 16,
+      
+    },
+    separator: {
+        height: 16,
+    },
+    columnCrossline: {
+        position: "absolute",
+        borderLeftWidth: 2,
+        borderLeftColor: "#6049E2",
+        top: '5.6%',
+        left: '15.6%',
+        height: '100%',
+      
+    }
 });
