@@ -254,11 +254,12 @@ const HomeView = () => {
       <View style={styles.buttonContainer}>
         <Link href={{
           pathname:"/RoomList", 
-          params: { selectedDeparture, selectedDestination, date: date.toISOString()}
+          params: { selectedDeparture, selectedDestination, date: date.toISOString() }
         }}
           style={styles.button}>
           <Text style={styles.buttonText}>방 탐색</Text>
         </Link>
+        
 
         <Link
           href={{
@@ -290,6 +291,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   mapInfoBox: {
+    flex:3,
     height: 300, // 지도 높이 조정
     borderWidth: 1,
     borderColor: '#ccc',
@@ -382,6 +384,7 @@ const styles = StyleSheet.create({
     color: '#6B59CC',
   },
   buttonContainer: {
+    flex:1,
     flexDirection: 'row',
     justifyContent: 'space-around',
     //  marginTop: 16,

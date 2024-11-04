@@ -24,10 +24,10 @@ const { width, height } = Dimensions.get('window');
 
 
 
-const Header = ({ origin, destination }: { origin: string, destination: string }) => (
+const Header = ({ origin, destination,today }) => (
     <View style={headerStyles.headerContainer}>
         <Text style={headerStyles.title}>방 리스트</Text>
-        <Text style={headerStyles.date}>10월 30일(월)</Text>
+        <Text style={headerStyles.date}>{today}</Text>
         <View style={headerStyles.routeContainer}>
             <Text style={headerStyles.locationName}>{origin}</Text>
             <Ionicons name="arrow-forward" size={24} color="#ffffff" style={headerStyles.arrowIcon} />
@@ -48,18 +48,19 @@ const headerStyles = StyleSheet.create({
         color: '#ffffff',
     },
     date: {
+        width:'80%',
         color: '#ffffff',
         fontSize: 20,
-        paddingTop: '5%'
+        paddingTop: '6%'
     },
 
     routeContainer: {
         flexDirection: 'row',
         alignItems: 'stretch',
         justifyContent: 'center',
-        paddingTop: '2%',
+        // paddingTop: '2%',
         width: '90%',
-        paddingBottom: '5%'
+        // paddingBottom: '5%'
 
     },
     locationName: {
@@ -77,6 +78,12 @@ const headerStyles = StyleSheet.create({
         alignSelf: 'center',
         top: '1.5%'
 
+    },
+    headerContainerWithModal: {
+        alignItems: 'center',
+        backgroundColor: '#6049E2',
+        height: '22%',
+        zIndex: 1, // 모달 오버레이 아래에 위치하도록 설정
     },
 });
 
@@ -135,17 +142,7 @@ const RoomDetailModal = ({ visible, room, onClose, onJoin }: RoomDetailModalProp
                             </Text>
                         </View>
 
-                        <View style={modalStyles.inputContainer}>
-                            <Text style={modalStyles.inputLabel}>나의 옷차림</Text>
-                            <TextInput
-                                style={modalStyles.input}
-                                placeholder="서로를 알아볼 수 있도록 자세히 입력해주세요."
-                                multiline={true}
-                                numberOfLines={3}
-                                placeholderTextColor="#999"
-                            />
-                        </View>
-
+                   
                         <TouchableOpacity
                             style={modalStyles.joinButton}
                             onPress={onJoin}
@@ -172,7 +169,7 @@ const modalStyles = StyleSheet.create({
         borderTopRightRadius: 24,
         paddingHorizontal: 20,
         paddingBottom: Platform.OS === 'ios' ? 40 : 20,
-        height: '80%',
+        height: '50%',
     },
     handleBar: {
         width: 40,
@@ -215,25 +212,7 @@ const modalStyles = StyleSheet.create({
         color: '#666666',
         lineHeight: 20,
     },
-    inputContainer: {
-        marginBottom: 24,
-    },
-    inputLabel: {
-        fontSize: 18,
-        fontWeight: '600',
-        marginBottom: 12,
-        color: '#000000',
-    },
-    input: {
-        borderWidth: 1,
-        borderColor: '#E0E0E0',
-        borderRadius: 12,
-        padding: 16,
-        height: 120,
-        textAlignVertical: 'top',
-        fontSize: 14,
-        backgroundColor: '#FFFFFF',
-    },
+    
     joinButton: {
         backgroundColor: '#6049E2',
         padding: 16,
@@ -314,7 +293,15 @@ export default function RoomList() {
     const { rooms, loading, error } = useLoadRooms();
     const [selectedRoom, setSelectedRoom] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
-    const { selectedDeparture = '출발지', selectedDestination = '도착지', date = new Date().toISOString() } = useLocalSearchParams();
+    const { selectedDeparture = '출발지', selectedDestination = '도착지',  date} = useLocalSearchParams();
+    const parsedDate = date ? new Date(date) : new Date();
+    const formattedDate = parsedDate.toLocaleDateString('ko-KR', {
+        month: 'long',  
+        day: 'numeric',
+        weekday: 'short' 
+    });
+    
+
 
 
     const handleRoomPress = (room) => {
@@ -350,8 +337,14 @@ export default function RoomList() {
     return (
         <SafeAreaView style={styles.container}>
             {/* Header 컴포넌트를 사용하여 화면 상단에 제목과 부제목을 표시합니다. */}
-            <Header origin={selectedDeparture} destination={selectedDestination} />
+            <Header origin={selectedDeparture} destination={selectedDestination}  today={formattedDate} />
             {/* FlatList 컴포넌트를 사용하여 방 목록을 표시합니다. */}
+            <RoomDetailModal
+                visible={modalVisible}
+                room={selectedRoom}
+                onClose={() => setModalVisible(false)}
+                onJoin={() => handleJoinRoom(selectedRoom)}
+            />
             <View style={listStyles.indexContainer}>
                     <Text style={listStyles.indexText}>출발 시각</Text>
                     <Text style={listStyles.indexText}>방 내용</Text>
@@ -387,12 +380,7 @@ export default function RoomList() {
                     />
                 </View>
             </View>
-            <RoomDetailModal
-                visible={modalVisible}
-                room={selectedRoom}
-                onClose={() => setModalVisible(false)}
-                onJoin={() => handleJoinRoom(selectedRoom)}
-            />
+
         </SafeAreaView>
     );
 }
