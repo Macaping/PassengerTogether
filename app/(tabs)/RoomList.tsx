@@ -352,15 +352,16 @@ export default function RoomList() {
             {/* Header 컴포넌트를 사용하여 화면 상단에 제목과 부제목을 표시합니다. */}
             <Header origin={selectedDeparture} destination={selectedDestination} />
             {/* FlatList 컴포넌트를 사용하여 방 목록을 표시합니다. */}
-            <View style={styles.container}>
-                <View style={listStyles.columnCrossline} />
-
-                <View style={listStyles.indexContainer}>
+            <View style={listStyles.indexContainer}>
                     <Text style={listStyles.indexText}>출발 시각</Text>
                     <Text style={listStyles.indexText}>방 내용</Text>
                     <Text style={listStyles.indexText}>인원수</Text>
 
                 </View>
+            <View style={styles.container}>
+                <View style={listStyles.columnCrossline} />
+
+               
                 <View style={listStyles.Container}>
 
                     <FlatList
