@@ -1,4 +1,5 @@
 import { createRoom } from '@/hooks/createRoom';
+import useJoinRoom from '@/hooks/useJoinRoom';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
@@ -62,7 +63,8 @@ const RoomMake = () => {
   };
 
   const handleCreateRoom = async () => {
-    await createRoom({
+    // 방 생성
+    const roomData = await createRoom({
       departure_time: selectedDate.toISOString(),
       origin: departure,
       destination: destination,
@@ -70,6 +72,8 @@ const RoomMake = () => {
       users: [],
       details: details,
     });
+    // 방 생성한 사람이 방에 참가
+    await useJoinRoom(roomData.id);
   };
 
   return (
