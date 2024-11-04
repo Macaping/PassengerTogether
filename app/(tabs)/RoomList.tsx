@@ -43,7 +43,7 @@ const headerStyles = StyleSheet.create({
         height: '22%'
     },
     title: {
-        paddingTop: '1%',
+        paddingTop: '2%',
         fontSize: 20,
         color: '#ffffff',
     },
@@ -270,11 +270,12 @@ const itemStyles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         backgroundColor: '#ffffff',
+        alignItems:'center',
         borderWidth: 0.5,
         borderColor: '#A594F9',
         borderRadius: 8,
         padding: 20,
-        top: '-4%'
+        top:'-4%'  
     },
     header: {
         backgroundColor: '#A594F9',
@@ -282,7 +283,7 @@ const itemStyles = StyleSheet.create({
         top: 0,
         bottom: 0,  // 추가
         left: 0,
-        width: '3%',
+        width: '2%',
         borderTopLeftRadius: 8,  // borderRadius 값을 container와 맞춤
         borderBottomLeftRadius: 8,  // 하단 왼쪽도 둥글게 처리
     },
@@ -293,19 +294,20 @@ const itemStyles = StyleSheet.create({
         fontWeight: 'bold',
     },
     방_번호: {
-        flex: 1,
+        width:'50%',
         textAlign: 'left',
         color: '#000000',
-        fontSize: 16,
-        marginLeft: 16,
+        fontSize: 20,
+        fontWeight:'500'
+        
     },
     현재인원_최대인원: {
         color: '#000000',
-        fontSize: 16,
-        fontWeight: 'bold',
-        top: 13,
-        left: 5
-    },
+        fontSize: 18,
+        fontWeight: '600',
+        right:'20%',
+        top:'3%'
+           },
 });
 
 export default function RoomList() {
@@ -433,8 +435,8 @@ const listStyles = StyleSheet.create({
         position: "absolute",
         borderLeftWidth: 2,
         borderLeftColor: "#6049E2",
-        top: '5.6%',
-        left: '15.6%',
+        top: '1%',
+        left: '17%',
         height: '100%',
 
     }
