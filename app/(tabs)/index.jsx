@@ -5,6 +5,8 @@ import React, { useRef, useEffect, useState } from 'react';
 import { FlatList, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import { StatusBar } from 'react-native-web';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 
 const HomeView = () => {
   const locations = ['천안역', '천안아산역', '선문대', '탕정역', '두정동 롯데'];
@@ -122,8 +124,8 @@ const HomeView = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <StatusBar style="light" />
+    <SafeAreaView style={styles.container}>
+      <StatusBar style="light"/>
       <View style={styles.header}>
         <Text style={styles.headerText}>조회</Text>
       </View>
@@ -250,7 +252,11 @@ const HomeView = () => {
       </View>
 
       <View style={styles.buttonContainer}>
-        <Link href="/RoomList" style={styles.button}>
+        <Link href={{
+          pathname:"/RoomList", 
+          params: { selectedDeparture, selectedDestination, date: date.toISOString()}
+        }}
+          style={styles.button}>
           <Text style={styles.buttonText}>방 탐색</Text>
         </Link>
 
@@ -264,7 +270,7 @@ const HomeView = () => {
           <Text style={styles.buttonText}>방장 하기</Text>
         </Link>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
