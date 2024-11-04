@@ -1,9 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const { width, height } = Dimensions.get('window');  // 화면 크기 가져오기
 
-const RoomDetailView = ({ navigation }) => {
+const RoomDetailView = () => {
   return (
     <View style={styles.container}>
       <View style={styles.ticketContainer}>
@@ -29,7 +29,7 @@ const RoomDetailView = ({ navigation }) => {
           <Text style={styles.detailsLabel}>세부사항</Text>
           <View style={styles.detailsBox} />
         </View>
-        
+
         {/* 점선 구간 */}
         <View style={styles.separatorContainer}>
           <View style={styles.dottedLine} />
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
   ticketId: {
     fontSize: width * 0.05,  // 화면 너비에 따른 텍스트 크기 조정
     fontWeight: 'bold',
-    marginLeft:10,
+    marginLeft: 10,
     color: '#333',
   },
   time: {
