@@ -1,90 +1,60 @@
 import { supabase } from "@/lib/supabase";
-import { AuthResponse, AuthTokenResponsePassword } from "@supabase/supabase-js";
+import { AuthError, AuthResponse, AuthTokenResponsePassword, PostgrestSingleResponse, User } from "@supabase/supabase-js";
 
-// 로그인 함수
-export const signIn = async (email: string, password: string): Promise<{ data?: any, error?: Error }> => {
-    try {
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) return { error: new Error(error.message) };
-        return { data };
-    } catch (error: unknown) {
-        if (error instanceof Error) {
-            console.error("Error during sign-in:", error.message);
-            return { error: new Error("로그인에 실패했습니다.") };
+// 로그인
+export async function signInWithEmail(email: string, password: string): Promise<User> {
+    return supabase.auth.signInWithPassword({ email: email, password: password }).then((value: AuthTokenResponsePassword) => {
+        if (value.error) {
+            throw value.error;
         }
-        return { error: new Error("Unknown error occurred") };
-    }
-};
+        return value.data.user;
+    });
+}
 
-// 회원가입 함수
-export const signUp = async (
-    email: string,
-    password: string,
-    nickname: string
-): Promise<{ user: any | null, error: Error | null }> => {
-    try {
-        const { data, error } = await supabase.auth.signUp({
-            email,
-            password,
+// 회원가입
+export async function signUpWithEmail(email: string, password: string, nickname: string): Promise<User> {
+    return supabase.from('users').select('nickname').eq('nickname', nickname)
+        // 닉네임 중복 체크
+        .then((value: PostgrestSingleResponse<{ nickname: any; }[]>) => {
+            if (value.error) {
+                throw value.error;
+            }
+            if (value.data.length > 0) {
+                throw new Error("이미 사용 중인 닉네임입니다. 다른 닉네임을 선택해주세요.");
+            }
+        })
+        // 회원가입
+        .then(() => {
+            return supabase.auth.signUp({ email: email, password: password })
+                .then((value: AuthResponse) => {
+                    if (value.error) {
+                        throw value.error;
+                    }
+                    return value.data.user;
+                })
+                .then((user: User | null) => {
+                    if (!user) {
+                        throw new Error("User is null");
+                    }
+                    // 닉네임 업데이트
+                    return supabase.from('users')
+                        .update({ nickname: nickname })
+                        .eq('user_id', user.id)
+                        .then((value) => {
+                            if (value.error) {
+                                throw value.error;
+                            }
+                            return user;
+                        });
+                });
         });
+}
 
-        if (error) throw new Error(error.message);
-
-        // 인증이 성공하면 users 테이블에 데이터 삽입
-        const user = data.user;
-        if (user) {
-            const { error: dbError } = await supabase
-                .from('users')
-                .insert([{
-                    user_id: user.id,
-                    nickname: nickname,
-                    leave_count: 0,
-                    followings: [],
-                    restriction_date: null,
-                    current_party: null,
-                    email: email,
-                }]);
-
-            if (dbError) throw new Error(dbError.message);
+// 로그아웃
+export async function signOut(): Promise<void> {
+    supabase.auth.signOut().then((value: { error: AuthError | null; }) => {
+        if (value.error) {
+            throw value.error;
         }
-
-        return { user, error: null };
-    } catch (error: unknown) {
-        if (error instanceof Error) {
-            return { user: null, error: new Error("회원가입에 실패했습니다.") };
-        }
-        return { user: null, error: new Error("Unknown error occurred") };
-    }
-};
-
-// 로그아웃 함수
-export const signOut = async (): Promise<void> => {
-    try {
-        await supabase.auth.signOut();
-    } catch (error: unknown) {
-        if (error instanceof Error) {
-            throw new Error("로그아웃에 실패했습니다.");
-        }
-        throw new Error("Unknown error occurred");
-    }
-};
-
-// 이메일 중복 확인 함수
-export const checkEmailExists = async (email: string): Promise<boolean> => {
-    try {
-        const { data, error } = await supabase
-            .from('users') // 'users' 테이블에서
-            .select('email') // 'email' 필드 선택
-            .eq('email', email); // 입력된 이메일과 일치하는 항목 조회
-
-        if (error) throw new Error(error.message);
-
-        // data가 비어 있지 않으면 중복된 이메일이 있는 것
-        return data.length > 0;
-    } catch (error: unknown) {
-        if (error instanceof Error) {
-            throw new Error(error.message);
-        }
-        throw new Error("Unknown error occurred");
-    }
-};
+    });
+}
