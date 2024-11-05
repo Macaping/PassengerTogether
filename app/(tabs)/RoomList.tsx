@@ -24,7 +24,7 @@ const { width, height } = Dimensions.get('window');
 
 
 
-const Header = ({ origin, destination,today }) => (
+const Header = ({ origin, destination,today }: { origin: string, destination: string, today:Date}) => (
     <View style={headerStyles.headerContainer}>
         <Text style={headerStyles.title}>방 리스트</Text>
         <Text style={headerStyles.date}>{today}</Text>
