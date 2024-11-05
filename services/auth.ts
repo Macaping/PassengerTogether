@@ -26,9 +26,9 @@ export const signUp = async (
             email,
             password,
         });
-        
+
         if (error) throw new Error(error.message);
-        
+
         // 인증이 성공하면 users 테이블에 데이터 삽입
         const user = data.user;
         if (user) {
@@ -41,6 +41,7 @@ export const signUp = async (
                     followings: [],
                     restriction_date: null,
                     current_party: null,
+                    email: email,
                 }]);
 
             if (dbError) throw new Error(dbError.message);
@@ -74,7 +75,7 @@ export const checkEmailExists = async (email: string): Promise<boolean> => {
             .from('users') // 'users' 테이블에서
             .select('email') // 'email' 필드 선택
             .eq('email', email); // 입력된 이메일과 일치하는 항목 조회
-        
+
         if (error) throw new Error(error.message);
 
         // data가 비어 있지 않으면 중복된 이메일이 있는 것

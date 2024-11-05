@@ -1,33 +1,49 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-
-const { width, height } = Dimensions.get('window');  // 화면 크기 가져오기
+import useUserDataManagement from '../../hooks/userDataManagement';
+import { SafeAreaView } from 'react-native-safe-area-context';
+const { width, height } = Dimensions.get('window');
 
 const RoomDetailView = () => {
+  const { room, fetchRoomDetails } = useUserDataManagement();
+
+  useEffect(() => {
+    fetchRoomDetails();
+  }, []);
+
+  if (!room) {
+    return <Text>로딩 중...</Text>;
+  }
+
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.ticketContainer}>
         <View style={styles.ticketHeader}>
-          <Text style={styles.ticketId}>123131654</Text>
+          <Text style={styles.ticketId}>{room.created_at.slice(-10, -6)}</Text>
         </View>
-        <Text style={styles.time}>출발 시간: 09월 30일 (월) 23:00</Text>
+        <View style={styles.timeContainer}>
+          <Text style={styles.time}>출발 날짜: {new Date(room.departure_time).toLocaleDateString()}</Text>
+          <Text style={styles.time}>출발 시간: {new Date(room.departure_time).toLocaleTimeString()}</Text>
+        </View>
         <View style={styles.routeContainer}>
           <View style={styles.stationContainer}>
             <Text style={styles.stationTitle}>출발</Text>
-            <Text style={styles.station}>천안역</Text>
+            <Text style={styles.station}>{room.origin}</Text>
           </View>
           <View style={styles.stationContainer}>
             <Text style={styles.stationTitle}>도착</Text>
-            <Text style={styles.station}>천안아산역</Text>
+            <Text style={styles.station}>{room.destination}</Text>
           </View>
         </View>
-
-        <Text style={styles.passengerCount}>인원수: 3/4</Text>
-
+        <Text style={styles.passengerCount}>
+          인원수: {room.users.length}/{room.limit_people}
+        </Text>
 
         <View style={styles.detailsContainer}>
-          <Text style={styles.detailsLabel}>세부사항</Text>
-          <View style={styles.detailsBox} />
+          <Text style={styles.detailsLabel}></Text>
+          <View style={styles.detailsBox}>
+            <Text style={styles.detailsText}>{room.details}</Text>
+          </View>
         </View>
 
         {/* 점선 구간 */}
@@ -49,7 +65,7 @@ const RoomDetailView = () => {
           </TouchableOpacity>
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -61,154 +77,157 @@ const styles = StyleSheet.create({
     backgroundColor: '#e0f0ff',
   },
   ticketContainer: {
-    width: width * 0.9,   // 화면 너비의 75%로 축소
-    height: height * 0.8,  // 화면 높이의 70%로 축소
-    padding: 20,
-    borderRadius: 10,
+    width: width * 0.92,
+    height: height * 0.8,
+    padding: width * 0.05,
+    borderRadius: width * 0.02,
     backgroundColor: '#fff',
-    position: 'relative',  // 상위 컨테이너에 상대적인 위치 설정
+    position: 'relative',
   },
   ticketHeader: {
-    backgroundColor: '#f8d7da',
-    borderTopLeftRadius: 10,  // 상단 왼쪽 모서리 둥글게
-    borderTopRightRadius: 10, // 상단 오른쪽 모서리 둥글게
-    paddingVertical: height * 0.01,  // 높이 조정
+    backgroundColor: '#CDC1FF',
+    borderTopLeftRadius: width * 0.02,
+    borderTopRightRadius: width * 0.02,
+    paddingVertical: height * 0.01,
     alignItems: 'flex-start',
-    position: 'absolute',  // 절대 위치
-    top: 0,  // 상단에 붙도록 설정
-    left: 0,  // 좌측 끝에 붙도록 설정
-    right: 0,  // 우측 끝에 붙도록 설정
-    borderBottomWidth: 1,  // 아래쪽에만 테두리 추가
-    borderColor: '#ddd',  // 테두리 색상
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    borderBottomWidth: 1,
+    borderColor: '#ddd',
   },
   ticketId: {
-    fontSize: width * 0.05,  // 화면 너비에 따른 텍스트 크기 조정
+    fontSize: width * 0.05,
     fontWeight: 'bold',
-    marginLeft: 10,
+    marginLeft: width * 0.025,
     color: '#333',
   },
+  timeContainer: {
+    alignItems: 'center',
+    marginTop: height * 0.1,
+    marginBottom: height * 0.05,
+  },
   time: {
-    height: '10%',
-    fontSize: width * 0.05,  // 화면 너비에 따른 텍스트 크기 조정
-    marginTop: '30%',
-    marginBottom: height * 0.05,  // 여백 비율 조정
+    fontSize: width * 0.05,
     color: '#555',
     textAlign: 'center',
   },
   routeContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: height * 0.015,  // 여백 비율 조정
+    marginBottom: height * 0.02,
   },
   stationContainer: {
     flex: 1,
     alignItems: 'center',
   },
   stationTitle: {
-    fontSize: width * 0.06,  // 화면 너비에 따른 텍스트 크기 조정
+    fontSize: width * 0.06,
     color: '#777',
-    marginBottom: height * 0.008,  // 여백 비율 조정
+    marginBottom: height * 0.01,
   },
   station: {
-    fontSize: width * 0.06,  // 화면 너비에 따른 텍스트 크기 조정
+    fontSize: width * 0.06,
     fontWeight: 'bold',
     color: '#333',
   },
   passengerCount: {
-    fontSize: width * 0.035,  // 화면 너비에 따른 텍스트 크기 조정
-    marginBottom: height * 0.03,  // 여백 비율 조정
+    fontSize: width * 0.035,
+    marginBottom: height * 0.03,
     color: '#333',
     textAlign: 'right',
   },
   detailsContainer: {
-    marginBottom: height * 0.03,  // 여백 비율 조정
+    marginBottom: height * 0.03,
   },
   detailsLabel: {
-    fontSize: width * 0.035,  // 화면 너비에 따른 텍스트 크기 조정
-    marginBottom: height * 0.015,  // 여백 비율 조정
+    fontSize: width * 0.035,
+    marginBottom: height * 0.015,
     color: '#777',
   },
   detailsBox: {
-    height: height * 0.12,  // 화면 높이에 따른 높이 조정
+    height: height * 0.12,
     borderWidth: 1,
     borderColor: '#ddd',
-    borderRadius: 5,
+    borderRadius: width * 0.02,
     backgroundColor: '#f9f9f9',
+    padding: width * 0.03,
+  },
+  detailsText: {
+    fontSize: width * 0.04,
+    color: '#333',
   },
   actionsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: height * 0.015,  // 여백 비율 조정
+    marginTop: height * 0.02,
   },
   completeButton: {
     flex: 2,
-    paddingVertical: height * 0.012,  // 화면 높이에 따른 패딩 감소
+    paddingVertical: height * 0.015,
     backgroundColor: '#5cb85c',
-    borderRadius: 5,
+    borderRadius: width * 0.02,
     alignItems: 'center',
-    marginRight: width * 0.015,  // 버튼 간의 간격 조정
+    marginRight: width * 0.015,
   },
   completeButtonText: {
     color: '#fff',
-    fontSize: width * 0.04,  // 화면 너비에 따른 텍스트 크기 조정
+    fontSize: width * 0.04,
   },
   passengerButton: {
     flex: 1,
-    paddingVertical: height * 0.012,  // 화면 높이에 따른 패딩 감소
+    paddingVertical: height * 0.015,
     backgroundColor: '#337ab7',
-    borderRadius: 5,
+    borderRadius: width * 0.02,
     alignItems: 'center',
-    marginHorizontal: width * 0.015,  // 버튼 간의 간격 조정
+    marginHorizontal: width * 0.015,
   },
   passengerButtonText: {
     color: '#fff',
-    fontSize: width * 0.04,  // 화면 너비에 따른 텍스트 크기 조정
+    fontSize: width * 0.04,
   },
   exitButton: {
     flex: 1,
-    paddingVertical: height * 0.012,  // 화면 높이에 따른 패딩 감소
+    paddingVertical: height * 0.015,
     backgroundColor: '#d9534f',
-    borderRadius: 5,
+    borderRadius: width * 0.02,
     alignItems: 'center',
-    marginLeft: width * 0.015,  // 버튼 간의 간격 조정
+    marginLeft: width * 0.015,
   },
   exitButtonText: {
     color: '#fff',
-    fontSize: width * 0.04,  // 화면 너비에 따른 텍스트 크기 조정
+    fontSize: width * 0.04,
   },
-
-  // 점선과 동그라미 스타일 수정
   separatorContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
-    marginBottom: height * 0.02,  // 여백 비율 조정
+    marginBottom: height * 0.02,
+    marginTop: height * 0.1,
   },
   dottedLine: {
     flex: 1,
     borderBottomWidth: 2,
     borderStyle: 'dashed',
     borderColor: '#C3C3C3',
-    zIndex: 1,  // 동그라미 뒤로 보내기
   },
   leftCircle: {
     position: 'absolute',
-    left: -45,  // 동그라미 위치 조정
-    width: 45,
-    height: 45,
+    left: -width * 0.1,
+    width: width * 0.1,
+    height: width * 0.1,
     backgroundColor: '#e0f0ff',
-    borderRadius: 25,  // 반원 형태
-    zIndex: 2,  // 점선 위로 오게 하기
+    borderRadius: width * 0.05,
   },
   rightCircle: {
     position: 'absolute',
-    right: -45,  // 동그라미 위치 조정
-    width: 45,
-    height: 45,
+    right: -width * 0.1,
+    width: width * 0.1,
+    height: width * 0.1,
     backgroundColor: '#e0f0ff',
-    borderRadius: 25,  // 반원 형태
-    zIndex: 2,  // 점선 위로 오게 하기
+    borderRadius: width * 0.05,
   },
 });
 
