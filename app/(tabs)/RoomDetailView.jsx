@@ -19,7 +19,7 @@ const RoomDetailView = () => {
     <SafeAreaView style={styles.container}>
       <View style={styles.ticketContainer}>
         <View style={styles.ticketHeader}>
-          <Text style={styles.ticketId}>{room.id}</Text>
+          <Text style={styles.ticketId}>{room.created_at.slice(-10, -6)}</Text>
         </View>
         <View style={styles.timeContainer}>
           <Text style={styles.time}>출발 날짜: {new Date(room.departure_time).toLocaleDateString()}</Text>
