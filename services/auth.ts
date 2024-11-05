@@ -1,4 +1,5 @@
-import { supabase } from "./supabaseClient";
+import { supabase } from "@/lib/supabase";
+import { AuthResponse, AuthTokenResponsePassword } from "@supabase/supabase-js";
 
 // 로그인 함수
 export const signIn = async (email: string, password: string): Promise<{ data?: any, error?: Error }> => {

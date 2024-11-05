@@ -1,4 +1,4 @@
-import { supabase } from "@/services/supabaseClient";
+import { supabase } from "@/lib/supabase";
 
 export default async function useJoinRoom(roomId: string) {
     // 현재 사용자 가져오기
