@@ -2,7 +2,8 @@ import { supabase } from "@/lib/supabase";
 
 export default async function useJoinRoom(roomId: string) {
     // 현재 사용자 가져오기
-    const userId = await (await supabase.auth.getSession()).data.session?.user.id;
+    const user = await supabase.auth.getUser();
+    const userId = user.data?.user?.id;
     console.log('userId:', userId);
 
     if (userId) {
@@ -33,6 +34,18 @@ export default async function useJoinRoom(roomId: string) {
                 if (updateError) {
                     // 오류 처리
                     console.error(updateError);
+                }
+
+                // 사용자 테이블에 방 추가
+                const { error: insertError } = await supabase
+                    .from('users')
+                    .update({ current_party: roomId })
+                    .eq('user_id', userId)
+                    .single();
+
+                if (insertError) {
+                    // 오류 처리
+                    console.error(insertError);
                 }
             }
         }
