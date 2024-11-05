@@ -1,26 +1,26 @@
+import useJoinRoom from '@/hooks/useJoinRoom';
 import useLoadRooms from '@/hooks/useLoadRooms';
-import { useFocusEffect } from 'expo-router';
-import React, { useCallback , useState } from 'react';
-import { 
-    StyleSheet, 
-    Text, 
-    View, 
-    FlatList, 
+import { router, useLocalSearchParams } from 'expo-router';
+import React, { useState } from 'react';
+import {
     ActivityIndicator,
-    Modal,
-    TouchableOpacity,
-    TextInput,
-    Platform,
-    KeyboardAvoidingView,
-    TouchableWithoutFeedback,
+    Dimensions,
+    FlatList,
     Keyboard,
-    Dimensions
+    KeyboardAvoidingView,
+    Modal,
+    Platform,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    TouchableWithoutFeedback,
+    View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from 'react-native-vector-icons';
-import { useLocalSearchParams } from 'expo-router';
 
-const { width, height } = Dimensions.get('window');  
+const { width, height } = Dimensions.get('window');
 
 
 
@@ -43,45 +43,46 @@ const headerStyles = StyleSheet.create({
         height: '22%'
     },
     title: {
-        paddingTop: '1%' ,
+        paddingTop: '1%',
         fontSize: 20,
         color: '#ffffff',
     },
-    date:{
+    date: {
         color: '#ffffff',
-        fontSize:20,
-        paddingTop:'5%'
+        fontSize: 20,
+        paddingTop: '5%'
     },
 
     routeContainer: {
         flexDirection: 'row',
         alignItems: 'stretch',
-        justifyContent:'center',
-        paddingTop:'2%',
+        justifyContent: 'center',
+        paddingTop: '2%',
         width: '90%',
-        paddingBottom:'5%'
-       
+        paddingBottom: '5%'
+
     },
     locationName: {
         fontSize: 30,
         color: '#ffffff',
         fontWeight: '600',
         alignItems: 'center',
-        
-         width: '40%',
-         textAlign:'center'
+
+        width: '40%',
+        textAlign: 'center'
 
     },
     arrowIcon: {
         marginHorizontal: 10, // 화살표와 텍스트 사이 간격
-        alignSelf:'center',
-        top:'1.5%'
-        
+        alignSelf: 'center',
+        top: '1.5%'
+
     },
 });
 
 
 type Room = {
+    id: string;
     created_at: string;
     departure_time: Date;
     limit_people: number;
@@ -97,8 +98,9 @@ type RoomDetailModalProps = {
 };
 
 const RoomDetailModal = ({ visible, room, onClose, onJoin }: RoomDetailModalProps) => {
+
     if (!room) return null;
-    
+
     return (
         <Modal
             animationType="slide"
@@ -107,13 +109,13 @@ const RoomDetailModal = ({ visible, room, onClose, onJoin }: RoomDetailModalProp
             onRequestClose={onClose}
         >
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                <KeyboardAvoidingView 
+                <KeyboardAvoidingView
                     behavior={Platform.OS === "ios" ? "padding" : "height"}
                     style={modalStyles.centeredView}
                 >
                     <View style={modalStyles.modalContent}>
                         <View style={modalStyles.handleBar} />
-                        
+
                         <View style={modalStyles.headerSection}>
                             <Text style={modalStyles.modalTime}>
                                 출발 시각: {new Date(room.departure_time).getHours().toString().padStart(2, '0')}:
@@ -246,7 +248,7 @@ const modalStyles = StyleSheet.create({
     },
 });
 
-const Item = ({ created_at, departure_time, limit_people, users, status,onPress  }: { created_at: string, departure_time: Date, limit_people: number, users: string[], status: string,onPress: () => void }) => (
+const Item = ({ created_at, departure_time, limit_people, users, status, onPress }: { created_at: string, departure_time: Date, limit_people: number, users: string[], status: string, onPress: () => void }) => (
     <TouchableOpacity onPress={onPress} style={itemStyles.container}>
         {/* 출발 시각 00:00으로 표현 */}
         <View style={itemStyles.header}>
@@ -272,7 +274,7 @@ const itemStyles = StyleSheet.create({
         borderColor: '#A594F9',
         borderRadius: 8,
         padding: 20,
-        top:'-4%'  
+        top: '-4%'
     },
     header: {
         backgroundColor: '#A594F9',
@@ -301,8 +303,9 @@ const itemStyles = StyleSheet.create({
         color: '#000000',
         fontSize: 16,
         fontWeight: 'bold',
-        top:13,
-        left:5   },
+        top: 13,
+        left: 5
+    },
 });
 
 export default function RoomList() {
@@ -310,16 +313,18 @@ export default function RoomList() {
     const [selectedRoom, setSelectedRoom] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
     const { selectedDeparture = '출발지', selectedDestination = '도착지', date = new Date().toISOString() } = useLocalSearchParams();
-    
+
 
     const handleRoomPress = (room) => {
         setSelectedRoom(room);
         setModalVisible(true);
     };
 
-    const handleJoinRoom = () => {
-        // TODO: Implement join room logic here
+    const handleJoinRoom = (room) => {
+        if (!room) return
+        useJoinRoom(room.id);
         setModalVisible(false);
+        router.replace('/RoomDetailView');
     };
 
 
@@ -341,7 +346,6 @@ export default function RoomList() {
     }
 
     return (
-        // Todo: 디자인 검토 필요
         <SafeAreaView style={styles.container}>
             {/* Header 컴포넌트를 사용하여 화면 상단에 제목과 부제목을 표시합니다. */}
             <Header origin={selectedDeparture} destination={selectedDestination} />
@@ -350,41 +354,41 @@ export default function RoomList() {
                 <View style={listStyles.columnCrossline} />
 
                 <View style={listStyles.indexContainer}>
-                <Text style={listStyles.indexText}>출발 시각</Text>
-                <Text style={listStyles.indexText}>방 내용</Text>
-                <Text style={listStyles.indexText}>인원수</Text>
+                    <Text style={listStyles.indexText}>출발 시각</Text>
+                    <Text style={listStyles.indexText}>방 내용</Text>
+                    <Text style={listStyles.indexText}>인원수</Text>
 
                 </View>
                 <View style={listStyles.Container}>
-           
-                <FlatList
-                    data={rooms}
-                    // 컴포넌트 자체의 스타일을 정의합니다.
-                    style={listStyles.listContainer}
-                    // 아이템들을 구분할 구분선을 정의합니다.
-                    ItemSeparatorComponent={() => <View style={listStyles.separator} />}
-                    // 내용물 컨테이너의 스타일을 정의합니다.
-                    contentContainerStyle={listStyles.contentContainer}
-                    renderItem={({ item }) => (
-                        // Item 컴포넌트에 전달할 props를 정의합니다.
-                        <Item
-                            created_at={item.created_at}
-                            departure_time={item.departure_time}
-                            limit_people={item.limit_people}
-                            users={item.users}
-                            status={item.status}
-                            onPress={() => handleRoomPress(item)}
-                        />
-                    )}
-                    keyExtractor={item => item.id}
-                />
+
+                    <FlatList
+                        data={rooms}
+                        // 컴포넌트 자체의 스타일을 정의합니다.
+                        style={listStyles.listContainer}
+                        // 아이템들을 구분할 구분선을 정의합니다.
+                        ItemSeparatorComponent={() => <View style={listStyles.separator} />}
+                        // 내용물 컨테이너의 스타일을 정의합니다.
+                        contentContainerStyle={listStyles.contentContainer}
+                        renderItem={({ item }) => (
+                            // Item 컴포넌트에 전달할 props를 정의합니다.
+                            <Item
+                                created_at={item.created_at}
+                                departure_time={item.departure_time}
+                                limit_people={item.limit_people}
+                                users={item.users}
+                                status={item.status}
+                                onPress={() => handleRoomPress(item)}
+                            />
+                        )}
+                        keyExtractor={item => item.id}
+                    />
                 </View>
             </View>
             <RoomDetailModal
                 visible={modalVisible}
                 room={selectedRoom}
                 onClose={() => setModalVisible(false)}
-                onJoin={handleJoinRoom}
+                onJoin={() => handleJoinRoom(selectedRoom)}
             />
         </SafeAreaView>
     );
@@ -397,30 +401,30 @@ const styles = StyleSheet.create({
     },
 });
 const listStyles = StyleSheet.create({
-    Container:{
-        flex:1,
-        
-    },
-    
-    indexContainer:{
-        flexDirection: 'row',
-        justifyContent:'space-around',
-        paddingTop:'1%',
-        // borderBottomWidth: 1, 
-        paddingBottom:'1%',
+    Container: {
+        flex: 1,
 
     },
-    indexText:{
-        color:"#747474"
+
+    indexContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        paddingTop: '1%',
+        // borderBottomWidth: 1, 
+        paddingBottom: '1%',
+
+    },
+    indexText: {
+        color: "#747474"
     },
     listContainer: {
         flexGrow: 1,
-        
-        
+
+
     },
     contentContainer: {
         padding: 16,
-      
+
     },
     separator: {
         height: 16,
@@ -432,6 +436,6 @@ const listStyles = StyleSheet.create({
         top: '5.6%',
         left: '15.6%',
         height: '100%',
-      
+
     }
 });

@@ -1,7 +1,5 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import useUserDataManagement from '../../hooks/userDataManagement';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width, height } = Dimensions.get('window');
 
@@ -47,6 +45,7 @@ const RoomDetailView = () => {
           </View>
         </View>
 
+        {/* 점선 구간 */}
         <View style={styles.separatorContainer}>
           <View style={styles.dottedLine} />
           <View style={styles.leftCircle} />
