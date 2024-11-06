@@ -1,12 +1,10 @@
+import { signOutUser } from '@/utils/auth.utils';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import React from 'react';
 import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import useAuth from '../../hooks/useAuth';
 
 export default function MyPage() {
-    const { handleSignOut } = useAuth();
-
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
@@ -38,7 +36,7 @@ export default function MyPage() {
 
             <TouchableOpacity
                 style={styles.logoutButton}
-                onPress={handleSignOut}
+                onPress={signOutUser}
             >
                 <Text style={styles.logoutButtonText}>로그아웃</Text>
             </TouchableOpacity>

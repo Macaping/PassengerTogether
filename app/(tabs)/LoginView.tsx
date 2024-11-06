@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
 import { View, TextInput, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import useAuth from '../../hooks/useAuth';
+import { signInUser } from '@/utils/auth.utils';
 import { router } from 'expo-router';
 
 const LoginView = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { handleSignIn, errorMessage } = useAuth();
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const onPressed = async () => {
-    await handleSignIn(email, password);
+  const handleLogin = async () => {
+    signInUser(email, password)
+      .then(() => router.replace('/(tabs)/'))
+      .catch((e: string) => setErrorMessage(e));
   };
-
 
   return (
     <View style={styles.container}>
@@ -36,7 +37,7 @@ const LoginView = () => {
       />
       {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
 
-      <TouchableOpacity style={styles.loginButton} onPress={onPressed}>
+      <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
         <Text style={styles.loginButtonText}>로그인</Text>
       </TouchableOpacity>
 

@@ -1,17 +1,19 @@
+import { signUpUser } from '@/utils/auth.utils';
+import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import useAuth from '../../hooks/useAuth';
 
 const SignupView = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [nickname, setNickname] = useState('');
-  const { handleSignUp, errorMessage } = useAuth();
-  
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const handleSignup = async () => {
-    await handleSignUp(email, password, confirmPassword, nickname);
+  const handleSignUp = async () => {
+    signUpUser(email, password, confirmPassword, nickname)
+      .then(() => router.replace('/(tabs)/'))
+      .catch((e: string) => setErrorMessage(e));
   };
 
   return (
@@ -48,7 +50,7 @@ const SignupView = () => {
 
       {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
 
-      <TouchableOpacity style={styles.signupButton} onPress={handleSignup}>
+      <TouchableOpacity style={styles.signupButton} onPress={handleSignUp}>
         <Text style={styles.signupButtonText}>회원가입</Text>
       </TouchableOpacity>
     </View>
