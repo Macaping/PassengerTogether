@@ -13,6 +13,7 @@ const useUserDataManagement = () => {
     }
 
     const userId = user?.id;
+
     if (!userId) {
       console.error("사용자 ID가 없습니다.");
       return;
@@ -31,6 +32,7 @@ const useUserDataManagement = () => {
 
     const currentPartyId = userData?.current_party;
     if (!currentPartyId) {
+      setRoom(null); // Set room to null if there is no current party
       return;
     }
 
@@ -42,19 +44,27 @@ const useUserDataManagement = () => {
 
     if (roomFetchError) {
       console.error("방 정보 가져오기 오류:", roomFetchError);
-    } else {
-      setRoom(roomData);
-      subscribeToRoomUpdates(currentPartyId);
+      setRoom(null); // Set room to null if there's an error fetching room data
+      return;
     }
+
+    const userInRoom = roomData.users && roomData.users.includes(userId);
+    if (!userInRoom) {
+      setRoom(null);
+      return;
+    }
+
+    setRoom(roomData);
+    subscribeToRoomUpdates(currentPartyId);
   };
 
-  const subscribeToRoomUpdates = (roomId: string) => {
+  const subscribeToRoomUpdates = (roomId) => {
     const roomChannel = supabase
       .channel("rooms")
       .on(
         "postgres_changes",
         {
-          event: "*", // Listen for all changes (INSERT, UPDATE, DELETE)
+          event: "*",
           schema: "public",
           table: "rooms",
           filter: `id=eq.${roomId}`,
@@ -62,7 +72,7 @@ const useUserDataManagement = () => {
         (payload) => {
           console.log("Room update received:", payload);
           if (payload.eventType === "UPDATE") {
-            setRoom(payload.new); // Update room state with new data
+            setRoom(payload.new);
           }
         }
       )
@@ -76,7 +86,6 @@ const useUserDataManagement = () => {
   useEffect(() => {
     fetchRoomDetails();
 
-    // Clean up the subscription when component unmounts
     return () => {
       supabase.removeAllSubscriptions();
     };
