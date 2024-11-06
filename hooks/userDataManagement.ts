@@ -31,7 +31,6 @@ const useUserDataManagement = () => {
 
     const currentPartyId = userData?.current_party;
     if (!currentPartyId) {
-      console.error("현재 사용자가 참여 중인 방이 없습니다.");
       return;
     }
 

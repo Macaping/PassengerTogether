@@ -16,7 +16,13 @@ const RoomDetailView = () => {
   );
 
   if (!room) {
-    return <Text>로딩 중...</Text>;
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.centeredMessageContainer}>
+          <Text style={styles.centeredMessageText}>현재 참여한 방이 없습니다.</Text>
+        </View>
+      </SafeAreaView>
+    );
   }
 
   return (
@@ -80,6 +86,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#e0f0ff',
   },
+  centeredMessageContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  centeredMessageText: {
+    fontSize: width * 0.05,
+    color: '#333',
+    textAlign: 'center',
+  },  
   ticketContainer: {
     width: width * 0.92,
     height: height * 0.8,
