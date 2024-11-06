@@ -1,4 +1,4 @@
-import { supabase } from "@/services/supabaseClient";
+import { supabase } from "@/lib/supabase";
 
 export async function createRoom(
     { departure_time, origin, destination, limit_people, users = [], details }:

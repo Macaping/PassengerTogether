@@ -1,4 +1,4 @@
-import { supabase } from "@/services/supabaseClient";
+import { supabase } from "@/lib/supabase";
 import { PostgrestError } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
 
