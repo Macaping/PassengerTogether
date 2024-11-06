@@ -5,6 +5,9 @@ import React, { useRef, useEffect, useState } from 'react';
 import { FlatList, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import { StatusBar } from 'react-native-web';
+import { Dimensions } from 'react-native'; //Dimensions API를 이용해 화면의 너비나 높이에 따라 fontSize를 설정
+
+const { width, height } = Dimensions.get('window'); //Dimensions 이용
 
 const HomeView = () => {
   const locations = ['천안역', '천안아산역', '선문대', '탕정역', '두정동 롯데'];
@@ -129,11 +132,11 @@ const HomeView = () => {
       </View>
 
       {/* 지도 상자 */}
-      <View style={styles.mapInfoBox}>
+      <View style={map_styles.mapInfoBox}>
         {location ? (
           <MapView
             ref={mapRef} // 지도 참조 추가
-            style={styles.map}
+            style={map_styles.map}
             initialRegion={{
               latitude: location.latitude,
               longitude: location.longitude,
@@ -164,7 +167,7 @@ const HomeView = () => {
             )}
           </MapView>
         ) : (
-          <View style={styles.loadingContainer}>
+          <View style={map_styles.loadingContainer}>
             <Text>위치를 불러오는 중...</Text>
             {errorMsg ? <Text>{errorMsg}</Text> : null}
           </View>
@@ -172,20 +175,43 @@ const HomeView = () => {
       </View>
 
       {/* 출발지 및 도착지 선택 상자 */}
-      <View style={styles.infoBox}>
-        <View style={styles.locationSection}>
-          <Text style={styles.locationLabel}>출발</Text>
-          <Text style={styles.locationLabel}>도착</Text>
+      <View style={main_styles.infoBox}>
+        <View style={main_styles.locationSection}>
+          <Text style={main_styles.locationLabel}>출발</Text>
+          <Text style={main_styles.locationLabel}>도착</Text>
         </View>
-        <View style={styles.locationSelector}>
+
+        <View style={main_styles.locationSelector}>
           <TouchableOpacity onPress={() => openLocationModal('departure')}>
-            <Text style={styles.routeText}>{selectedDeparture}</Text>
+            <View style={main_styles.routeContainer}>
+              <Text style={main_styles.routeText}>{selectedDeparture}</Text>
+            </View>
           </TouchableOpacity>
-          <Text style={styles.arrow}> → </Text>
+
+          <Text style={main_styles.arrow}>→</Text>
+
           <TouchableOpacity onPress={() => openLocationModal('destination')}>
-            <Text style={styles.routeText}>{selectedDestination}</Text>
+            <View style={main_styles.routeContainer}>
+              <Text style={main_styles.routeText}>{selectedDestination}</Text>
+            </View>
           </TouchableOpacity>
         </View>
+
+
+
+      {/*  
+        <View style={main_styles.locationSelector}>
+          <TouchableOpacity onPress={() => openLocationModal('departure')}>
+            <Text style={main_styles.routeText}>{selectedDeparture}</Text>
+          </TouchableOpacity>  
+              
+          <Text style={main_styles.arrow}> → </Text>
+
+          <TouchableOpacity onPress={() => openLocationModal('destination')}>
+            <Text style={main_styles.routeText}>{selectedDestination}</Text>
+          </TouchableOpacity>
+        </View>
+      */}
 
         <Modal
           animationType="slide"
@@ -193,7 +219,7 @@ const HomeView = () => {
           visible={modalVisible}
           onRequestClose={() => setModalVisible(false)}
         >
-          <View style={styles.modalView}>
+          <View style={choice_styles.modalView}>
             <FlatList
               data={locations.filter(
                 item => (changingLocationType === 'departure' && item !== selectedDestination) ||
@@ -201,23 +227,23 @@ const HomeView = () => {
               )}
               keyExtractor={(item) => item}
               renderItem={({ item }) => (
-                <TouchableOpacity style={styles.item} onPress={() => handleLocationSelect(item)}>
-                  <Text style={styles.itemText}>{item}</Text>
+                <TouchableOpacity style={choice_styles.item} onPress={() => handleLocationSelect(item)}>
+                  <Text style={choice_styles.itemText}>{item}</Text>
                 </TouchableOpacity>
               )}
-              ItemSeparatorComponent={() => <View style={styles.separator} />}
+              ItemSeparatorComponent={() => <View style={choice_styles.separator} />}
             />
 
           </View>
         </Modal>
 
-        <Text style={styles.infoTitle}>출발 시간</Text>
-        <View style={styles.dateTimeRow}>
-          <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.dateTimeButton}>
-            <Text style={styles.dateText}>{date.toLocaleDateString()}</Text>
+        <Text style={date_styles.infoTitle}>출발 시간</Text>
+        <View style={date_styles.dateTimeRow}>
+          <TouchableOpacity onPress={() => setShowDatePicker(true)} style={date_styles.dateTimeButton}>
+            <Text style={date_styles.dateText}>{date.toLocaleDateString()}</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => setShowTimePicker(true)} style={styles.dateTimeButton}>
-            <Text style={styles.dateText}>{date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Text>
+          <TouchableOpacity onPress={() => setShowTimePicker(true)} style={date_styles.dateTimeButton}>
+            <Text style={date_styles.dateText}>{date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Text>
           </TouchableOpacity>
         </View>
 
@@ -251,7 +277,7 @@ const HomeView = () => {
 
       <View style={styles.buttonContainer}>
         <Link href="/RoomList" style={styles.button}>
-          <Text style={styles.buttonText}>방 탐색</Text>
+          <Text style={styles.buttonText}>  방 탐색</Text>
         </Link>
 
         <Link
@@ -268,36 +294,73 @@ const HomeView = () => {
   );
 };
 
-const styles = StyleSheet.create({
+
+const styles = StyleSheet.create({   // 맨 위 타이틀, 버튼
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
   header: {
     backgroundColor: '#6B59CC',
-    padding: 20,
+  //  padding: 20,
+    paddingVertical: '4.5%' ,
     alignItems: 'center',
   },
   headerText: {
     color: '#FFFFFF',
-    fontSize: 18,
+  //  fontSize: 18,
+    fontSize: width * 0.045, // 화면 너비의 5%를 fontSize로 지정
     fontWeight: 'bold',
   },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    //  marginTop: 16,
+    //  marginHorizontal: 16,
+  },
+  button: {
+    backgroundColor: '#A99CE3',
+    paddingVertical: '4%', //버튼 크기 
+  //  paddingHorizontal: 24,
+    borderRadius: 8,
+    width: '40%',
+    alignItems: 'center',
+    paddingHorizontal: '10%',
+
+  },
+  buttonText: {
+    color: '#FFFFFF',
+  //  fontSize: 20,
+    fontSize: width * 0.045,
+
+  },
+});
+
+const map_styles = StyleSheet.create({  // 지도화면, 소요시간 글씨
   mapInfoBox: {
-    height: 300, // 지도 높이 조정
+    height: '37%', // 지도 높이 조정
     borderWidth: 1,
     borderColor: '#ccc',
-    borderRadius: 10,
-    overflow: 'hidden',
+  //  borderRadius: 10,
+  //  overflow: 'hidden',
     //  margin: 16,
   },
   map: {
     ...StyleSheet.absoluteFillObject,
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+});
+
+const main_styles = StyleSheet.create({   //출발지 도착지
   infoBox: {
     backgroundColor: '#FFFFFF',
-    padding: 50,
-    margin: 20,
+    padding: '12%', 
+    margin: '5%', 
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#ccc',
@@ -311,38 +374,76 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '70%',
-    marginBottom: 20,
+    marginBottom: '6%',
   },
   locationLabel: {
-    fontSize: 15,
+    fontSize: width * 0.037,
     color: '#888',
   },
+
   locationSelector: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
+  //  justifyContent: 'center',
+    justifyContent: 'space-evenly',
+    marginBottom: '8%',
+    width: '120%',
+  },
+  routeContainer: {
+    width: width * 0.3, // 고정된 너비로 박스가 항상 일정하게 유지
+    //paddingVertical: 10,
+    //borderColor: '#6B59CC',
+    //borderWidth: 1,
+    //borderRadius: 8,
+    alignItems: 'center',
   },
   routeText: {
-    fontSize: 30,
+    fontSize: width * 0.06,
+    color: '#6B59CC',
+    fontWeight: 'bold',
+    textAlign: 'center', // 텍스트 중앙 정렬
+  },
+  arrow: {
+    fontSize: width * 0.06,
+    color: '#6B59CC',
+    marginHorizontal: '5%',
+  },
+
+  /*
+  locationSelector: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: '8%',
+    justifyContent: 'center',
+    width: '100%',
+  },
+
+  routeText: {
+    fontSize: width * 0.073,
     color: '#6B59CC',
     fontWeight: 'bold',
   },
   arrow: {
-    fontSize: 30,
+    fontSize: width * 0.07,
     color: '#6B59CC',
-    marginHorizontal: 8,
+    paddingHorizontal: '10%',
   },
+  */
+
+});
+
+const choice_styles = StyleSheet.create({  //출발지 도착지 선택 항목
   modalView: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    paddingVertical: 35,
-    paddingHorizontal: 20,
+    paddingVertical: '10%',
+    paddingHorizontal: '10%',
     alignItems: 'stretch',
   },
   item: {
     backgroundColor: 'white',
-    padding: 15,
-    marginVertical: 5,
+    padding: '5%',
+    marginVertical: '1.5%',
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 10,
@@ -352,9 +453,13 @@ const styles = StyleSheet.create({
   separator: {
     height: 1,
   },
+
+});
+
+const date_styles = StyleSheet.create({   // 날짜, 시간
   infoTitle: {
-    marginTop: 16,
-    fontSize: 15,
+    marginTop: '5%',
+    fontSize: width * 0.037,
     fontWeight: 'bold',
     color: '#888',
   },
@@ -363,44 +468,21 @@ const styles = StyleSheet.create({
     //  justifyContent: 'space-between',
     justifyContent: 'center',
     width: '80%',
-    marginTop: 15,
+    marginTop: '6%',
   },
   dateTimeButton: {
     backgroundColor: '#FFFFFF',
     borderRadius: 5,
-    marginHorizontal: 10,
+    marginHorizontal: '4.5%',
 
   },
   dateText: {
-    fontSize: 25,
+    fontSize: width * 0.06,
     color: '#6B59CC',
   },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    //  marginTop: 16,
-    //  marginHorizontal: 16,
-  },
-  button: {
-    backgroundColor: '#A99CE3',
-    paddingVertical: 20, //버튼 크기
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    width: '40%',
-    alignItems: 'center',
-    paddingLeft: 40,
 
-  },
-  buttonText: {
-    color: '#FFFFFF',
-    fontSize: 20,
-
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
 });
+
+
 
 export default HomeView;
