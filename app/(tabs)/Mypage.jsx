@@ -1,11 +1,11 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useNavigation } from '@react-navigation/native';
+import React from 'react';
+import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import useAuth from '../../hooks/useAuth';
 
 export default function MyPage() {
-    const navigation = useNavigation();
+    const { handleSignOut } = useAuth();
 
     return (
         <SafeAreaView style={styles.container}>
@@ -38,12 +38,12 @@ export default function MyPage() {
 
             <TouchableOpacity
                 style={styles.logoutButton}
-                onPress={() => navigation.navigate('LoginView')}
+                onPress={handleSignOut}
             >
                 <Text style={styles.logoutButtonText}>로그아웃</Text>
             </TouchableOpacity>
 
-  
+
 
         </SafeAreaView>
     );
@@ -93,13 +93,13 @@ const styles = StyleSheet.create({
         fontSize: 23,
         color: 'gray',
         textAlign: 'center',
-       bottom: '6%',
+        bottom: '6%',
     },
     followContainer: {
         flexDirection: 'row',
         justifyContent: 'space-around',
         width: '100%',
-       bottom: '-15%',
+        bottom: '-15%',
     },
     followBox: {
         alignItems: 'center',

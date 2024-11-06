@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { supabase } from "../services/supabaseClient";
+import { supabase } from "@/lib/supabase";
 
 const useUserDataManagement = () => {
   const [room, setRoom] = useState(null);
