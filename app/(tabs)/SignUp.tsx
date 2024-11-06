@@ -3,7 +3,7 @@ import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
-const SignupView = () => {
+const SignUpView = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -112,4 +112,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SignupView;
+export default SignUpView;

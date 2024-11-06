@@ -3,12 +3,12 @@ import { View, TextInput, Text, StyleSheet, TouchableOpacity } from 'react-nativ
 import { signInUser } from '@/utils/auth.utils';
 import { router } from 'expo-router';
 
-const LoginView = () => {
+const SignInView = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
-  const handleLogin = async () => {
+  const handleSignIn = async () => {
     signInUser(email, password)
       .then(() => router.replace('/(tabs)/'))
       .catch((e: string) => setErrorMessage(e));
@@ -37,7 +37,7 @@ const LoginView = () => {
       />
       {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
 
-      <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+      <TouchableOpacity style={styles.loginButton} onPress={handleSignIn}>
         <Text style={styles.loginButtonText}>로그인</Text>
       </TouchableOpacity>
 
@@ -126,4 +126,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LoginView;
+export default SignInView;

@@ -5,7 +5,7 @@ import { useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
 import { FlatList, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
-const RoomMake = () => {
+const RoomMakeView = () => {
   const { selectedDeparture = '기본 출발지', selectedDestination = '기본 도착지', date = new Date().toISOString() } = useLocalSearchParams();
 
   const [departure, setDeparture] = useState(selectedDeparture);
@@ -294,4 +294,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default RoomMake;
+export default RoomMakeView;

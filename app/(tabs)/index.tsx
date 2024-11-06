@@ -1,11 +1,11 @@
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as Location from 'expo-location';
 import { Link } from 'expo-router';
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FlatList, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MapView, { Marker, Polyline } from 'react-native-maps';
-import { StatusBar } from 'react-native-web';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { StatusBar } from 'react-native-web';
 
 
 const HomeView = () => {
@@ -125,7 +125,7 @@ const HomeView = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar style="light"/>
+      <StatusBar style="light" />
       <View style={styles.header}>
         <Text style={styles.headerText}>조회</Text>
       </View>
@@ -253,13 +253,13 @@ const HomeView = () => {
 
       <View style={styles.buttonContainer}>
         <Link href={{
-          pathname:"/RoomList", 
+          pathname: "/RoomList",
           params: { selectedDeparture, selectedDestination, date: date.toISOString() }
         }}
           style={styles.button}>
           <Text style={styles.buttonText}>방 탐색</Text>
         </Link>
-        
+
 
         <Link
           href={{
@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   mapInfoBox: {
-    flex:3,
+    flex: 3,
     height: 300, // 지도 높이 조정
     borderWidth: 1,
     borderColor: '#ccc',
@@ -384,7 +384,7 @@ const styles = StyleSheet.create({
     color: '#6B59CC',
   },
   buttonContainer: {
-    flex:1,
+    flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-around',
     //  marginTop: 16,
