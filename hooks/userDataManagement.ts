@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 
 const useUserDataManagement = () => {
@@ -45,8 +45,43 @@ const useUserDataManagement = () => {
       console.error("방 정보 가져오기 오류:", roomFetchError);
     } else {
       setRoom(roomData);
+      subscribeToRoomUpdates(currentPartyId);
     }
   };
+
+  const subscribeToRoomUpdates = (roomId: string) => {
+    const roomChannel = supabase
+      .channel("rooms")
+      .on(
+        "postgres_changes",
+        {
+          event: "*", // Listen for all changes (INSERT, UPDATE, DELETE)
+          schema: "public",
+          table: "rooms",
+          filter: `id=eq.${roomId}`,
+        },
+        (payload) => {
+          console.log("Room update received:", payload);
+          if (payload.eventType === "UPDATE") {
+            setRoom(payload.new); // Update room state with new data
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeSubscription(roomChannel);
+    };
+  };
+
+  useEffect(() => {
+    fetchRoomDetails();
+
+    // Clean up the subscription when component unmounts
+    return () => {
+      supabase.removeAllSubscriptions();
+    };
+  }, []);
 
   return { room, fetchRoomDetails };
 };
