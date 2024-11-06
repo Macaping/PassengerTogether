@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { View, TextInput, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { signInUser } from '@/utils/auth.utils';
 import { router } from 'expo-router';
+import React, { useState } from 'react';
+import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 const SignInView = () => {
   const [email, setEmail] = useState('');
@@ -42,7 +42,7 @@ const SignInView = () => {
       </TouchableOpacity>
 
       <Text style={styles.footerText}>아직 회원이 아니신가요?
-        <Text style={styles.signupText} onPress={() => router.push('/SignupView')}>
+        <Text style={styles.signupText} onPress={() => router.push('/(tabs)/SignUp')}>
           {'  '}회원가입
         </Text>
       </Text>
