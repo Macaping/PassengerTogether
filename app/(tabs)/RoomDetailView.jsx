@@ -1,15 +1,19 @@
-import React, { useEffect } from 'react';
+import React, { useCallback } from 'react';
 import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import useUserDataManagement from '../../hooks/userDataManagement';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFocusEffect } from '@react-navigation/native';
+import useUserDataManagement from '../../hooks/userDataManagement';
+
 const { width, height } = Dimensions.get('window');
 
 const RoomDetailView = () => {
   const { room, fetchRoomDetails } = useUserDataManagement();
 
-  useEffect(() => {
-    fetchRoomDetails();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchRoomDetails();
+    }, [])
+  );
 
   if (!room) {
     return <Text>로딩 중...</Text>;
