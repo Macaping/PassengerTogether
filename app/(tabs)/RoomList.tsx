@@ -311,9 +311,10 @@ export default function RoomListView() {
 
     const handleJoinRoom = (room) => {
         if (!room) return
-        useJoinRoom(room.id);
-        setModalVisible(false);
-        router.replace('/(tabs)/RoomDetail')
+        useJoinRoom(room.id).then(() => {
+            setModalVisible(false);
+            router.replace('/(tabs)/RoomDetail')
+        });
     };
 
 
