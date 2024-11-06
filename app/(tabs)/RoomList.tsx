@@ -313,7 +313,7 @@ export default function RoomListView() {
         if (!room) return
         useJoinRoom(room.id);
         setModalVisible(false);
-        router.replace('/RoomDetailView');
+        router.replace('/(tabs)/RoomDetail')
     };
 
 
