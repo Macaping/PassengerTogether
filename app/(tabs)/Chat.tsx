@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, FlatList, StyleSheet } from 'react-native';
-import { supabase } from '../../services/supabaseClient';
-import { getCurrentUserId } from '../../hooks/authHelpers';
+import { supabase } from '@/lib/supabase';
+import { getCurrentUserId } from '@/hooks/authHelpers';
 
-export default function ChatScreen() {
+export default function ChatView() {
     const [userId, setUserId] = useState(null);
     const [roomId, setRoomId] = useState(null);
     const [messages, setMessages] = useState([]);
