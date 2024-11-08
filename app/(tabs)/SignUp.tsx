@@ -43,7 +43,7 @@ export default function SignUpView() {
       />
       <TextInput
         style={styles.input}
-        placeholder="닉네임을 입력하세요"
+        placeholder="두글자 이상의 닉네임을 입력하세요"
         value={nickname}
         onChangeText={setNickname}
       />
