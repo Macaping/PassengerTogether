@@ -1,4 +1,4 @@
-import DateTimePicker from '@react-native-community/datetimepicker';
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import * as Location from 'expo-location';
 import { Link } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
@@ -10,7 +10,11 @@ import { StatusBar } from 'react-native-web';
 
 export default function HomeView() {
   const locations = ['천안역', '천안아산역', '선문대', '탕정역', '두정동 롯데'];
-  const coordinates = {
+  interface Coordinates {
+    latitude: number;
+    longitude: number;
+  }
+  const coordinates: { [key: string]: Coordinates } = {
     '천안역': { latitude: 36.8089885, longitude: 127.148933 },
     '천안아산역': { latitude: 36.7946071, longitude: 127.1045608 },
     '선문대': { latitude: 36.7989764, longitude: 127.0750025 },
@@ -27,11 +31,11 @@ export default function HomeView() {
   const [modalVisible, setModalVisible] = useState(false);
   const [changingLocationType, setChangingLocationType] = useState('departure');
 
-  const [location, setLocation] = useState(null);
-  const [errorMsg, setErrorMsg] = useState(null);
-  const [route, setRoute] = useState(null);
-  const [distance, setDistance] = useState(null);
-  const [duration, setDuration] = useState(null);
+  const [location, setLocation] = useState<Location.LocationObjectCoords | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [route, setRoute] = useState<{ latitude: number; longitude: number }[]>([]);
+  const [distance, setDistance] = useState<number | null>(null);
+  const [duration, setDuration] = useState<number | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -64,7 +68,7 @@ export default function HomeView() {
       const response = await fetch(url);
       const data = await response.json();
       const geometry = data.features[0].geometry.coordinates;
-      const polylineCoords = geometry.map(coord => ({ latitude: coord[1], longitude: coord[0] }));
+      const polylineCoords: { latitude: number; longitude: number }[] = geometry.map((coord: [number, number]) => ({ latitude: coord[1], longitude: coord[0] }));
       setRoute(polylineCoords);
 
       const summary = data.features[0].properties.summary;
@@ -75,7 +79,7 @@ export default function HomeView() {
     }
   };
 
-  const handleDateChange = (event, selectedDate) => {
+  const handleDateChange = (_event: DateTimePickerEvent, selectedDate?: Date | undefined): void => {
     setShowDatePicker(false);
     if (selectedDate) {
       const newDate = new Date(date);
@@ -84,7 +88,7 @@ export default function HomeView() {
     }
   };
 
-  const handleTimeChange = (event, selectedTime) => {
+  const handleTimeChange = (_event: DateTimePickerEvent, selectedTime?: Date) => {
     setShowTimePicker(false);
     if (selectedTime) {
       const newDate = new Date(date);
@@ -94,14 +98,14 @@ export default function HomeView() {
     }
   };
 
-  const openLocationModal = (type) => {
+  const openLocationModal = (type: 'departure' | 'destination') => {
     setChangingLocationType(type);
     setModalVisible(true);
   };
 
-  const mapRef = useRef(null);
+  const mapRef = useRef<MapView | null>(null);
 
-  const handleLocationSelect = (location) => {
+  const handleLocationSelect = (location: string) => {
     if (changingLocationType === 'departure') {
       setSelectedDeparture(location);
     } else {
@@ -109,7 +113,7 @@ export default function HomeView() {
     }
     setModalVisible(false);
 
-    const selectedCoordinates = coordinates[location];
+    const selectedCoordinates: Coordinates = coordinates[location];
     mapRef.current?.animateToRegion(
       {
         latitude: selectedCoordinates.latitude,
@@ -119,8 +123,6 @@ export default function HomeView() {
       },
       1000 // 애니메이션 지속 시간 (1초)
     );
-
-
   };
 
   return (
