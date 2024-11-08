@@ -3,7 +3,7 @@ import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
-const SignInView = () => {
+export default function SignInView() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -48,7 +48,7 @@ const SignInView = () => {
       </Text>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -125,5 +125,3 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
-
-export default SignInView;

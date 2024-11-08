@@ -5,7 +5,7 @@ import { useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
 import { FlatList, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
-const RoomMakeView = () => {
+export default function RoomMakeView() {
   const { selectedDeparture = '기본 출발지', selectedDestination = '기본 도착지', date = new Date().toISOString() } = useLocalSearchParams();
 
   const [departure, setDeparture] = useState(selectedDeparture);
@@ -161,7 +161,7 @@ const RoomMakeView = () => {
       </TouchableOpacity>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -293,5 +293,3 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
-
-export default RoomMakeView;

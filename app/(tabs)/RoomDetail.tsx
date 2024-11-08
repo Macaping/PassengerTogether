@@ -1,12 +1,12 @@
+import useUserDataManagement from '@/hooks/userDataManagement';
+import { useFocusEffect } from '@react-navigation/native';
 import React, { useCallback } from 'react';
 import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useFocusEffect } from '@react-navigation/native';
-import useUserDataManagement from '@/hooks/userDataManagement';
 
 const { width, height } = Dimensions.get('window');
 
-const RoomDetailView = () => {
+export default function RoomDetailView() {
   const { room, fetchRoomDetails } = useUserDataManagement();
 
   useFocusEffect(
@@ -77,7 +77,7 @@ const RoomDetailView = () => {
       </View>
     </SafeAreaView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
     fontSize: width * 0.05,
     color: '#333',
     textAlign: 'center',
-  },  
+  },
   ticketContainer: {
     width: width * 0.92,
     height: height * 0.8,
@@ -250,5 +250,3 @@ const styles = StyleSheet.create({
     borderRadius: width * 0.05,
   },
 });
-
-export default RoomDetailView;

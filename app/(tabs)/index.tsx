@@ -8,7 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'react-native-web';
 
 
-const HomeView = () => {
+export default function HomeView() {
   const locations = ['천안역', '천안아산역', '선문대', '탕정역', '두정동 롯데'];
   const coordinates = {
     '천안역': { latitude: 36.8089885, longitude: 127.148933 },
@@ -273,7 +273,7 @@ const HomeView = () => {
       </View>
     </SafeAreaView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -411,5 +411,3 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
-
-export default HomeView;
