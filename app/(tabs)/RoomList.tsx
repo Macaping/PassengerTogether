@@ -1,15 +1,13 @@
 import useJoinRoom from '@/hooks/useJoinRoom';
 import useLoadRooms from '@/hooks/useLoadRooms';
 import { router, useLocalSearchParams } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useRef, useEffect,useState} from 'react';
 import {
     ActivityIndicator,
     Dimensions,
     FlatList,
-    Keyboard,
-    KeyboardAvoidingView,
     Modal,
-    Platform,
+    Animated,
     StyleSheet,
     Text,
     TextInput,
@@ -21,6 +19,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from 'react-native-vector-icons';
 
 const { width, height } = Dimensions.get('window');
+
 
 
 
@@ -40,7 +39,7 @@ const headerStyles = StyleSheet.create({
     headerContainer: {
         alignItems: 'center',
         backgroundColor: '#6049E2',
-        height: '22%'
+        height: height * 0.20,
     },
     title: {
         paddingTop: '2%',
@@ -95,6 +94,7 @@ type Room = {
     limit_people: number;
     users: string[];
     status: string;
+    details:string;
 };
 
 type RoomDetailModalProps = {
@@ -105,71 +105,136 @@ type RoomDetailModalProps = {
 };
 
 const RoomDetailModal = ({ visible, room, onClose, onJoin }: RoomDetailModalProps) => {
+    const slideAnim = useRef(new Animated.Value(height)).current;
+    const fadeAnim = useRef(new Animated.Value(0)).current;
+
+    useEffect(() => {
+        if (visible) {
+            Animated.parallel([
+                Animated.timing(slideAnim, {
+                    toValue: 0,
+                    duration: 300,
+                    useNativeDriver: true,
+                }),
+                Animated.timing(fadeAnim, {
+                    toValue: 1,
+                    duration: 300,
+                    useNativeDriver: true,
+                }),
+            ]).start();
+        } else {
+            Animated.parallel([
+                Animated.timing(slideAnim, {
+                    toValue: height,
+                    duration: 300,
+                    useNativeDriver: true,
+                }),
+                Animated.timing(fadeAnim, {
+                    toValue: 0,
+                    duration: 300,
+                    useNativeDriver: true,
+                }),
+            ]).start();
+        }
+    }, [visible]);
 
     if (!room) return null;
 
     return (
         <Modal
-            animationType="slide"
             transparent={true}
             visible={visible}
             onRequestClose={onClose}
+            animationType="none"
         >
-            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                <KeyboardAvoidingView
-                    behavior={Platform.OS === "ios" ? "padding" : "height"}
-                    style={modalStyles.centeredView}
+            <View style={modalStyles.container}>
+                <Animated.View 
+                    style={[
+                        modalStyles.backdrop,
+                        {
+                            opacity: fadeAnim,
+                            transform: [{ translateY: height * 0.2 }] // Header height
+                        }
+                    ]}
                 >
-                    <View style={modalStyles.modalContent}>
-                        <View style={modalStyles.handleBar} />
+                    <TouchableWithoutFeedback onPress={onClose}>
+                        <View style={modalStyles.backdropTouchable} />
+                    </TouchableWithoutFeedback>
+                </Animated.View>
+                
+                <Animated.View
+                    style={[
+                        modalStyles.modalContent,
+                        {
+                            transform: [{ translateY: slideAnim }]
+                        }
+                    ]}
+                >
+                    <View style={modalStyles.handleBar} />
+                    <Text style={modalStyles.modalName}>{room.created_at.slice(-10, -6)}</Text>
 
-                        <View style={modalStyles.headerSection}>
-                            <Text style={modalStyles.modalTime}>
-                                출발 시각: {new Date(room.departure_time).getHours().toString().padStart(2, '0')}:
-                                {new Date(room.departure_time).getMinutes().toString().padStart(2, '0')}
-                            </Text>
-                            <Text style={modalStyles.modalMembers}>
-                                인원: {room.users ? room.users.length : 0}/{room.limit_people}
-                            </Text>
-                        </View>
-
-                        <View style={modalStyles.divider} />
-
-                        <View style={modalStyles.messageContainer}>
-                            <Text style={modalStyles.detailText}>상세사항</Text>
-                            <Text style={modalStyles.messageText}>
-                                아무거나 내용 입력..
-                            </Text>
-                        </View>
-
-                   
-                        <TouchableOpacity
-                            style={modalStyles.joinButton}
-                            onPress={onJoin}
-                            activeOpacity={0.8}
-                        >
-                            <Text style={modalStyles.joinButtonText}>참가 하기</Text>
-                        </TouchableOpacity>
+                     {/* 출발 시각과 인원을 한 줄로 배치 */}
+                     <View style={modalStyles.headerSection}>
+                        <Text style={modalStyles.modalTime}>
+                        <Text style={modalStyles.labelText}>출발 시각: </Text>
+                                <Text style={modalStyles.timeText}>
+                                    {new Date(room.departure_time).getHours().toString().padStart(2, '0')}:
+                                    {new Date(room.departure_time).getMinutes().toString().padStart(2, '0')}
+                                </Text>
+                        </Text>
+                        <Text style={modalStyles.modalMembers}>
+                            <Text style={modalStyles.labelText}>인원: </Text>
+                            <Text style={modalStyles.timeText}>{room.users ? room.users.length : 0}/{room.limit_people}</Text>
+                    </Text>
                     </View>
-                </KeyboardAvoidingView>
-            </TouchableWithoutFeedback>
+
+                    <View style={modalStyles.divider} />
+
+                    <View style={modalStyles.messageContainer}>
+                        <Text style={modalStyles.detailText}>상세사항</Text>
+                        <Text style={modalStyles.messageText}>
+                            {room.details}
+                        </Text>
+                    </View>
+
+                    <TouchableOpacity
+                        style={modalStyles.joinButton}
+                        onPress={onJoin}
+                        activeOpacity={0.8}
+                    >
+                        <Text style={modalStyles.joinButtonText}>참가 하기</Text>
+                    </TouchableOpacity>
+                </Animated.View>
+            </View>
         </Modal>
     );
 };
 
 const modalStyles = StyleSheet.create({
-    centeredView: {
+    container: {
         flex: 1,
         justifyContent: 'flex-end',
+        
+    },
+    backdrop: {
+        
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    backdropTouchable: {
+        flex: 1,
     },
     modalContent: {
         backgroundColor: 'white',
         borderTopLeftRadius: 24,
         borderTopRightRadius: 24,
-        paddingHorizontal: 20,
-        paddingBottom: Platform.OS === 'ios' ? 40 : 20,
-        height: '50%',
+        paddingHorizontal: 25,
+        height: height * 0.45, 
+        width: '100%',
     },
     handleBar: {
         width: 40,
@@ -180,26 +245,37 @@ const modalStyles = StyleSheet.create({
         marginTop: 12,
         marginBottom: 20,
     },
+    modalName:{
+        fontSize:25,
+        fontWeight:'600'
+    },
     headerSection: {
-        marginBottom: 20,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: '5%',
     },
     modalTime: {
         fontSize: 20,
-        color: '#6049E2',
-        fontWeight: '600',
-        marginBottom: 8,
+        color: '#000000',
     },
     modalMembers: {
-        fontSize: 16,
+        fontSize: 20,
+        color: '#000000',
+    },
+    labelText: {
+        fontWeight: '400', // 얇은 글꼴
+        color: '#000000',
+    },
+    timeText: {
+        fontWeight: '600', // 굵은 글꼴
         color: '#000000',
     },
     divider: {
         height: 1,
         backgroundColor: '#E0E0E0',
-        marginVertical: 20,
+        marginVertical: '5%',
     },
     messageContainer: {
-        marginBottom: 24,
     },
     detailText: {
         fontSize: 18,
@@ -208,17 +284,17 @@ const modalStyles = StyleSheet.create({
         color: '#000000',
     },
     messageText: {
-        fontSize: 14,
+        fontSize: 16,
         color: '#666666',
         lineHeight: 20,
     },
-    
     joinButton: {
         backgroundColor: '#6049E2',
         padding: 16,
-        borderRadius: 12,
+        borderRadius: 8,
         alignItems: 'center',
         marginTop: 'auto',
+        marginBottom: 20,
     },
     joinButtonText: {
         color: 'white',
@@ -228,7 +304,7 @@ const modalStyles = StyleSheet.create({
 });
 
 const Item = ({ created_at, departure_time, limit_people, users, status, onPress }: { created_at: string, departure_time: Date, limit_people: number, users: string[], status: string, onPress: () => void }) => (
-    <TouchableOpacity onPress={onPress} style={itemStyles.container}>
+    <TouchableOpacity onPress={onPress} style={itemStyles.container} activeOpacity={1}>
         {/* 출발 시각 00:00으로 표현 */}
         <View style={itemStyles.header}>
         </View>
@@ -300,9 +376,6 @@ export default function RoomList() {
         day: 'numeric',
         weekday: 'short' 
     });
-    
-
-
 
     const handleRoomPress = (room) => {
         setSelectedRoom(room);
@@ -339,19 +412,21 @@ export default function RoomList() {
             {/* Header 컴포넌트를 사용하여 화면 상단에 제목과 부제목을 표시합니다. */}
             <Header origin={selectedDeparture} destination={selectedDestination}  today={formattedDate} />
             {/* FlatList 컴포넌트를 사용하여 방 목록을 표시합니다. */}
-            <RoomDetailModal
-                visible={modalVisible}
-                room={selectedRoom}
-                onClose={() => setModalVisible(false)}
-                onJoin={() => handleJoinRoom(selectedRoom)}
-            />
+ 
             <View style={listStyles.indexContainer}>
                     <Text style={listStyles.indexText}>출발 시각</Text>
                     <Text style={listStyles.indexText}>방 내용</Text>
                     <Text style={listStyles.indexText}>인원수</Text>
 
                 </View>
+                <RoomDetailModal
+                visible={modalVisible}
+                room={selectedRoom}
+                onClose={() => setModalVisible(false)}
+                onJoin={() => handleJoinRoom(selectedRoom)}
+            />
             <View style={styles.container}>
+
                 <View style={listStyles.columnCrossline} />
 
                
