@@ -5,7 +5,8 @@ import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-nati
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
-const { width, height } = Dimensions.get('window');
+const {width, height } = Dimensions.get('window');
+
 
 export default function RoomDetailView() {
   const { room, fetchRoomDetails } = useUserDataManagement();
@@ -25,6 +26,7 @@ export default function RoomDetailView() {
       </SafeAreaView>
     );
   }
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -103,12 +105,14 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     height: 80,
+    backgroundColor:'red',
     alignItems: 'center',
     justifyContent: 'center'
   },
   header:{
-    paddingTop: '2%',
-    fontSize:20,
+    
+    paddingTop: height* 0.02,
+    fontSize: 20,
     color:'#ffffff',
     
   },
@@ -144,7 +148,7 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
   },
   ticketId: {
-    fontSize: width * 0.06,
+    fontSize: 11,
     fontWeight: 'bold',
     marginLeft: width * 0.025,
     color: '#333',

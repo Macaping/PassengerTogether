@@ -169,7 +169,7 @@ const RoomDetailModal = ({ visible, room, onClose, onJoin }: RoomDetailModalProp
                     ]}
                 >
                     <View style={modalStyles.handleBar} />
-                    <Text style={modalStyles.modalName}>{room.created_at.slice(-10, -6)}</Text>
+                    <Text style={modalStyles.modalName}>🏠 {room.created_at.slice(-10, -6)}</Text>
 
                     {/* 출발 시각과 인원을 한 줄로 배치 */}
                     <View style={modalStyles.headerSection}>
@@ -189,7 +189,7 @@ const RoomDetailModal = ({ visible, room, onClose, onJoin }: RoomDetailModalProp
                     <View style={modalStyles.divider} />
 
                     <View style={modalStyles.messageContainer}>
-                        <Text style={modalStyles.detailText}>상세사항</Text>
+                        <Text style={modalStyles.detailText}>만남의 장소</Text>
                         <Text style={modalStyles.messageText}>
                             {room.details}
                         </Text>
@@ -242,13 +242,14 @@ const modalStyles = StyleSheet.create({
         marginBottom: 20,
     },
     modalName: {
-        fontSize: 25,
+        fontSize: 20,
         fontWeight: '600'
     },
     headerSection: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginBottom: '5%',
+        marginTop:'3%'
     },
     modalTime: {
         fontSize: 20,
@@ -259,6 +260,7 @@ const modalStyles = StyleSheet.create({
         color: '#000000',
     },
     labelText: {
+        fontSize: 20,
         fontWeight: '400', // 얇은 글꼴
         color: '#000000',
     },
@@ -274,13 +276,13 @@ const modalStyles = StyleSheet.create({
     messageContainer: {
     },
     detailText: {
-        fontSize: 18,
+        fontSize: 20,
         fontWeight: '600',
         marginBottom: 12,
         color: '#000000',
     },
     messageText: {
-        fontSize: 16,
+        fontSize: 18,
         color: '#666666',
         lineHeight: 20,
     },
