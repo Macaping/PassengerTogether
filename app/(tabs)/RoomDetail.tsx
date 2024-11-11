@@ -4,20 +4,37 @@ import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { PostgrestSingleResponse, UserResponse } from '@supabase/supabase-js';
 import { router } from 'expo-router';
-import React, { useCallback } from 'react';
-import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { Dimensions, StyleSheet, Text, TouchableOpacity, View, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width, height } = Dimensions.get('window');
 
 export default function RoomDetailView() {
   const { room, fetchRoomDetails } = useUserDataManagement();
-
+  const [isLoading, setIsLoading] = useState(true);
   useFocusEffect(
     useCallback(() => {
-      fetchRoomDetails();
+      const loadRoomDetails = async () => {
+        setIsLoading(true);
+        await fetchRoomDetails();
+        setIsLoading(false);
+      };
+
+      loadRoomDetails();
     }, [])
   );
+
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+        <Text style={styles.loadingText}>로딩 중...</Text>
+      </SafeAreaView>
+    );
+  }
+
 
   if (!room) {
     return (
@@ -126,10 +143,22 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  allContainer: {
+  loadingContainer: {
     flex: 1,
-    backgroundColor: "#6049E2",
-    alignItems: 'center'
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#e0f0ff',
+  },
+  loadingText: {
+    fontSize: width * 0.05,
+    color: '#333',
+    textAlign: 'center',
+    marginTop: 10,
+  },
+  allContainer:{
+    flex:1,
+    backgroundColor:"#6049E2",
+    alignItems:'center'
   },
   headerContainer: {
     height: 80,
