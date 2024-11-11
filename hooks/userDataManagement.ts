@@ -1,21 +1,26 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import type { Database } from "@/lib/supabase_type";
+import { RealtimeChannel } from "@supabase/supabase-js";
+
+type Room = Database['public']['Tables']['rooms']['Row'];
+type User = Database['public']['Tables']['users']['Row'];
 
 const useUserDataManagement = () => {
-  const [room, setRoom] = useState(null);
+  const [room, setRoom] = useState<Room | null>(null);
+  const [roomChannel, setRoomChannel] = useState<RealtimeChannel>();
 
   const fetchRoomDetails = async () => {
     const { data: { user }, error: userError } = await supabase.auth.getUser();
 
     if (userError) {
-      console.error("로그인한 사용자 정보 가져오기 오류:", userError);
+      console.error("User fetch error:", userError);
       return;
     }
 
     const userId = user?.id;
-
     if (!userId) {
-      console.error("사용자 ID가 없습니다.");
+      console.error("No user ID found.");
       return;
     }
 
@@ -26,13 +31,13 @@ const useUserDataManagement = () => {
       .single();
 
     if (userFetchError) {
-      console.error("사용자 정보 가져오기 오류:", userFetchError);
+      console.error("User data fetch error:", userFetchError);
       return;
     }
 
     const currentPartyId = userData?.current_party;
     if (!currentPartyId) {
-      setRoom(null); // Set room to null if there is no current party
+      setRoom(null);
       return;
     }
 
@@ -43,23 +48,28 @@ const useUserDataManagement = () => {
       .single();
 
     if (roomFetchError) {
-      console.error("방 정보 가져오기 오류:", roomFetchError);
-      setRoom(null); // Set room to null if there's an error fetching room data
+      console.error("Room data fetch error:", roomFetchError);
+      setRoom(null);
       return;
     }
 
-    const userInRoom = roomData.users && roomData.users.includes(userId);
-    if (!userInRoom) {
+    // Check if the user is in the room
+    const filteredUsers = roomData?.users?.filter(Boolean) as string[];
+    if (!filteredUsers.includes(userId)) {
       setRoom(null);
       return;
     }
 
     setRoom(roomData);
-    subscribeToRoomUpdates(currentPartyId);
   };
 
-  const subscribeToRoomUpdates = (roomId) => {
-    const roomChannel = supabase
+  const subscribeToRoomUpdates = (roomId: string) => {
+    // 구독이 이미 설정된 경우 해제
+    if (roomChannel) {
+      supabase.removeChannel(roomChannel);
+    }
+
+    const channel = supabase
       .channel("rooms")
       .on(
         "postgres_changes",
@@ -70,26 +80,31 @@ const useUserDataManagement = () => {
           filter: `id=eq.${roomId}`,
         },
         (payload) => {
-          console.log("Room update received:", payload);
           if (payload.eventType === "UPDATE") {
-            setRoom(payload.new);
+            console.log("Room updated:", payload.new);
+            setRoom(payload.new as Room);
           }
         }
       )
       .subscribe();
 
-    return () => {
-      supabase.removeSubscription(roomChannel);
-    };
+    // 채널 상태를 roomChannel에 저장
+    setRoomChannel(channel);
   };
 
   useEffect(() => {
     fetchRoomDetails();
 
-    return () => {
-      supabase.removeAllSubscriptions();
-    };
-  }, []);
+    if (room?.id) {
+      subscribeToRoomUpdates(room.id);
+
+      return () => {
+        if (roomChannel) {
+          supabase.removeChannel(roomChannel); // 해당 구독만 해제
+        }
+      };
+    }
+  }, [room?.id]);
 
   return { room, fetchRoomDetails };
 };
