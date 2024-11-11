@@ -1,25 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, FlatList, StyleSheet } from 'react-native';
 import { supabase } from '@/lib/supabase';
-import { getCurrentUserId } from '@/utils/authHelpers';
+import { useAuthUser } from '@/hooks/useAuthUser';
 
 export default function ChatView() {
-    const [userId, setUserId] = useState(null);
-    const [roomId, setRoomId] = useState(null);
+    const [roomId, setRoomId] = useState<string | null>(null);
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
+    const { user, loading } = useAuthUser();
 
     useEffect(() => {
         const fetchUserIdAndRoomId = async () => {
-            const id = await getCurrentUserId();
-            console.log('Fetched user ID:', id);
-            setUserId(id);
+            console.log('Fetched user ID:', user?.id);
 
-            if (id) {
+            if (user?.id) {
                 const { data, error } = await supabase
                     .from('users')
                     .select('current_party')
-                    .eq('user_id', id)
+                    .eq('user_id', user?.id)
                     .single();
 
                 if (error) {
