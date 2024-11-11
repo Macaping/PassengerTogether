@@ -1,24 +1,19 @@
-import React, { useState } from 'react';
-import { View, TextInput, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import useAuth from '../../hooks/useAuth';
+import { signUpUser } from '@/utils/auth.utils';
 import { router } from 'expo-router';
+import React, { useState } from 'react';
+import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
-const LoginView = () => {
+export default function SignUpView() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [nickname, setNickname] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const { handleSignIn } = useAuth(); // Destructure handleSignIn from useAuth
 
-  const onPressed = async () => {
-    try {
-      if (!email || !password) {
-        setErrorMessage('이메일과 비밀번호를 입력해주세요.');
-        return;
-      }
-      await handleSignIn(email, password);
-    } catch (error) {
-      setErrorMessage('비밀번호가 일치하지 않습니다.');
-    }
+  const handleSignUp = async () => {
+    signUpUser(email, password, confirmPassword, nickname)
+      .then(() => router.replace('/(tabs)/'))
+      .catch((e: string) => setErrorMessage(e));
   };
 
   return (
@@ -26,36 +21,41 @@ const LoginView = () => {
       <Text style={styles.title}>Passenger Together.</Text>
       <Text style={styles.subtitle}>Call Van Matching App</Text>
 
-      <Text style={styles.label}>이메일</Text>
       <TextInput
         style={styles.input}
         placeholder="이메일을 입력하세요"
         value={email}
         onChangeText={setEmail}
       />
-
-      <Text style={styles.label}>비밀번호</Text>
       <TextInput
-        style={[styles.input, errorMessage ? styles.errorInput : null]}
+        style={styles.input}
         placeholder="비밀번호를 입력하세요"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
       />
+      <TextInput
+        style={styles.input}
+        placeholder="비밀번호를 한번 더 입력하세요"
+        value={confirmPassword}
+        onChangeText={setConfirmPassword}
+        secureTextEntry
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="두글자 이상의 닉네임을 입력하세요"
+        value={nickname}
+        onChangeText={setNickname}
+      />
+
       {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
 
-      <TouchableOpacity style={styles.loginButton} onPress={onPressed}>
-        <Text style={styles.loginButtonText}>로그인</Text>
+      <TouchableOpacity style={styles.signupButton} onPress={handleSignUp}>
+        <Text style={styles.signupButtonText}>회원가입</Text>
       </TouchableOpacity>
-
-      <Text style={styles.footerText}>아직 회원이 아니신가요?
-        <Text style={styles.signupText} onPress={() => router.push('/SignupView')}>
-          {'  '}회원가입
-        </Text>
-      </Text>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -79,13 +79,6 @@ const styles = StyleSheet.create({
     width: '80%',
     textAlign: 'left',
   },
-  label: {
-    width: '80%',
-    textAlign: 'left',
-    fontSize: 14,
-    color: '#000',
-    marginBottom: 4,
-  },
   input: {
     width: '80%',
     height: 50,
@@ -96,41 +89,25 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     backgroundColor: '#fff',
   },
-  errorInput: {
-    borderColor: '#FF0000',
-  },
   errorText: {
     color: '#FF0000',
     fontSize: 12,
-    marginBottom: 24,
-    marginTop:-4,
-    width: '80%',
-    marginLeft:2,
+    marginBottom: 12,
     textAlign: 'left',
+    width: '80%',
   },
-  loginButton: {
+  signupButton: {
     width: '80%',
     height: 50,
     backgroundColor: '#5D3FD3',
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    marginBottom: 12,
+    marginTop: 16,
   },
-  loginButtonText: {
+  signupButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
   },
-  footerText: {
-    fontSize: 14,
-    color: '#999999',
-    marginTop: 16,
-  },
-  signupText: {
-    color: '#5D3FD3',
-    fontWeight: 'bold',
-  },
 });
-
-export default LoginView;

@@ -1,17 +1,22 @@
-import DateTimePicker from '@react-native-community/datetimepicker';
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import * as Location from 'expo-location';
 import { Link } from 'expo-router';
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FlatList, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MapView, { Marker, Polyline } from 'react-native-maps';
-import { StatusBar } from 'react-native-web';
 import { Dimensions } from 'react-native'; //Dimensions API를 이용해 화면의 너비나 높이에 따라 fontSize를 설정
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width, height } = Dimensions.get('window'); //Dimensions 이용
 
-const HomeView = () => {
+
+export default function HomeView() {
   const locations = ['천안역', '천안아산역', '선문대', '탕정역', '두정동 롯데'];
-  const coordinates = {
+  interface Coordinates {
+    latitude: number;
+    longitude: number;
+  }
+  const coordinates: { [key: string]: Coordinates } = {
     '천안역': { latitude: 36.8089885, longitude: 127.148933 },
     '천안아산역': { latitude: 36.7946071, longitude: 127.1045608 },
     '선문대': { latitude: 36.7989764, longitude: 127.0750025 },
@@ -28,11 +33,11 @@ const HomeView = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [changingLocationType, setChangingLocationType] = useState('departure');
 
-  const [location, setLocation] = useState(null);
-  const [errorMsg, setErrorMsg] = useState(null);
-  const [route, setRoute] = useState(null);
-  const [distance, setDistance] = useState(null);
-  const [duration, setDuration] = useState(null);
+  const [location, setLocation] = useState<Location.LocationObjectCoords | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [route, setRoute] = useState<{ latitude: number; longitude: number }[]>([]);
+  const [distance, setDistance] = useState<number | null>(null);
+  const [duration, setDuration] = useState<number | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -65,7 +70,7 @@ const HomeView = () => {
       const response = await fetch(url);
       const data = await response.json();
       const geometry = data.features[0].geometry.coordinates;
-      const polylineCoords = geometry.map(coord => ({ latitude: coord[1], longitude: coord[0] }));
+      const polylineCoords: { latitude: number; longitude: number }[] = geometry.map((coord: [number, number]) => ({ latitude: coord[1], longitude: coord[0] }));
       setRoute(polylineCoords);
 
       const summary = data.features[0].properties.summary;
@@ -76,7 +81,7 @@ const HomeView = () => {
     }
   };
 
-  const handleDateChange = (event, selectedDate) => {
+  const handleDateChange = (_event: DateTimePickerEvent, selectedDate?: Date | undefined): void => {
     setShowDatePicker(false);
     if (selectedDate) {
       const newDate = new Date(date);
@@ -85,7 +90,7 @@ const HomeView = () => {
     }
   };
 
-  const handleTimeChange = (event, selectedTime) => {
+  const handleTimeChange = (_event: DateTimePickerEvent, selectedTime?: Date) => {
     setShowTimePicker(false);
     if (selectedTime) {
       const newDate = new Date(date);
@@ -95,14 +100,14 @@ const HomeView = () => {
     }
   };
 
-  const openLocationModal = (type) => {
+  const openLocationModal = (type: 'departure' | 'destination') => {
     setChangingLocationType(type);
     setModalVisible(true);
   };
 
-  const mapRef = useRef(null);
+  const mapRef = useRef<MapView | null>(null);
 
-  const handleLocationSelect = (location) => {
+  const handleLocationSelect = (location: string) => {
     if (changingLocationType === 'departure') {
       setSelectedDeparture(location);
     } else {
@@ -110,7 +115,7 @@ const HomeView = () => {
     }
     setModalVisible(false);
 
-    const selectedCoordinates = coordinates[location];
+    const selectedCoordinates: Coordinates = coordinates[location];
     mapRef.current?.animateToRegion(
       {
         latitude: selectedCoordinates.latitude,
@@ -120,13 +125,10 @@ const HomeView = () => {
       },
       1000 // 애니메이션 지속 시간 (1초)
     );
-
-
   };
 
   return (
-    <View style={styles.container}>
-      <StatusBar style="light" />
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerText}>조회</Text>
       </View>
@@ -276,8 +278,12 @@ const HomeView = () => {
       </View>
 
       <View style={styles.buttonContainer}>
-        <Link href="/RoomList" style={styles.button}>
-          <Text style={styles.buttonText}>  방 탐색</Text>
+        <Link href={{
+          pathname: "/RoomList",
+          params: { selectedDeparture, selectedDestination, date: date.toISOString() }
+        }}
+          style={styles.button}>
+          <Text style={styles.buttonText}>방 탐색</Text>
         </Link>
 
         <Link
@@ -290,9 +296,9 @@ const HomeView = () => {
           <Text style={styles.buttonText}>방장 하기</Text>
         </Link>
       </View>
-    </View>
+    </SafeAreaView>
   );
-};
+}
 
 
 const styles = StyleSheet.create({   // 맨 위 타이틀, 버튼
@@ -480,9 +486,9 @@ const date_styles = StyleSheet.create({   // 날짜, 시간
     fontSize: width * 0.06,
     color: '#6B59CC',
   },
-
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });
-
-
-
-export default HomeView;

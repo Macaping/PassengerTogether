@@ -1,4 +1,5 @@
 import { createRoom } from '@/hooks/createRoom';
+import useJoinRoom from '@/hooks/useJoinRoom';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
@@ -8,16 +9,15 @@ import { Dimensions } from 'react-native'; //Dimensions API를 이용해 화면�
 const { width, height } = Dimensions.get('window'); //Dimensions 이용
 
 
-const RoomMake = () => {
-//  const { selectedDeparture = '기본 출발지', selectedDestination = '기본 도착지', date = new Date().toISOString() } = useLocalSearchParams();
-const { selectedDeparture = '기본 출발지', selectedDestination = '기본 도착지', date } = useLocalSearchParams();
+export default function RoomMakeView() {
+  const { selectedDeparture = '기본 출발지', selectedDestination = '기본 도착지', date } = useLocalSearchParams();
 
-// date가 배열이면 첫 번째 요소를 가져오고, 그렇지 않으면 date 그대로 사용
-const initialDate = Array.isArray(date) ? new Date(date[0]) : new Date(date || new Date());
+  // date가 배열이면 첫 번째 요소를 가져오고, 그렇지 않으면 date 그대로 사용
+  const initialDate = Array.isArray(date) ? new Date(date[0]) : new Date(date || new Date());
 
   const [departure, setDeparture] = useState(selectedDeparture);
   const [destination, setDestination] = useState(selectedDestination);
-//  const [selectedDate, setSelectedDate] = useState(new Date(date));
+  //  const [selectedDate, setSelectedDate] = useState(new Date(date));
   const [selectedDate, setSelectedDate] = useState(initialDate);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
@@ -71,7 +71,8 @@ const initialDate = Array.isArray(date) ? new Date(date[0]) : new Date(date || n
   };
 
   const handleCreateRoom = async () => {
-    await createRoom({
+    // 방 생성
+    const roomData = await createRoom({
       departure_time: selectedDate.toISOString(),
       origin: departure as string,
       destination: destination as string,
@@ -79,6 +80,8 @@ const initialDate = Array.isArray(date) ? new Date(date[0]) : new Date(date || n
       users: [],
       details: details,
     });
+    // 방 생성한 사람이 방에 참가
+    await useJoinRoom(roomData.id);
   };
 
   return (
@@ -179,7 +182,7 @@ const initialDate = Array.isArray(date) ? new Date(date[0]) : new Date(date || n
       </TouchableOpacity>
     </View>
   );
-};
+}
 
 
 const styles = StyleSheet.create({
@@ -338,7 +341,3 @@ const passenger_styles = StyleSheet.create({
     fontSize: width * 0.038,
   },
 });
-
-
-
-export default RoomMake;

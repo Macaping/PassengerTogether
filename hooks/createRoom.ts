@@ -1,4 +1,4 @@
-import { supabase } from "@/services/supabaseClient";
+import { supabase } from "@/lib/supabase";
 
 export async function createRoom(
     { departure_time, origin, destination, limit_people, users = [], details }:
@@ -12,19 +12,25 @@ export async function createRoom(
         users: users,
         details: details,
     };
-    roomData.users.push((await (supabase.auth.getSession())).data.session?.user?.id as string);
     console.log('roomData:', roomData);
 
     try {
-        const { error } = await supabase
+        // 방을 생성하고 생성된 방 데이터를 반환
+        const { data: insertedData, error } = await supabase
             .from('rooms')
-            .insert([roomData]);
+            .insert([roomData])
+            .select();
 
         if (error) {
             throw error.message;
         }
         console.log('Room created successfully');
+        // 성공적으로 생성된 방 데이터 반환
+        console.log('insertedData:', insertedData.at(0));
+        return insertedData.at(0);
     } catch (error) {
+        // 오류
         console.error('Failed to create room:', error);
     }
+    return null;
 }
