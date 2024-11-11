@@ -1,18 +1,28 @@
-import React, { useEffect } from 'react';
+import useUserDataManagement from '@/hooks/userDataManagement';
+import { useFocusEffect } from '@react-navigation/native';
+import React, { useCallback } from 'react';
 import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import useUserDataManagement from '../../hooks/userDataManagement';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
 const { width, height } = Dimensions.get('window');
 
-const RoomDetailView = () => {
+export default function RoomDetailView() {
   const { room, fetchRoomDetails } = useUserDataManagement();
 
-  useEffect(() => {
-    fetchRoomDetails();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchRoomDetails();
+    }, [])
+  );
 
   if (!room) {
-    return <Text>로딩 중...</Text>;
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.centeredMessageContainer}>
+          <Text style={styles.centeredMessageText}>현재 참여한 방이 없습니다.</Text>
+        </View>
+      </SafeAreaView>
+    );
   }
 
   return (
@@ -67,7 +77,7 @@ const RoomDetailView = () => {
       </View>
     </SafeAreaView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -75,6 +85,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#e0f0ff',
+  },
+  centeredMessageContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  centeredMessageText: {
+    fontSize: width * 0.05,
+    color: '#333',
+    textAlign: 'center',
   },
   ticketContainer: {
     width: width * 0.92,
@@ -230,5 +250,3 @@ const styles = StyleSheet.create({
     borderRadius: width * 0.05,
   },
 });
-
-export default RoomDetailView;

@@ -15,7 +15,7 @@ export default function TabLayout() {
         headerShown: false,
       }}>
       <Tabs.Screen
-        name="RoomDetailView"
+        name="RoomDetail"
         options={{
           title: '나의 티켓',
           tabBarIcon: ({ color, focused }) => (
@@ -42,7 +42,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="LoginView"
+        name="SignIn"
         options={{
           title: '로그인',
           tabBarIcon: ({ color, focused }) => (
@@ -51,7 +51,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="SignupView"
+        name="SignUp"
         options={{
           title: '회원가입',
           tabBarIcon: ({ color, focused }) => (
@@ -59,8 +59,8 @@ export default function TabLayout() {
           ),
         }}
       />
-      <Tabs.Screen //내정보 아이콘 추가
-        name="Mypage"
+      <Tabs.Screen
+        name="MyPage"
         options={{
           title: '내정보',
           tabBarIcon: ({ color, focused }) => (
@@ -68,10 +68,15 @@ export default function TabLayout() {
           ),
         }}
       />
-
-
-
-
+      <Tabs.Screen
+        name="RoomMake"
+        options={{
+          title: '방 만들기',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? 'add-circle' : 'add-circle-outline'} color={color} />
+          ),
+        }}
+      />
     </Tabs>
   );
 }

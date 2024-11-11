@@ -24,7 +24,7 @@ const { width, height } = Dimensions.get('window');
 
 
 
-const Header = ({ origin, destination,today }: { origin: string, destination: string, today:Date}) => (
+const Header = ({ origin, destination, today }: { origin: string, destination: string, today: Date }) => (
     <View style={headerStyles.headerContainer}>
         <Text style={headerStyles.title}>방 리스트</Text>
         <Text style={headerStyles.date}>{today}</Text>
@@ -48,7 +48,7 @@ const headerStyles = StyleSheet.create({
         color: '#ffffff',
     },
     date: {
-        width:'80%',
+        width: '80%',
         color: '#ffffff',
         fontSize: 20,
         paddingTop: '6%'
@@ -142,7 +142,7 @@ const RoomDetailModal = ({ visible, room, onClose, onJoin }: RoomDetailModalProp
                             </Text>
                         </View>
 
-                   
+
                         <TouchableOpacity
                             style={modalStyles.joinButton}
                             onPress={onJoin}
@@ -212,7 +212,7 @@ const modalStyles = StyleSheet.create({
         color: '#666666',
         lineHeight: 20,
     },
-    
+
     joinButton: {
         backgroundColor: '#6049E2',
         padding: 16,
@@ -249,12 +249,12 @@ const itemStyles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         backgroundColor: '#ffffff',
-        alignItems:'center',
+        alignItems: 'center',
         borderWidth: 0.5,
         borderColor: '#A594F9',
         borderRadius: 8,
         padding: 20,
-        top:'-4%'  
+        top: '-4%'
     },
     header: {
         backgroundColor: '#A594F9',
@@ -273,34 +273,34 @@ const itemStyles = StyleSheet.create({
         fontWeight: 'bold',
     },
     방_번호: {
-        width:'50%',
+        width: '50%',
         textAlign: 'left',
         color: '#000000',
         fontSize: 20,
-        fontWeight:'500'
-        
+        fontWeight: '500'
+
     },
     현재인원_최대인원: {
         color: '#000000',
         fontSize: 18,
         fontWeight: '600',
-        right:'20%',
-        top:'3%'
-           },
+        right: '20%',
+        top: '3%'
+    },
 });
 
-export default function RoomList() {
+export default function RoomListView() {
     const { rooms, loading, error } = useLoadRooms();
     const [selectedRoom, setSelectedRoom] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
-    const { selectedDeparture = '출발지', selectedDestination = '도착지',  date} = useLocalSearchParams();
+    const { selectedDeparture = '출발지', selectedDestination = '도착지', date } = useLocalSearchParams();
     const parsedDate = date ? new Date(date) : new Date();
     const formattedDate = parsedDate.toLocaleDateString('ko-KR', {
-        month: 'long',  
+        month: 'long',
         day: 'numeric',
-        weekday: 'short' 
+        weekday: 'short'
     });
-    
+
 
 
 
@@ -311,9 +311,10 @@ export default function RoomList() {
 
     const handleJoinRoom = (room) => {
         if (!room) return
-        useJoinRoom(room.id);
-        setModalVisible(false);
-        router.replace('/RoomDetailView');
+        useJoinRoom(room.id).then(() => {
+            setModalVisible(false);
+            router.replace('/(tabs)/RoomDetail')
+        });
     };
 
 
@@ -337,7 +338,7 @@ export default function RoomList() {
     return (
         <SafeAreaView style={styles.container}>
             {/* Header 컴포넌트를 사용하여 화면 상단에 제목과 부제목을 표시합니다. */}
-            <Header origin={selectedDeparture} destination={selectedDestination}  today={formattedDate} />
+            <Header origin={selectedDeparture} destination={selectedDestination} today={formattedDate} />
             {/* FlatList 컴포넌트를 사용하여 방 목록을 표시합니다. */}
             <RoomDetailModal
                 visible={modalVisible}
@@ -346,15 +347,15 @@ export default function RoomList() {
                 onJoin={() => handleJoinRoom(selectedRoom)}
             />
             <View style={listStyles.indexContainer}>
-                    <Text style={listStyles.indexText}>출발 시각</Text>
-                    <Text style={listStyles.indexText}>방 내용</Text>
-                    <Text style={listStyles.indexText}>인원수</Text>
+                <Text style={listStyles.indexText}>출발 시각</Text>
+                <Text style={listStyles.indexText}>방 내용</Text>
+                <Text style={listStyles.indexText}>인원수</Text>
 
-                </View>
+            </View>
             <View style={styles.container}>
                 <View style={listStyles.columnCrossline} />
 
-               
+
                 <View style={listStyles.Container}>
 
                     <FlatList
