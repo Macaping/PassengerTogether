@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, FlatList, StyleSheet } from 'react-native';
 import { supabase } from '@/lib/supabase';
-import { getCurrentUserId } from '@/hooks/authHelpers';
+import { getCurrentUserId } from '@/utils/authHelpers';
 
 export default function ChatView() {
     const [userId, setUserId] = useState(null);
