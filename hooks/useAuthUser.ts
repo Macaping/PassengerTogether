@@ -8,10 +8,15 @@ export function useAuthUser() {
 
     useEffect(() => {
         // 초기 사용자 상태 확인
-        getUserFromSupabase().then((value: void | { user: User; }) => {
-            setUser(user);
-            setLoading(false);
-        });
+        getUserFromSupabase()
+            .then((value: void | { user: User; }) => {
+                setUser(user);
+            }).then(() => {
+                setLoading(false);
+                if (!user) throw Error("유저가 없습니다.");
+            }).catch((error: Error) => {
+                console.log(error.message);
+            });
 
         // 인증 상태 변경 구독
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
