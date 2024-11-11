@@ -5,7 +5,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { FlatList, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { StatusBar } from 'react-native-web';
 
 
 export default function HomeView() {
@@ -127,7 +126,6 @@ export default function HomeView() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar style="light" />
       <View style={styles.header}>
         <Text style={styles.headerText}>조회</Text>
       </View>
