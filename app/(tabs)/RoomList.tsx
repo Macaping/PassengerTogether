@@ -88,6 +88,8 @@ const headerStyles = StyleSheet.create({
 type Room = {
     id: string;
     created_at: string;
+    origin: string;
+    destination: string;
     departure_time: Date;
     limit_people: number;
     users: string[];
@@ -362,16 +364,36 @@ const itemStyles = StyleSheet.create({
 });
 
 export default function RoomListView() {
-    const { rooms, loading, error } = useLoadRooms();
     const [selectedRoom, setSelectedRoom] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
+
+    // 출발지와 도착지 선택 파라미터를 받아오기
     const { selectedDeparture = '출발지', selectedDestination = '도착지', date } = useLocalSearchParams();
-    const parsedDate = date ? new Date(date) : new Date();
-    const formattedDate = parsedDate.toLocaleDateString('ko-KR', {
+
+    // 배열로 받을 경우 첫 번째 값만 사용
+    const departure = Array.isArray(selectedDeparture) ? selectedDeparture[0] : selectedDeparture;
+    const destination = Array.isArray(selectedDestination) ? selectedDestination[0] : selectedDestination;
+
+    // 사용자가 선택한 시간과 날짜를 minDepartureTime으로 설정
+    const minDepartureTime = date ? new Date(date) : new Date();
+     
+    // 출발지, 도착지, 기준 시간을 파라미터로 useLoadRooms 호출
+    const { rooms, loading, error } = useLoadRooms(departure, destination, minDepartureTime);
+
+    // 날짜 포맷
+    const formattedDate = minDepartureTime.toLocaleDateString('ko-KR', {
         month: 'long',
         day: 'numeric',
         weekday: 'short'
     });
+    
+//    const parsedDate = date ? new Date(date) : new Date();
+/*    const formattedDate = parsedDate.toLocaleDateString('ko-KR', {
+        month: 'long',
+        day: 'numeric',
+        weekday: 'short'
+    });
+*/
 
 
 

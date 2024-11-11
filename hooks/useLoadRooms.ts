@@ -1,21 +1,29 @@
 import { supabase } from "@/lib/supabase";
 import { PostgrestError } from "@supabase/supabase-js";
-import { useEffect, useState } from "react";
-
-const useLoadRooms = () => {
+import { useEffect, useState, useCallback } from "react";
+ 
+const useLoadRooms = (origin: string, destination: string, minDepartureTime: Date) => {  //(origin: string, destination: string)
     const [loading, setLoading] = useState(false);
-    const [rooms, setRooms] = useState<any[] | null>();
+    const [rooms, setRooms] = useState<any[] | null>(null);
     const [error, setError] = useState<string | null>(null);
 
-    const fetchRooms = async () => {
+    // `minDepartureTime`을 `ISO` 형식 문자열로 변환하여 종속성으로 사용
+    const minDepartureTimeIso = minDepartureTime.toISOString();
+    
+    const fetchRooms = useCallback(async () => {
         try {
             setLoading(true);
-            // departure_time 순으로 가져오기
-            let { data, error } = await supabase.from("rooms")
+            const { data, error } = await supabase
+                .from("rooms")
                 .select("*")
+                .eq("origin", origin)
+                .eq("destination", destination)
+                .gte("departure_time", minDepartureTimeIso) // 기준 시간 이후 방만 가져옴
                 .order("departure_time", { ascending: true });
 
+            console.log("Fetched data:", data); // 데이터 확인용 로그
             if (error) {
+                console.error("Fetch error:", error);
                 throw error;
             }
             setRooms(data);
@@ -24,7 +32,7 @@ const useLoadRooms = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [origin, destination, minDepartureTimeIso]); // 안정적 종속성 설정
 
     useEffect(() => {
         // 리얼타임 데이터베이스 변경 감지
@@ -37,7 +45,15 @@ const useLoadRooms = () => {
                     table: "rooms"
                 },
                 (payload) => {
-                    if (payload.eventType === "INSERT") {
+                    const eventTime = payload.new?.departure_time ? new Date(payload.new.departure_time) : null;
+                    if (
+                        payload.eventType === "INSERT" && 
+                         payload.new?.origin === origin && 
+                         payload.new?.destination === destination &&
+                         eventTime && eventTime >= new Date(minDepartureTimeIso) // 기준 시간 비교
+                        )  {
+
+                        console.log("INSERT detected:", payload.new);
                         setRooms((current) => {
                             if (!current) return [payload.new];
                             const newRooms = [...current, payload.new];
@@ -69,7 +85,7 @@ const useLoadRooms = () => {
         return () => {
             channel.unsubscribe();
         };
-    }, []);
+    }, [fetchRooms]);
 
     return { loading, rooms, error };
 };
