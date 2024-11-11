@@ -1,6 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient } from '@supabase/supabase-js';
 import { Platform } from 'react-native';
+// supabase의 Database 타입을 가져옵니다.
+import { Database } from './supabase_type';
 
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '';
@@ -15,4 +17,4 @@ const options = Platform.OS === 'web' ? {} : {
   },
 };
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, options);
+export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, options);
