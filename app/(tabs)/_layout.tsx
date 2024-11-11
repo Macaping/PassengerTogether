@@ -62,7 +62,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="MyPage"
         options={{
-          title: '내정보',
+          title: '마이 페이지',
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon name={focused ? 'person-circle' : 'person-circle-outline'} color={color} />
           ),
