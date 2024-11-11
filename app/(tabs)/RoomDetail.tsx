@@ -1,21 +1,41 @@
 import useUserDataManagement from '@/hooks/userDataManagement';
-import { useFocusEffect } from '@react-navigation/native';
-import React, { useCallback } from 'react';
-import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { supabase } from '@/lib/supabase';
 import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
+import { PostgrestSingleResponse, UserResponse } from '@supabase/supabase-js';
+import { router } from 'expo-router';
+import React, { useCallback, useState } from 'react';
+import { Dimensions, StyleSheet, Text, TouchableOpacity, View, ActivityIndicator } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const {width, height } = Dimensions.get('window');
 
 
 export default function RoomDetailView() {
   const { room, fetchRoomDetails } = useUserDataManagement();
-
+  const [isLoading, setIsLoading] = useState(true);
   useFocusEffect(
     useCallback(() => {
-      fetchRoomDetails();
+      const loadRoomDetails = async () => {
+        setIsLoading(true);
+        await fetchRoomDetails();
+        setIsLoading(false);
+      };
+
+      loadRoomDetails();
     }, [])
   );
+
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+        <Text style={styles.loadingText}>로딩 중...</Text>
+      </SafeAreaView>
+    );
+  }
+
 
   if (!room) {
     return (
@@ -27,28 +47,54 @@ export default function RoomDetailView() {
     );
   }
 
+  const handleLeaveRoom = async () => {
+    supabase.auth.getUser()
+      // 사용자 정보 가져오기
+      .then((value: UserResponse) => {
+        if (value.error) throw value.error;
+        return value.data.user.id;
+      })
+      // 사용자를 방에서 나가게 하기
+      .then((userId: string) => {
+        supabase
+          .from('users')
+          .update({ current_party: null })
+          .eq('user_id', userId)
+          .then((value: PostgrestSingleResponse<null>) => {
+            if (value.error) throw value.error;
+            return value.data;
+          });
+      })
+      // 페이지 이동
+      .then(() => {
+        router.replace('/(tabs)/');
+      })
+      // 오류 처리
+      .catch((error: Error) => {
+        console.error('사용자 정보 가져오기 오류:', error);
+      });
+  };
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.allContainer}>
         <View style={styles.headerContainer}>
-        <Text style={styles.header}>나의 티켓</Text>
+          <Text style={styles.header}>나의 티켓</Text>
         </View>
-      
-      <View style={styles.ticketContainer}>
-        <View style={styles.ticketHeader}>
-          <Text style={styles.ticketId}>{room.created_at.slice(-10, -6)}</Text>
-        </View>
-        
-        
-        <View style={styles.timeContainer}>
-        <Text style={styles.timeLabel}>출발 시각</Text>
+
+        <View style={styles.ticketContainer}>
+          <View style={styles.ticketHeader}>
+            <Text style={styles.ticketId}>{room.created_at.slice(-10, -6)}</Text>
+          </View>
+
+          <View style={styles.timeContainer}>
+            <Text style={styles.timeLabel}>출발 시각</Text>
             <Text style={styles.timeValue}>
-              {`${new Date(room.departure_time).getMonth() + 1}월 ${new Date(room.departure_time).getDate()}일 (${['일','월','화','수','목','금','토'][new Date(room.departure_time).getDay()]}) ${String(new Date(room.departure_time).getHours()).padStart(2, '0')}:${String(new Date(room.departure_time).getMinutes()).padStart(2, '0')}`}
+              {`${new Date(room.departure_time).getMonth() + 1}월 ${new Date(room.departure_time).getDate()}일 (${['일', '월', '화', '수', '목', '금', '토'][new Date(room.departure_time).getDay()]}) ${String(new Date(room.departure_time).getHours()).padStart(2, '0')}:${String(new Date(room.departure_time).getMinutes()).padStart(2, '0')}`}
             </Text>
 
-        </View>
-        <View style={styles.routeSection}>
+          </View>
+          <View style={styles.routeSection}>
             <View style={styles.routeItem}>
               <Text style={styles.routeLabel}>출발</Text>
               <Text style={styles.routeValue}>{room.origin}</Text>
@@ -67,24 +113,24 @@ export default function RoomDetailView() {
             <Text style={styles.detailsText}>{room.details}</Text>
           </View>
 
-        {/* 점선 구간 */}
-        <View style={styles.separatorContainer}>
-          <View style={styles.dottedLine} />
-          <View style={styles.leftCircle} />
-          <View style={styles.rightCircle} />
-        </View>
+          {/* 점선 구간 */}
+          <View style={styles.separatorContainer}>
+            <View style={styles.dottedLine} />
+            <View style={styles.leftCircle} />
+            <View style={styles.rightCircle} />
+          </View>
 
-        <View style={styles.buttonContainer}>
+          <View style={styles.buttonContainer}>
             <TouchableOpacity style={styles.iconButton}>
-            <Ionicons name="chatbubbles-outline" size={24} color="#666666" />
+              <Ionicons name="chatbubbles-outline" size={24} color="#666666" />
               <Text style={styles.iconButtonText}>채팅</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.iconButton}>
-            <Ionicons name="people-outline" size={24} color="#666666" />
+              <Ionicons name="people-outline" size={24} color="#666666" />
               <Text style={styles.iconButtonText}>동승자</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.iconButton}>
-            <Ionicons name="exit-outline" size={24} color="#666666" />
+            <TouchableOpacity style={styles.iconButton} onPress={handleLeaveRoom}>
+              <Ionicons name="exit-outline" size={24} color="#666666" />
               <Text style={styles.iconButtonText}>나가기</Text>
             </TouchableOpacity>
           </View>
@@ -97,6 +143,18 @@ export default function RoomDetailView() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#e0f0ff',
+  },
+  loadingText: {
+    fontSize: width * 0.05,
+    color: '#333',
+    textAlign: 'center',
+    marginTop: 10,
   },
   allContainer:{
     flex:1,
@@ -208,7 +266,7 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
 
-  
+
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
