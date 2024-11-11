@@ -5,7 +5,6 @@ import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-nati
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width, height } = Dimensions.get('window');
-import { StatusBar } from 'react-native-web';
 
 export default function RoomDetailView() {
   const { room, fetchRoomDetails } = useUserDataManagement();
