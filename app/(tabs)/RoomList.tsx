@@ -1,16 +1,15 @@
 import useJoinRoom from '@/hooks/useJoinRoom';
 import useLoadRooms from '@/hooks/useLoadRooms';
 import { router, useLocalSearchParams } from 'expo-router';
-import React, { useRef, useEffect,useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
     ActivityIndicator,
+    Animated,
     Dimensions,
     FlatList,
     Modal,
-    Animated,
     StyleSheet,
     Text,
-    TextInput,
     TouchableOpacity,
     TouchableWithoutFeedback,
     View
@@ -23,7 +22,7 @@ const { width, height } = Dimensions.get('window');
 
 
 
-const Header = ({ origin, destination,today }: { origin: string, destination: string, today:Date}) => (
+const Header = ({ origin, destination, today }: { origin: string, destination: string, today: Date }) => (
     <View style={headerStyles.headerContainer}>
         <Text style={headerStyles.title}>방 리스트</Text>
         <Text style={headerStyles.date}>{today}</Text>
@@ -47,7 +46,7 @@ const headerStyles = StyleSheet.create({
         color: '#ffffff',
     },
     date: {
-        width:'80%',
+        width: '80%',
         color: '#ffffff',
         fontSize: 20,
         paddingTop: '6%'
@@ -94,7 +93,7 @@ type Room = {
     limit_people: number;
     users: string[];
     status: string;
-    details:string;
+    details: string;
 };
 
 type RoomDetailModalProps = {
@@ -148,7 +147,7 @@ const RoomDetailModal = ({ visible, room, onClose, onJoin }: RoomDetailModalProp
             animationType="none"
         >
             <View style={modalStyles.container}>
-                <Animated.View 
+                <Animated.View
                     style={[
                         modalStyles.backdrop,
                         {
@@ -161,7 +160,7 @@ const RoomDetailModal = ({ visible, room, onClose, onJoin }: RoomDetailModalProp
                         <View style={modalStyles.backdropTouchable} />
                     </TouchableWithoutFeedback>
                 </Animated.View>
-                
+
                 <Animated.View
                     style={[
                         modalStyles.modalContent,
@@ -173,19 +172,19 @@ const RoomDetailModal = ({ visible, room, onClose, onJoin }: RoomDetailModalProp
                     <View style={modalStyles.handleBar} />
                     <Text style={modalStyles.modalName}>{room.created_at.slice(-10, -6)}</Text>
 
-                     {/* 출발 시각과 인원을 한 줄로 배치 */}
-                     <View style={modalStyles.headerSection}>
+                    {/* 출발 시각과 인원을 한 줄로 배치 */}
+                    <View style={modalStyles.headerSection}>
                         <Text style={modalStyles.modalTime}>
-                        <Text style={modalStyles.labelText}>출발 시각: </Text>
-                                <Text style={modalStyles.timeText}>
-                                    {new Date(room.departure_time).getHours().toString().padStart(2, '0')}:
-                                    {new Date(room.departure_time).getMinutes().toString().padStart(2, '0')}
-                                </Text>
+                            <Text style={modalStyles.labelText}>출발 시각: </Text>
+                            <Text style={modalStyles.timeText}>
+                                {new Date(room.departure_time).getHours().toString().padStart(2, '0')}:
+                                {new Date(room.departure_time).getMinutes().toString().padStart(2, '0')}
+                            </Text>
                         </Text>
                         <Text style={modalStyles.modalMembers}>
                             <Text style={modalStyles.labelText}>인원: </Text>
                             <Text style={modalStyles.timeText}>{room.users ? room.users.length : 0}/{room.limit_people}</Text>
-                    </Text>
+                        </Text>
                     </View>
 
                     <View style={modalStyles.divider} />
@@ -214,10 +213,8 @@ const modalStyles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: 'flex-end',
-        
     },
     backdrop: {
-        
         position: 'absolute',
         top: 0,
         left: 0,
@@ -233,7 +230,7 @@ const modalStyles = StyleSheet.create({
         borderTopLeftRadius: 24,
         borderTopRightRadius: 24,
         paddingHorizontal: 25,
-        height: height * 0.45, 
+        height: height * 0.45,
         width: '100%',
     },
     handleBar: {
@@ -245,9 +242,9 @@ const modalStyles = StyleSheet.create({
         marginTop: 12,
         marginBottom: 20,
     },
-    modalName:{
-        fontSize:25,
-        fontWeight:'600'
+    modalName: {
+        fontSize: 25,
+        fontWeight: '600'
     },
     headerSection: {
         flexDirection: 'row',
@@ -325,12 +322,12 @@ const itemStyles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         backgroundColor: '#ffffff',
-        alignItems:'center',
+        alignItems: 'center',
         borderWidth: 0.5,
         borderColor: '#A594F9',
         borderRadius: 8,
         padding: 20,
-        top:'-4%'  
+        top: '-4%'
     },
     header: {
         backgroundColor: '#A594F9',
@@ -349,33 +346,36 @@ const itemStyles = StyleSheet.create({
         fontWeight: 'bold',
     },
     방_번호: {
-        width:'50%',
+        width: '50%',
         textAlign: 'left',
         color: '#000000',
         fontSize: 20,
-        fontWeight:'500'
-        
+        fontWeight: '500'
+
     },
     현재인원_최대인원: {
         color: '#000000',
         fontSize: 18,
         fontWeight: '600',
-        right:'20%',
-        top:'3%'
-           },
+        right: '20%',
+        top: '3%'
+    },
 });
 
-export default function RoomList() {
+export default function RoomListView() {
     const { rooms, loading, error } = useLoadRooms();
     const [selectedRoom, setSelectedRoom] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
-    const { selectedDeparture = '출발지', selectedDestination = '도착지',  date} = useLocalSearchParams();
+    const { selectedDeparture = '출발지', selectedDestination = '도착지', date } = useLocalSearchParams();
     const parsedDate = date ? new Date(date) : new Date();
     const formattedDate = parsedDate.toLocaleDateString('ko-KR', {
-        month: 'long',  
+        month: 'long',
         day: 'numeric',
-        weekday: 'short' 
+        weekday: 'short'
     });
+
+
+
 
     const handleRoomPress = (room) => {
         setSelectedRoom(room);
@@ -384,9 +384,10 @@ export default function RoomList() {
 
     const handleJoinRoom = (room) => {
         if (!room) return
-        useJoinRoom(room.id);
-        setModalVisible(false);
-        router.replace('/RoomDetailView');
+        useJoinRoom(room.id).then(() => {
+            setModalVisible(false);
+            router.replace('/(tabs)/RoomDetail')
+        });
     };
 
 
@@ -410,26 +411,22 @@ export default function RoomList() {
     return (
         <SafeAreaView style={styles.container}>
             {/* Header 컴포넌트를 사용하여 화면 상단에 제목과 부제목을 표시합니다. */}
-            <Header origin={selectedDeparture} destination={selectedDestination}  today={formattedDate} />
+            <Header origin={selectedDeparture} destination={selectedDestination} today={formattedDate} />
             {/* FlatList 컴포넌트를 사용하여 방 목록을 표시합니다. */}
- 
             <View style={listStyles.indexContainer}>
-                    <Text style={listStyles.indexText}>출발 시각</Text>
-                    <Text style={listStyles.indexText}>방 내용</Text>
-                    <Text style={listStyles.indexText}>인원수</Text>
+                <Text style={listStyles.indexText}>출발 시각</Text>
+                <Text style={listStyles.indexText}>방 내용</Text>
+                <Text style={listStyles.indexText}>인원수</Text>
 
-                </View>
                 <RoomDetailModal
-                visible={modalVisible}
-                room={selectedRoom}
-                onClose={() => setModalVisible(false)}
-                onJoin={() => handleJoinRoom(selectedRoom)}
-            />
+                    visible={modalVisible}
+                    room={selectedRoom}
+                    onClose={() => setModalVisible(false)}
+                    onJoin={() => handleJoinRoom(selectedRoom)}
+                />
+            </View>
             <View style={styles.container}>
-
                 <View style={listStyles.columnCrossline} />
-
-               
                 <View style={listStyles.Container}>
 
                     <FlatList
@@ -455,7 +452,6 @@ export default function RoomList() {
                     />
                 </View>
             </View>
-
         </SafeAreaView>
     );
 }

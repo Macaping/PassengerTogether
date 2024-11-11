@@ -1,17 +1,18 @@
-import React, { useState } from 'react';
-import { View, TextInput, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import useAuth from '../../hooks/useAuth';
+import { signInUser } from '@/utils/auth.utils';
 import { router } from 'expo-router';
+import React, { useState } from 'react';
+import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
-const LoginView = () => {
+export default function SignInView() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { handleSignIn, errorMessage } = useAuth();
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const onPressed = async () => {
-    await handleSignIn(email, password);
+  const handleSignIn = async () => {
+    signInUser(email, password)
+      .then(() => router.replace('/(tabs)/'))
+      .catch((e: string) => setErrorMessage(e));
   };
-
 
   return (
     <View style={styles.container}>
@@ -36,18 +37,18 @@ const LoginView = () => {
       />
       {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
 
-      <TouchableOpacity style={styles.loginButton} onPress={onPressed}>
+      <TouchableOpacity style={styles.loginButton} onPress={handleSignIn}>
         <Text style={styles.loginButtonText}>로그인</Text>
       </TouchableOpacity>
 
       <Text style={styles.footerText}>아직 회원이 아니신가요?
-        <Text style={styles.signupText} onPress={() => router.push('/SignupView')}>
+        <Text style={styles.signupText} onPress={() => router.push('/(tabs)/SignUp')}>
           {'  '}회원가입
         </Text>
       </Text>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -124,5 +125,3 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
-
-export default LoginView;

@@ -7,46 +7,33 @@ export async function signInWithEmail(email: string, password: string): Promise<
         if (value.error) {
             throw value.error;
         }
+        if (!value.data.user) {
+            throw new Error("User is null");
+        }
         return value.data.user;
     });
 }
 
 // 회원가입
 export async function signUpWithEmail(email: string, password: string, nickname: string): Promise<User> {
-    return supabase.from('users').select('nickname').eq('nickname', nickname)
-        // 닉네임 중복 체크
-        .then((value: PostgrestSingleResponse<{ nickname: any; }[]>) => {
+    return supabase.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+            data: {
+                // 닉네임 추가
+                username: nickname
+            }
+        }
+    })
+        .then((value: AuthResponse) => {
             if (value.error) {
                 throw value.error;
             }
-            if (value.data.length > 0) {
-                throw new Error("이미 사용 중인 닉네임입니다. 다른 닉네임을 선택해주세요.");
+            if (!value.data.user) {
+                throw new Error("User is null");
             }
-        })
-        // 회원가입
-        .then(() => {
-            return supabase.auth.signUp({ email: email, password: password })
-                .then((value: AuthResponse) => {
-                    if (value.error) {
-                        throw value.error;
-                    }
-                    return value.data.user;
-                })
-                .then((user: User | null) => {
-                    if (!user) {
-                        throw new Error("User is null");
-                    }
-                    // 닉네임 업데이트
-                    return supabase.from('users')
-                        .update({ nickname: nickname })
-                        .eq('user_id', user.id)
-                        .then((value) => {
-                            if (value.error) {
-                                throw value.error;
-                            }
-                            return user;
-                        });
-                });
+            return value.data.user;
         });
 }
 
