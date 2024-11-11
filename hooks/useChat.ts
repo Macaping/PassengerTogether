@@ -1,14 +1,13 @@
-// hooks/useChat.ts
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { getCurrentUserId } from '@/hooks/authHelpers';
+import { useAuthUser } from '@/hooks/useAuthUser';
 import type { Database } from '@/lib/supabase_type';
 
 type Message = Database['public']['Tables']['messages']['Row'];
 type User = Database['public']['Tables']['users']['Row'];
 
 export default function useChat() {
-    const [userId, setUserId] = useState<User['user_id'] | null>(null);
+    const { user, loading } = useAuthUser();
     const [roomId, setRoomId] = useState<User['current_party'] | null>(null);
     const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState<string>('');
@@ -18,19 +17,17 @@ export default function useChat() {
 
     useEffect(() => {
         const fetchUserIdAndRoomId = async () => {
-            const id = await getCurrentUserId();
-            setUserId(id);
-            if (id) {
+            if (user?.id) {
                 const { data, error } = await supabase
                     .from('users')
                     .select('current_party')
-                    .eq('user_id', id)
+                    .eq('user_id', user?.id)
                     .single();
                 if (error) console.error('Room ID fetch error:', error.message);
                 else if (data?.current_party) {
                     setRoomId(data.current_party);
                     setNoRoomMessage(false);
-                    if (!userChannel) subscribeToCurrentParty(id);
+                    if (!userChannel) subscribeToCurrentParty(user?.id);
                 } else setNoRoomMessage(true);
             }
         };
@@ -42,7 +39,7 @@ export default function useChat() {
                 setUserChannel(null);
             }
         };
-    }, [userId]);
+    }, [user]);
 
     useEffect(() => {
         let channel: any;
@@ -92,7 +89,7 @@ export default function useChat() {
 
     const handleSendMessage = async () => {
         if (newMessage.trim() === '' || !roomId) return;
-        const { error } = await supabase.from('messages').insert([{ room_id: roomId, user_id: userId, message: newMessage }]);
+        const { error } = await supabase.from('messages').insert([{ room_id: roomId, user_id: user?.id, message: newMessage }]);
         if (error) console.error('Message send error:', error.message);
         else setNewMessage('');
     };

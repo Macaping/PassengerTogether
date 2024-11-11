@@ -3,7 +3,7 @@ import { View, Text, TextInput, Button, FlatList, StyleSheet } from 'react-nativ
 import { SafeAreaView } from 'react-native-safe-area-context';
 import useChat from '@/hooks/useChat';
 
-export default function Chat() {
+export default function ChatView() {
     const { messages, newMessage, noRoomMessage, setNewMessage, handleSendMessage } = useChat();
 
     const renderMessageItem = ({ item }: { item: { user_id: string | null; message: string; created_at: string | null } }) => (
