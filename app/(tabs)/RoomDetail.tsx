@@ -27,6 +27,11 @@ export default function RoomDetailView() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <View style={styles.allContainer}>
+        <View style={styles.headerContainer}>
+        <Text style={styles.header}>나의 티켓</Text>
+        </View>
+      
       <View style={styles.ticketContainer}>
         <View style={styles.ticketHeader}>
           <Text style={styles.ticketId}>{room.created_at.slice(-10, -6)}</Text>
@@ -75,6 +80,7 @@ export default function RoomDetailView() {
           </TouchableOpacity>
         </View>
       </View>
+    </View>
     </SafeAreaView>
   );
 }
@@ -82,9 +88,20 @@ export default function RoomDetailView() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  allContainer:{
+    flex:1,
+    backgroundColor:"#6049E2",
+    alignItems:'center'
+  },
+  headerContainer: {
+    height: 60,
     alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#e0f0ff',
+    justifyContent: 'center'
+  },
+  header:{
+    fontSize:20,
+    color:'#ffffff'
   },
   centeredMessageContainer: {
     flex: 1,
@@ -100,15 +117,15 @@ const styles = StyleSheet.create({
     width: width * 0.92,
     height: height * 0.8,
     padding: width * 0.05,
-    borderRadius: width * 0.02,
+    borderRadius: width * 0.05,
     backgroundColor: '#fff',
     position: 'relative',
   },
   ticketHeader: {
-    backgroundColor: '#CDC1FF',
-    borderTopLeftRadius: width * 0.02,
-    borderTopRightRadius: width * 0.02,
-    paddingVertical: height * 0.01,
+    backgroundColor: '#EAE5FE',
+    borderTopLeftRadius: width * 0.05,
+    borderTopRightRadius: width * 0.05,
+    paddingVertical: height * 0.02,
     alignItems: 'flex-start',
     position: 'absolute',
     top: 0,
@@ -118,7 +135,7 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
   },
   ticketId: {
-    fontSize: width * 0.05,
+    fontSize: width * 0.06,
     fontWeight: 'bold',
     marginLeft: width * 0.025,
     color: '#333',
@@ -153,13 +170,15 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   passengerCount: {
-    fontSize: width * 0.035,
-    marginBottom: height * 0.03,
+    fontSize: 16,
     color: '#333',
     textAlign: 'right',
+    paddingHorizontal: 20,
+    marginTop: 20,
   },
   detailsContainer: {
-    marginBottom: height * 0.03,
+    paddingHorizontal: 20,
+    marginTop: 20,
   },
   detailsLabel: {
     fontSize: width * 0.035,
