@@ -4,6 +4,7 @@ import useUserDataManagement from '../../hooks/userDataManagement';
 import { SafeAreaView } from 'react-native-safe-area-context';
 const { width, height } = Dimensions.get('window');
 import { StatusBar } from 'react-native-web';
+import { Ionicons } from '@expo/vector-icons';
 
 const RoomDetailView = () => {
   const { room, fetchRoomDetails } = useUserDataManagement();
@@ -27,30 +28,33 @@ const RoomDetailView = () => {
         <View style={styles.ticketHeader}>
           <Text style={styles.ticketId}>{room.created_at.slice(-10, -6)}</Text>
         </View>
+        
+        
         <View style={styles.timeContainer}>
-          <Text style={styles.time}>출발 날짜: {new Date(room.departure_time).toLocaleDateString()}</Text>
-          <Text style={styles.time}>출발 시간: {new Date(room.departure_time).toLocaleTimeString()}</Text>
-        </View>
-        <View style={styles.routeContainer}>
-          <View style={styles.stationContainer}>
-            <Text style={styles.stationTitle}>출발</Text>
-            <Text style={styles.station}>{room.origin}</Text>
-          </View>
-          <View style={styles.stationContainer}>
-            <Text style={styles.stationTitle}>도착</Text>
-            <Text style={styles.station}>{room.destination}</Text>
-          </View>
-        </View>
-        <Text style={styles.passengerCount}>
-          인원수: {room.users.length}/{room.limit_people}
-        </Text>
+        <Text style={styles.timeLabel}>출발 시각</Text>
+            <Text style={styles.timeValue}>
+              {`${new Date(room.departure_time).getMonth() + 1}월 ${new Date(room.departure_time).getDate()}일 (${['일','월','화','수','목','금','토'][new Date(room.departure_time).getDay()]}) ${String(new Date(room.departure_time).getHours()).padStart(2, '0')}:${String(new Date(room.departure_time).getMinutes()).padStart(2, '0')}`}
+            </Text>
 
-        <View style={styles.detailsContainer}>
-          <Text style={styles.detailsLabel}></Text>
-          <View style={styles.detailsBox}>
+        </View>
+        <View style={styles.routeSection}>
+            <View style={styles.routeItem}>
+              <Text style={styles.routeLabel}>출발</Text>
+              <Text style={styles.routeValue}>{room.origin}</Text>
+            </View>
+            <View style={styles.routeItem}>
+              <Text style={styles.routeLabel}>도착</Text>
+              <Text style={styles.routeValue}>{room.destination}</Text>
+            </View>
+          </View>
+
+          <View style={styles.passengerSection}>
+            <Text style={styles.passengerCount}>인원수 {room.users ? room.users.length : 0}/{room.limit_people}</Text>
+          </View>
+
+          <View style={styles.detailsSection}>
             <Text style={styles.detailsText}>{room.details}</Text>
           </View>
-        </View>
 
         {/* 점선 구간 */}
         <View style={styles.separatorContainer}>
@@ -59,19 +63,22 @@ const RoomDetailView = () => {
           <View style={styles.rightCircle} />
         </View>
 
-        <View style={styles.actionsContainer}>
-          <TouchableOpacity style={styles.completeButton}>
-            <Text style={styles.completeButtonText}>도착 완료</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.passengerButton}>
-            <Text style={styles.passengerButtonText}>동승자</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.exitButton}>
-            <Text style={styles.exitButtonText}>나가기</Text>
-          </TouchableOpacity>
+        <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.iconButton}>
+            <Ionicons name="chatbubbles-outline" size={24} color="#666666" />
+              <Text style={styles.iconButtonText}>채팅</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.iconButton}>
+            <Ionicons name="people-outline" size={24} color="#666666" />
+              <Text style={styles.iconButtonText}>동승자</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.iconButton}>
+            <Ionicons name="exit-outline" size={24} color="#666666" />
+              <Text style={styles.iconButtonText}>나가기</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
-    </View>
     </SafeAreaView>
   );
 };
@@ -86,13 +93,15 @@ const styles = StyleSheet.create({
     alignItems:'center'
   },
   headerContainer: {
-    height: 60,
+    height: 80,
     alignItems: 'center',
     justifyContent: 'center'
   },
   header:{
+    paddingTop: '2%',
     fontSize:20,
-    color:'#ffffff'
+    color:'#ffffff',
+    
   },
   ticketContainer: {
     width: width * 0.92,
@@ -122,103 +131,75 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   timeContainer: {
-    alignItems: 'center',
-    marginTop: height * 0.1,
-    marginBottom: height * 0.05,
+    marginTop: height * 0.07,
   },
-  time: {
-    fontSize: width * 0.05,
-    color: '#555',
-    textAlign: 'center',
+  timeLabel: {
+    fontSize: 16,
+    color: '#666666',
+    marginBottom: 8,
   },
-  routeContainer: {
+  timeValue: {
+    fontSize: 20,
+    color: '#000000',
+  },
+  routeSection: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: height * 0.02,
+    marginVertical: 10,
   },
-  stationContainer: {
+  routeItem: {
     flex: 1,
-    alignItems: 'center',
   },
-  stationTitle: {
-    fontSize: width * 0.06,
-    color: '#777',
-    marginBottom: height * 0.01,
+  routeLabel: {
+    fontSize: 16,
+    color: '#666666',
+    marginBottom: 8,
   },
-  station: {
-    fontSize: width * 0.06,
-    fontWeight: 'bold',
-    color: '#333',
+  routeValue: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#000000',
+  },
+
+  passengerSection: {
+    alignItems: 'flex-end',
+    paddingHorizontal: 20,
+    marginTop: 10,
   },
   passengerCount: {
     fontSize: 16,
-    color: '#333',
-    textAlign: 'right',
-    paddingHorizontal: 20,
-    marginTop: 20,
+    color: '#000000',
   },
-  detailsContainer: {
-    paddingHorizontal: 20,
-    marginTop: 20,
-  },
-  detailsLabel: {
-    fontSize: width * 0.035,
-    marginBottom: height * 0.015,
-    color: '#777',
-  },
-  detailsBox: {
-    height: height * 0.12,
+  detailsSection: {
+    padding: 65,
+    marginTop: 10,
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: width * 0.02,
-    backgroundColor: '#f9f9f9',
-    padding: width * 0.03,
+    borderColor: '#EEEEEE',
+    borderRadius: 8,
+    marginHorizontal: 20,
+    backgroundColor: '#FAFAFA',
   },
   detailsText: {
-    fontSize: width * 0.04,
-    color: '#333',
+    fontSize: 16,
+    color: '#666666',
+    lineHeight: 24,
   },
-  actionsContainer: {
+
+  
+  buttonContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: height * 0.02,
+    justifyContent: 'space-around',
+    marginTop: 20,
   },
-  completeButton: {
-    flex: 2,
-    paddingVertical: height * 0.015,
-    backgroundColor: '#5cb85c',
-    borderRadius: width * 0.02,
+  iconButton: {
     alignItems: 'center',
-    marginRight: width * 0.015,
   },
-  completeButtonText: {
-    color: '#fff',
-    fontSize: width * 0.04,
+  iconButtonText: {
+    marginTop: 8,
+    fontSize: 14,
+    color: '#666666',
   },
-  passengerButton: {
-    flex: 1,
-    paddingVertical: height * 0.015,
-    backgroundColor: '#337ab7',
-    borderRadius: width * 0.02,
-    alignItems: 'center',
-    marginHorizontal: width * 0.015,
-  },
-  passengerButtonText: {
-    color: '#fff',
-    fontSize: width * 0.04,
-  },
-  exitButton: {
-    flex: 1,
-    paddingVertical: height * 0.015,
-    backgroundColor: '#d9534f',
-    borderRadius: width * 0.02,
-    alignItems: 'center',
-    marginLeft: width * 0.015,
-  },
-  exitButtonText: {
-    color: '#fff',
-    fontSize: width * 0.04,
-  },
+
   separatorContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -238,7 +219,7 @@ const styles = StyleSheet.create({
     left: -width * 0.1,
     width: width * 0.1,
     height: width * 0.1,
-    backgroundColor: '#e0f0ff',
+    backgroundColor: '#6049E2',
     borderRadius: width * 0.05,
   },
   rightCircle: {
@@ -246,7 +227,7 @@ const styles = StyleSheet.create({
     right: -width * 0.1,
     width: width * 0.1,
     height: width * 0.1,
-    backgroundColor: '#e0f0ff',
+    backgroundColor: '#6049E2',
     borderRadius: width * 0.05,
   },
 });
