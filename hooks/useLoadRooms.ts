@@ -1,15 +1,18 @@
 import { supabase } from "@/lib/supabase";
 import { PostgrestError } from "@supabase/supabase-js";
 import { useEffect, useState, useCallback } from "react";
- 
-const useLoadRooms = (origin: string, destination: string, minDepartureTime: Date) => {  //(origin: string, destination: string)
+
+const useLoadRooms = (origin: string, destination: string, minDepartureTime: Date) => {
     const [loading, setLoading] = useState(false);
     const [rooms, setRooms] = useState<any[] | null>(null);
     const [error, setError] = useState<string | null>(null);
 
-    // `minDepartureTime`을 `ISO` 형식 문자열로 변환하여 종속성으로 사용
+    // 기준 시간을 ISO 형식으로 변환
     const minDepartureTimeIso = minDepartureTime.toISOString();
-    
+
+    // 선택한 날짜를 "YYYY-MM-DD" 형식으로 변환하여 사용
+    const selectedDate = minDepartureTime.toISOString().split("T")[0]; // "YYYY-MM-DD" 형식
+
     const fetchRooms = useCallback(async () => {
         try {
             setLoading(true);
@@ -21,18 +24,24 @@ const useLoadRooms = (origin: string, destination: string, minDepartureTime: Dat
                 .gte("departure_time", minDepartureTimeIso) // 기준 시간 이후 방만 가져옴
                 .order("departure_time", { ascending: true });
 
-            console.log("Fetched data:", data); // 데이터 확인용 로그
             if (error) {
                 console.error("Fetch error:", error);
                 throw error;
             }
-            setRooms(data);
+
+            // 클라이언트 측에서 선택한 날짜와 일치하는 항목만 필터링
+            const filteredData = data?.filter(room => 
+                new Date(room.departure_time).toISOString().split("T")[0] === selectedDate
+            );
+
+            console.log("Filtered data:", filteredData); // 필터링된 데이터 확인용 로그
+            setRooms(filteredData || []);
         } catch (error) {
             setError((error as PostgrestError).message);
         } finally {
             setLoading(false);
         }
-    }, [origin, destination, minDepartureTimeIso]); // 안정적 종속성 설정
+    }, [origin, destination, minDepartureTimeIso, selectedDate]);
 
     useEffect(() => {
         // 리얼타임 데이터베이스 변경 감지
@@ -40,18 +49,21 @@ const useLoadRooms = (origin: string, destination: string, minDepartureTime: Dat
             .channel("rooms")
             .on("postgres_changes",
                 {
-                    event: "*",  // 모든 이벤트 감지 (INSERT, UPDATE, DELETE)
+                    event: "*",
                     schema: "public",
                     table: "rooms"
                 },
                 (payload) => {
                     const eventTime = payload.new?.departure_time ? new Date(payload.new.departure_time) : null;
+                    const eventDate = eventTime ? eventTime.toISOString().split("T")[0] : null;
                     if (
                         payload.eventType === "INSERT" && 
-                         payload.new?.origin === origin && 
-                         payload.new?.destination === destination &&
-                         eventTime && eventTime >= new Date(minDepartureTimeIso) // 기준 시간 비교
-                        )  {
+                        payload.new?.origin === origin && 
+                        payload.new?.destination === destination &&
+                        eventTime && 
+                        eventDate === selectedDate && // 선택한 날짜와 일치하는지 확인
+                        eventTime >= new Date(minDepartureTimeIso) // 기준 시간 비교
+                    ) {
 
                         console.log("INSERT detected:", payload.new);
                         setRooms((current) => {
