@@ -3,7 +3,6 @@ import {
   AuthError,
   AuthResponse,
   AuthTokenResponsePassword,
-  PostgrestSingleResponse,
   User,
 } from "@supabase/supabase-js";
 

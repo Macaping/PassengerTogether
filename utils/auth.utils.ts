@@ -8,7 +8,7 @@ export async function signInUser(
 ): Promise<User> {
   if (!email || !password) throw "이메일과 비밀번호를 입력해주세요.";
   return signInWithEmail(email, password).catch((e: AuthError) => {
-    if (e.message == "Invalid login credentials")
+    if (e.message === "Invalid login credentials")
       throw "이메일 또는 비밀번호가 일치하지 않습니다.";
     else throw e.message;
   });
@@ -32,10 +32,10 @@ export async function signUpUser(
 
   return signUpWithEmail(email, password, nickname).catch(
     (e: AuthError | PostgrestError) => {
-      if (e.message == "User already registered")
+      if (e.message === "User already registered")
         throw "이미 사용 중인 이메일입니다.";
       // 닉네임이 중복되었을 때 발생하는 오류라고 판단함.
-      if (e.message == "Database error saving new user")
+      if (e.message === "Database error saving new user")
         throw "사용할 수 없는 닉네임입니다.";
       else throw e.message;
     },

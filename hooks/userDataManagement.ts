@@ -4,7 +4,6 @@ import type { Database } from "@/lib/supabase_type";
 import { RealtimeChannel } from "@supabase/supabase-js";
 
 type Room = Database["public"]["Tables"]["rooms"]["Row"];
-type User = Database["public"]["Tables"]["users"]["Row"];
 
 const useUserDataManagement = () => {
   const [room, setRoom] = useState<Room | null>(null);
