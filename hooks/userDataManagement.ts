@@ -3,15 +3,18 @@ import { supabase } from "@/lib/supabase";
 import type { Database } from "@/lib/supabase_type";
 import { RealtimeChannel } from "@supabase/supabase-js";
 
-type Room = Database['public']['Tables']['rooms']['Row'];
-type User = Database['public']['Tables']['users']['Row'];
+type Room = Database["public"]["Tables"]["rooms"]["Row"];
+type User = Database["public"]["Tables"]["users"]["Row"];
 
 const useUserDataManagement = () => {
   const [room, setRoom] = useState<Room | null>(null);
   const [roomChannel, setRoomChannel] = useState<RealtimeChannel>();
 
   const fetchRoomDetails = async () => {
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
 
     if (userError) {
       console.error("User fetch error:", userError);
@@ -84,7 +87,7 @@ const useUserDataManagement = () => {
             console.log("Room updated:", payload.new);
             setRoom(payload.new as Room);
           }
-        }
+        },
       )
       .subscribe();
 

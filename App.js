@@ -1,8 +1,8 @@
-import * as React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import HomeView from './index'; // HomeView의 정확한 경로
-import RoomMake from './RoomMake'; // RoomMake의 정확한 경로
+import * as React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import HomeView from "./index"; // HomeView의 정확한 경로
+import RoomMake from "./RoomMake"; // RoomMake의 정확한 경로
 
 const Stack = createNativeStackNavigator();
 
