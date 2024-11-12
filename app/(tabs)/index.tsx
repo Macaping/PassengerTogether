@@ -5,6 +5,7 @@ import * as Location from "expo-location";
 import { Link } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
+  Dimensions,
   FlatList,
   Modal,
   StyleSheet,
@@ -13,8 +14,6 @@ import {
   View,
 } from "react-native";
 import MapView, { Marker, Polyline } from "react-native-maps";
-import { Dimensions } from "react-native"; //Dimensions API를 이용해 화면의 너비나 높이에 따라 fontSize를 설정
-import { SafeAreaView } from "react-native-safe-area-context";
 
 const { width, height } = Dimensions.get("window"); //Dimensions 이용
 
@@ -152,7 +151,7 @@ export default function HomeView() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       {/* 지도 상자 */}
       <View style={map_styles.mapInfoBox}>
         {location ? (
@@ -196,141 +195,147 @@ export default function HomeView() {
         )}
       </View>
 
-      {/* 출발지 및 도착지 선택 상자 */}
-      <View style={main_styles.infoBox}>
-        <View style={main_styles.locationSection}>
-          <Text style={main_styles.locationLabel}>출발</Text>
-          <Text style={main_styles.locationLabel}>도착</Text>
-        </View>
+      <View style={{ flex: 1 }}></View>
+      {/* 상호작용 UI */}
+      <View style={styles.interface}>
+        {/* 출발지 및 도착지 선택 상자 */}
+        <View style={main_styles.infoBox}>
+          <View style={main_styles.locationSection}>
+            <Text style={main_styles.locationLabel}>출발</Text>
+            <Text style={main_styles.locationLabel}>도착</Text>
+          </View>
 
-        <View style={main_styles.locationSelector}>
-          <TouchableOpacity onPress={() => openLocationModal("departure")}>
-            <View style={main_styles.routeContainer}>
-              <Text style={main_styles.routeText}>{selectedDeparture}</Text>
+          <View style={main_styles.locationSelector}>
+            {/* 출발지 */}
+            <TouchableOpacity onPress={() => openLocationModal("departure")}>
+              <View style={main_styles.routeContainer}>
+                <Text style={main_styles.routeText}>{selectedDeparture}</Text>
+              </View>
+            </TouchableOpacity>
+
+            <Text style={main_styles.arrow}>→</Text>
+
+            {/* 도착지 */}
+            <TouchableOpacity onPress={() => openLocationModal("destination")}>
+              <View style={main_styles.routeContainer}>
+                <Text style={main_styles.routeText}>{selectedDestination}</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => setModalVisible(false)}
+          >
+            <View style={choice_styles.modalView}>
+              <FlatList
+                data={locations.filter(
+                  (item) =>
+                    (changingLocationType === "departure" &&
+                      item !== selectedDestination) ||
+                    (changingLocationType === "destination" &&
+                      item !== selectedDeparture),
+                )}
+                keyExtractor={(item) => item}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={choice_styles.item}
+                    onPress={() => handleLocationSelect(item)}
+                  >
+                    <Text style={choice_styles.itemText}>{item}</Text>
+                  </TouchableOpacity>
+                )}
+                ItemSeparatorComponent={() => (
+                  <View style={choice_styles.separator} />
+                )}
+              />
             </View>
-          </TouchableOpacity>
+          </Modal>
 
-          <Text style={main_styles.arrow}>→</Text>
+          <Text style={date_styles.infoTitle}>출발 시간</Text>
+          <View style={date_styles.dateTimeRow}>
+            <TouchableOpacity
+              onPress={() => setShowDatePicker(true)}
+              style={date_styles.dateTimeButton}
+            >
+              <Text style={date_styles.dateText}>
+                {date.toLocaleDateString()}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setShowTimePicker(true)}
+              style={date_styles.dateTimeButton}
+            >
+              <Text style={date_styles.dateText}>
+                {date.toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </Text>
+            </TouchableOpacity>
+          </View>
 
-          <TouchableOpacity onPress={() => openLocationModal("destination")}>
-            <View style={main_styles.routeContainer}>
-              <Text style={main_styles.routeText}>{selectedDestination}</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => setModalVisible(false)}
-        >
-          <View style={choice_styles.modalView}>
-            <FlatList
-              data={locations.filter(
-                (item) =>
-                  (changingLocationType === "departure" &&
-                    item !== selectedDestination) ||
-                  (changingLocationType === "destination" &&
-                    item !== selectedDeparture),
-              )}
-              keyExtractor={(item) => item}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={choice_styles.item}
-                  onPress={() => handleLocationSelect(item)}
-                >
-                  <Text style={choice_styles.itemText}>{item}</Text>
-                </TouchableOpacity>
-              )}
-              ItemSeparatorComponent={() => (
-                <View style={choice_styles.separator} />
-              )}
+          {showDatePicker && (
+            <DateTimePicker
+              value={date}
+              mode="date"
+              display="default"
+              onChange={handleDateChange}
             />
-          </View>
-        </Modal>
+          )}
 
-        <Text style={date_styles.infoTitle}>출발 시간</Text>
-        <View style={date_styles.dateTimeRow}>
-          <TouchableOpacity
-            onPress={() => setShowDatePicker(true)}
-            style={date_styles.dateTimeButton}
-          >
-            <Text style={date_styles.dateText}>
-              {date.toLocaleDateString()}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => setShowTimePicker(true)}
-            style={date_styles.dateTimeButton}
-          >
-            <Text style={date_styles.dateText}>
-              {date.toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </Text>
-          </TouchableOpacity>
+          {showTimePicker && (
+            <DateTimePicker
+              value={date}
+              mode="time"
+              display="default"
+              minuteInterval={5}
+              onChange={handleTimeChange}
+            />
+          )}
+
+          {/* 경로 정보 표시 */}
+          {distance && duration && (
+            <View style={styles.routeInfo}>
+              <Text>거리: {distance.toFixed(2)} km</Text>
+              <Text>소요 시간: {duration.toFixed(2)} 분</Text>
+            </View>
+          )}
         </View>
 
-        {showDatePicker && (
-          <DateTimePicker
-            value={date}
-            mode="date"
-            display="default"
-            onChange={handleDateChange}
-          />
-        )}
+        <View style={styles.buttonContainer}>
+          <Link
+            href={{
+              pathname: "/RoomList",
+              params: {
+                selectedDeparture,
+                selectedDestination,
+                date: date.toISOString(),
+              },
+            }}
+            style={styles.button}
+          >
+            <Text style={styles.buttonText}>방 탐색</Text>
+          </Link>
 
-        {showTimePicker && (
-          <DateTimePicker
-            value={date}
-            mode="time"
-            display="default"
-            minuteInterval={5}
-            onChange={handleTimeChange}
-          />
-        )}
-
-        {/* 경로 정보 표시 */}
-        {distance && duration && (
-          <View style={styles.routeInfo}>
-            <Text>거리: {distance.toFixed(2)} km</Text>
-            <Text>소요 시간: {duration.toFixed(2)} 분</Text>
-          </View>
-        )}
+          <Link
+            href={{
+              pathname: "/RoomMake",
+              params: {
+                selectedDeparture,
+                selectedDestination,
+                date: date.toISOString(),
+              },
+            }}
+            style={styles.button}
+          >
+            <Text style={styles.buttonText}>방장 하기</Text>
+          </Link>
+        </View>
       </View>
-
-      <View style={styles.buttonContainer}>
-        <Link
-          href={{
-            pathname: "/RoomList",
-            params: {
-              selectedDeparture,
-              selectedDestination,
-              date: date.toISOString(),
-            },
-          }}
-          style={styles.button}
-        >
-          <Text style={styles.buttonText}>방 탐색</Text>
-        </Link>
-
-        <Link
-          href={{
-            pathname: "/RoomMake",
-            params: {
-              selectedDeparture,
-              selectedDestination,
-              date: date.toISOString(),
-            },
-          }}
-          style={styles.button}
-        >
-          <Text style={styles.buttonText}>방장 하기</Text>
-        </Link>
-      </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -340,36 +345,25 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#FFFFFF",
   },
-  header: {
-    backgroundColor: "#6B59CC",
-    //  padding: 20,
-    paddingVertical: "4.5%",
-    alignItems: "center",
-  },
-  headerText: {
-    color: "#FFFFFF",
-    //  fontSize: 18,
-    fontSize: width * 0.045, // 화면 너비의 5%를 fontSize로 지정
-    fontWeight: "bold",
+  interface: {
+    flex: 2,
+    padding: "5%",
+    gap: 20,
   },
   buttonContainer: {
+    flex: 1,
     flexDirection: "row",
-    justifyContent: "space-around",
-    //  marginTop: 16,
-    //  marginHorizontal: 16,
+    gap: 20,
   },
   button: {
-    backgroundColor: "#A99CE3",
-    paddingVertical: "4%", //버튼 크기
-    //  paddingHorizontal: 24,
+    flex: 1,
+    backgroundColor: "#7963F4",
     borderRadius: 8,
-    width: "40%",
-    alignItems: "center",
-    paddingHorizontal: "10%",
+    textAlign: "center",
+    textAlignVertical: "center",
   },
   buttonText: {
     color: "#FFFFFF",
-    //  fontSize: 20,
     fontSize: width * 0.045,
   },
 });
@@ -377,12 +371,15 @@ const styles = StyleSheet.create({
 const map_styles = StyleSheet.create({
   // 지도화면, 소요시간 글씨
   mapInfoBox: {
-    height: "37%", // 지도 높이 조정
+    // 절대 위치로 지정해서 지도가 배경으로 나타나게 함
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: "75%",
+    zIndex: -1,
     borderWidth: 1,
     borderColor: "#ccc",
-    //  borderRadius: 10,
-    //  overflow: 'hidden',
-    //  margin: 16,
   },
   map: {
     ...StyleSheet.absoluteFillObject,
@@ -397,9 +394,9 @@ const map_styles = StyleSheet.create({
 const main_styles = StyleSheet.create({
   //출발지 도착지
   infoBox: {
+    flex: 4,
     backgroundColor: "#FFFFFF",
     padding: "12%",
-    margin: "5%",
     borderRadius: 8,
     borderWidth: 1,
     borderColor: "#ccc",
@@ -413,7 +410,7 @@ const main_styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     width: "70%",
-    marginBottom: "6%",
+    marginBottom: 10,
   },
   locationLabel: {
     fontSize: width * 0.037,
@@ -423,17 +420,12 @@ const main_styles = StyleSheet.create({
   locationSelector: {
     flexDirection: "row",
     alignItems: "center",
-    //  justifyContent: 'center',
     justifyContent: "space-evenly",
     marginBottom: "8%",
     width: "120%",
   },
   routeContainer: {
     width: width * 0.3, // 고정된 너비로 박스가 항상 일정하게 유지
-    //paddingVertical: 10,
-    //borderColor: '#6B59CC',
-    //borderWidth: 1,
-    //borderRadius: 8,
     alignItems: "center",
   },
   routeText: {
@@ -445,29 +437,7 @@ const main_styles = StyleSheet.create({
   arrow: {
     fontSize: width * 0.06,
     color: "#6B59CC",
-    marginHorizontal: "5%",
   },
-
-  /*
-  locationSelector: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: '8%',
-    justifyContent: 'center',
-    width: '100%',
-  },
-
-  routeText: {
-    fontSize: width * 0.073,
-    color: '#6B59CC',
-    fontWeight: 'bold',
-  },
-  arrow: {
-    fontSize: width * 0.07,
-    color: '#6B59CC',
-    paddingHorizontal: '10%',
-  },
-  */
 });
 
 const choice_styles = StyleSheet.create({
@@ -504,7 +474,6 @@ const date_styles = StyleSheet.create({
   },
   dateTimeRow: {
     flexDirection: "row",
-    //  justifyContent: 'space-between',
     justifyContent: "center",
     width: "80%",
     marginTop: "6%",
