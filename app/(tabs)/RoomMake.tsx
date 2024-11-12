@@ -86,9 +86,6 @@ export default function RoomMakeView() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerText}>방 만들기</Text>
-      </View>
 
       <View style={main_styles.infoBox}>
         {/* 출발지와 도착지 선택 */}

@@ -77,9 +77,6 @@ export default function RoomDetailView() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.allContainer}>
-        <View style={styles.headerContainer}>
-          <Text style={styles.header}>나의 티켓</Text>
-        </View>
 
         <View style={styles.ticketContainer}>
           <View style={styles.ticketHeader}>

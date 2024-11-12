@@ -15,9 +15,6 @@ export default function MyPage() {
 
     return (
         <SafeAreaView style={styles.container}>
-            <View style={styles.header}>
-                <Text style={styles.headerText}>내 정보</Text>
-            </View>
 
             <View style={styles.profileCard}>
                 <Ionicons

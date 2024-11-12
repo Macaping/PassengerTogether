@@ -129,10 +129,6 @@ export default function HomeView() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerText}>조회</Text>
-      </View>
-
       {/* 지도 상자 */}
       <View style={map_styles.mapInfoBox}>
         {location ? (
@@ -198,22 +194,6 @@ export default function HomeView() {
             </View>
           </TouchableOpacity>
         </View>
-
-
-
-      {/*  
-        <View style={main_styles.locationSelector}>
-          <TouchableOpacity onPress={() => openLocationModal('departure')}>
-            <Text style={main_styles.routeText}>{selectedDeparture}</Text>
-          </TouchableOpacity>  
-              
-          <Text style={main_styles.arrow}> → </Text>
-
-          <TouchableOpacity onPress={() => openLocationModal('destination')}>
-            <Text style={main_styles.routeText}>{selectedDestination}</Text>
-          </TouchableOpacity>
-        </View>
-      */}
 
         <Modal
           animationType="slide"

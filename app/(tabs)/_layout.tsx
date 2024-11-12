@@ -18,12 +18,14 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
+        headerStyle: { backgroundColor: '#6049E2' },
+        headerTintColor: '#ffffff',
+        headerTitleAlign: 'center',
       }}>
       <Tabs.Screen
         name="RoomDetail"
         options={{
-          title: '나의 티켓',
+          title: '나의 파티',
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon name={focused ? 'ticket' : 'ticket-outline'} color={color} />
           ),
@@ -32,7 +34,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: '홈',
+          title: '방 조회',
+          tabBarLabel: '홈',
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon name={focused ? 'home' : 'home-outline'} color={color} />
           ),
