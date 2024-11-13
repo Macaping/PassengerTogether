@@ -22,6 +22,7 @@ export default function TabLayout() {
         headerTintColor: "#ffffff",
         headerTitleAlign: "center",
         headerShadowVisible: false,
+        tabBarHideOnKeyboard: true,
       }}
     >
       <Tabs.Screen
@@ -74,6 +75,7 @@ export default function TabLayout() {
             />
           ),
           href: user ? null : undefined,
+          headerShown: false,
         }}
       />
     </Tabs>
