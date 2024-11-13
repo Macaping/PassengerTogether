@@ -6,14 +6,13 @@ import { PostgrestSingleResponse, UserResponse } from "@supabase/supabase-js";
 import { router } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
+  ActivityIndicator,
   Dimensions,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  ActivityIndicator,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 const { width, height } = Dimensions.get("window");
 
@@ -34,22 +33,22 @@ export default function RoomDetailView() {
 
   if (isLoading) {
     return (
-      <SafeAreaView style={styles.loadingContainer}>
+      <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#0000ff" />
         <Text style={styles.loadingText}>로딩 중...</Text>
-      </SafeAreaView>
+      </View>
     );
   }
 
   if (!room) {
     return (
-      <SafeAreaView style={styles.container}>
+      <View style={styles.container}>
         <View style={styles.centeredMessageContainer}>
           <Text style={styles.centeredMessageText}>
             현재 참여한 방이 없습니다.
           </Text>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
@@ -83,76 +82,66 @@ export default function RoomDetailView() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.allContainer}>
-        <View style={styles.ticketContainer}>
-          <View style={styles.ticketHeader}>
-            <Text style={styles.ticketId}>
-              {room.created_at.slice(-10, -6)}
-            </Text>
-          </View>
+    <View style={styles.container}>
+      <View style={styles.ticketContainer}>
+        <View style={styles.ticketHeader}>
+          <Text style={styles.ticketId}>{room.created_at.slice(-10, -6)}</Text>
+        </View>
 
-          <View style={styles.timeContainer}>
-            <Text style={styles.timeLabel}>출발 시각</Text>
-            <Text style={styles.timeValue}>
-              {`${new Date(room.departure_time).getMonth() + 1}월 ${new Date(room.departure_time).getDate()}일 (${["일", "월", "화", "수", "목", "금", "토"][new Date(room.departure_time).getDay()]}) ${String(new Date(room.departure_time).getHours()).padStart(2, "0")}:${String(new Date(room.departure_time).getMinutes()).padStart(2, "0")}`}
-            </Text>
+        <View style={styles.timeContainer}>
+          <Text style={styles.timeLabel}>출발 시각</Text>
+          <Text style={styles.timeValue}>
+            {`${new Date(room.departure_time).getMonth() + 1}월 ${new Date(room.departure_time).getDate()}일 (${["일", "월", "화", "수", "목", "금", "토"][new Date(room.departure_time).getDay()]}) ${String(new Date(room.departure_time).getHours()).padStart(2, "0")}:${String(new Date(room.departure_time).getMinutes()).padStart(2, "0")}`}
+          </Text>
+        </View>
+        <View style={styles.routeSection}>
+          <View style={styles.routeItem}>
+            <Text style={styles.routeLabel}>출발</Text>
+            <Text style={styles.routeValue}>{room.origin}</Text>
           </View>
-          <View style={styles.routeSection}>
-            <View style={styles.routeItem}>
-              <Text style={styles.routeLabel}>출발</Text>
-              <Text style={styles.routeValue}>{room.origin}</Text>
-            </View>
-            <View style={styles.routeItem}>
-              <Text style={styles.routeLabel}>도착</Text>
-              <Text style={styles.routeValue}>{room.destination}</Text>
-            </View>
-          </View>
-
-          <View style={styles.passengerSection}>
-            <Text style={styles.passengerCount}>
-              인원수 {room.users ? room.users.length : 0}/{room.limit_people}
-            </Text>
-          </View>
-
-          <View style={styles.detailsSection}>
-            <Text style={styles.detailsText}>{room.details}</Text>
-          </View>
-
-          {/* 점선 구간 */}
-          <View style={styles.separatorContainer}>
-            <View style={styles.dottedLine} />
-            <View style={styles.leftCircle} />
-            <View style={styles.rightCircle} />
-          </View>
-
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.iconButton}>
-              <Ionicons name="chatbubbles-outline" size={24} color="#666666" />
-              <Text style={styles.iconButtonText}>채팅</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.iconButton}>
-              <Ionicons name="people-outline" size={24} color="#666666" />
-              <Text style={styles.iconButtonText}>동승자</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.iconButton}
-              onPress={handleLeaveRoom}
-            >
-              <Ionicons name="exit-outline" size={24} color="#666666" />
-              <Text style={styles.iconButtonText}>나가기</Text>
-            </TouchableOpacity>
+          <View style={styles.routeItem}>
+            <Text style={styles.routeLabel}>도착</Text>
+            <Text style={styles.routeValue}>{room.destination}</Text>
           </View>
         </View>
+
+        <View style={styles.passengerSection}>
+          <Text style={styles.passengerCount}>
+            인원수 {room.users ? room.users.length : 0}/{room.limit_people}
+          </Text>
+        </View>
+
+        <View style={styles.detailsSection}>
+          <Text style={styles.detailsText}>{room.details}</Text>
+        </View>
+
+        {/* 점선 구간 */}
+        <View style={styles.separatorContainer}>
+          <View style={styles.dottedLine} />
+          <View style={styles.leftCircle} />
+          <View style={styles.rightCircle} />
+        </View>
+
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.iconButton}>
+            <Ionicons name="chatbubbles-outline" size={24} color="#666666" />
+            <Text style={styles.iconButtonText}>채팅</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.iconButton}>
+            <Ionicons name="people-outline" size={24} color="#666666" />
+            <Text style={styles.iconButtonText}>동승자</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.iconButton} onPress={handleLeaveRoom}>
+            <Ionicons name="exit-outline" size={24} color="#666666" />
+            <Text style={styles.iconButtonText}>나가기</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   loadingContainer: {
     flex: 1,
     alignItems: "center",
@@ -165,7 +154,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 10,
   },
-  allContainer: {
+  container: {
     flex: 1,
     backgroundColor: "#6049E2",
     alignItems: "center",
