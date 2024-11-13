@@ -3,34 +3,43 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import React from 'react';
 import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { useNavigation } from '@react-navigation/native';
+import { router } from 'expo-router';
 
 export default function MyPage() {
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
-                <Text style={styles.headerText}>내 정보</Text>
+                <Text style={styles.headerText}>마이 페이지</Text>
             </View>
 
             <View style={styles.profileCard}>
                 <Ionicons
                     name="person-circle-outline"
-                    size={Dimensions.get('window').width * 0.45} // 이미지 크기를 화면 비율로 설정
+                    size={Dimensions.get('window').width * 0.5} // 이미지 크기 조정
                     color="#6C4AB6"
                     style={styles.icon}
+                   
                 />
 
-                <Text style={styles.userName}>하라마라탕</Text>
+                <Text style={styles.userName}>하마마라탕</Text>
                 <Text style={styles.userEmail}>haram@gmail.com</Text>
 
-                <View style={styles.followContainer}>
-                    <View style={styles.followBox}>
-                        <Text style={styles.followLabel}>팔로워</Text>
-                        <Text style={styles.followCount}>32</Text>
-                    </View>
-                    <View style={styles.followBox}>
-                        <Text style={styles.followLabel}>팔로잉</Text>
-                        <Text style={styles.followCount}>32</Text>
-                    </View>
+                {/*밑에 아이콘 세개 크기*/}
+                <View style={styles.iconContainer}> 
+                    <TouchableOpacity style={styles.profileIcon}>
+                        <Ionicons name="mail-outline" size={60} color="#6C4AB6" />
+                        <Text>메세지함</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.profileIcon}>
+                        <Ionicons name="person-add-outline" size={30} color="#6C4AB6" />
+                        <Text>친구추가</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.profileIcon}>
+                        <Ionicons name="people-outline" size={30} color="#6C4AB6" />
+                        <Text>친구목록</Text>
+                    </TouchableOpacity>
                 </View>
             </View>
 
@@ -55,7 +64,7 @@ const styles = StyleSheet.create({
     },
     header: {
         width: '100%',
-        paddingVertical: '3%',
+        paddingVertical: 10,
         backgroundColor: '#6C4AB6',
         alignItems: 'center',
         borderBottomLeftRadius: 20,
@@ -66,63 +75,73 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
     },
-    profileCard: {
+
+    
+    profileCard: { //프로필 상자 상하위치
         width: '90%',
-        marginTop: '10%',
-        padding: '5%',
         backgroundColor: 'white',
         borderRadius: 10,
         alignItems: 'center',
         borderWidth: 1,
         borderColor: '#6C4AB6',
-        height: '70%',
-        justifyContent: 'center',
+        bottom: -10,
     },
-    icon: {
-        marginBottom: '5%',
+    icon: { //프로필아이콘 위치
+        bottom: -140,
     },
     userName: {
-        fontSize: 25,
+        fontSize: 23,
         fontWeight: 'bold',
-        textAlign: 'center',
-        bottom: '5%',
+        marginVertical: 5,
+        bottom: -120,
     },
     userEmail: {
-        fontSize: 23,
+        fontSize: 21,
         color: 'gray',
         textAlign: 'center',
         bottom: '6%',
     },
-    followContainer: {
+    iconContainer: {
         flexDirection: 'row',
         justifyContent: 'space-around',
         width: '100%',
         bottom: '-15%',
     },
-    followBox: {
+    profileIcon: {
         alignItems: 'center',
-    },
-    followLabel: {
-        fontSize: 15,
-        color: 'gray',
-    },
-    followCount: {
-        fontSize: 25,
-        fontWeight: 'bold',
+        bottom: -60,
     },
     logoutButton: {
         position: 'absolute',
-        bottom: '5%',
+        bottom: 700,
         width: '90%',
-        paddingVertical: '5%',
+        paddingVertical: 15,
         backgroundColor: '#E0E0E0',
         alignItems: 'center',
-        borderRadius: 8,
+        borderRadius: 5,
     },
     logoutButtonText: {
         color: '#888888',
-        fontSize: 20,
+        fontSize: 18,
         fontWeight: 'bold',
     },
-
+    footer: {
+        flexDirection: 'row',
+        width: '100%',
+        height: 60,
+        borderTopWidth: 1,
+        borderTopColor: '#E0E0E0',
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        backgroundColor: '#EDE7F6',
+        position: 'absolute',
+        bottom: 0,
+    },
+    footerButton: {
+        alignItems: 'center',
+    },
+    footerText: {
+        fontSize: 20,
+        color: '#6C4AB6',
+    },
 });
