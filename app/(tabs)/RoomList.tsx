@@ -40,7 +40,7 @@ const headerStyles = StyleSheet.create({
         height: height * 0.20,
     },
     title: {
-        paddingTop: '2%',
+        paddingTop: height* 0.01,
         fontSize: 20,
         color: '#ffffff',
     },
@@ -48,7 +48,7 @@ const headerStyles = StyleSheet.create({
         width: '80%',
         color: '#ffffff',
         fontSize: 20,
-        paddingTop: '6%'
+        paddingTop: height* 0.03
     },
 
     routeContainer: {
