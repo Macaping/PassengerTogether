@@ -205,13 +205,12 @@ export default function HomeView() {
             }}
           >
             {/* 출발지 */}
-            <TouchableOpacity
-              style={{ flex: 3 }}
-              onPress={() => openLocationModal("departure")}
-            >
+            <View style={{ flex: 3 }}>
               <Text style={main_styles.locationLabel}>출발</Text>
-              <Text style={main_styles.routeText}>{selectedDeparture}</Text>
-            </TouchableOpacity>
+              <TouchableOpacity onPress={() => openLocationModal("departure")}>
+                <Text style={main_styles.routeText}>{selectedDeparture}</Text>
+              </TouchableOpacity>
+            </View>
 
             {/* 화살표 */}
             <View style={{ flex: 1 }}>
@@ -221,13 +220,14 @@ export default function HomeView() {
             </View>
 
             {/* 도착지 */}
-            <TouchableOpacity
-              style={{ flex: 3 }}
-              onPress={() => openLocationModal("destination")}
-            >
+            <View style={{ flex: 3 }}>
               <Text style={main_styles.locationLabel}>도착</Text>
-              <Text style={main_styles.routeText}>{selectedDestination}</Text>
-            </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => openLocationModal("destination")}
+              >
+                <Text style={main_styles.routeText}>{selectedDestination}</Text>
+              </TouchableOpacity>
+            </View>
 
             {/* 출발지와 목적지에 관한 모달 */}
             <Modal
