@@ -14,7 +14,6 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "react-native-vector-icons";
 
 const { width, height } = Dimensions.get("window");
@@ -51,7 +50,7 @@ const headerStyles = StyleSheet.create({
     height: height * 0.2,
   },
   title: {
-    paddingTop: "2%",
+    paddingTop: height * 0.01,
     fontSize: 20,
     color: "#ffffff",
   },
@@ -59,7 +58,7 @@ const headerStyles = StyleSheet.create({
     width: "80%",
     color: "#ffffff",
     fontSize: 20,
-    paddingTop: "6%",
+    paddingTop: height * 0.03,
   },
 
   routeContainer: {
@@ -184,7 +183,7 @@ const RoomDetailModal = ({
         >
           <View style={modalStyles.handleBar} />
           <Text style={modalStyles.modalName}>
-            {room.created_at.slice(-10, -6)}
+            🏠 {room.created_at.slice(-10, -6)}
           </Text>
 
           {/* 출발 시각과 인원을 한 줄로 배치 */}
@@ -214,7 +213,7 @@ const RoomDetailModal = ({
           <View style={modalStyles.divider} />
 
           <View style={modalStyles.messageContainer}>
-            <Text style={modalStyles.detailText}>상세사항</Text>
+            <Text style={modalStyles.detailText}>만남의 장소</Text>
             <Text style={modalStyles.messageText}>{room.details}</Text>
           </View>
 
@@ -265,13 +264,14 @@ const modalStyles = StyleSheet.create({
     marginBottom: 20,
   },
   modalName: {
-    fontSize: 25,
+    fontSize: 20,
     fontWeight: "600",
   },
   headerSection: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: "5%",
+    marginTop: "3%",
   },
   modalTime: {
     fontSize: 20,
@@ -282,6 +282,7 @@ const modalStyles = StyleSheet.create({
     color: "#000000",
   },
   labelText: {
+    fontSize: 20,
     fontWeight: "400", // 얇은 글꼴
     color: "#000000",
   },
@@ -296,13 +297,13 @@ const modalStyles = StyleSheet.create({
   },
   messageContainer: {},
   detailText: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "600",
     marginBottom: 12,
     color: "#000000",
   },
   messageText: {
-    fontSize: 16,
+    fontSize: 18,
     color: "#666666",
     lineHeight: 20,
   },
@@ -476,7 +477,7 @@ export default function RoomListView() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       {/* Header 컴포넌트를 사용하여 화면 상단에 제목과 부제목을 표시합니다. */}
       <Header
         origin={selectedDeparture}
@@ -522,7 +523,7 @@ export default function RoomListView() {
           />
         </View>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 

@@ -3,7 +3,7 @@ import { supabase } from "@/lib/supabase";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { PostgrestSingleResponse, UserResponse } from "@supabase/supabase-js";
-import { router } from "expo-router";
+import { router, useNavigation } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
   ActivityIndicator,
@@ -19,6 +19,7 @@ const { width, height } = Dimensions.get("window");
 export default function RoomDetailView() {
   const { room, fetchRoomDetails } = useUserDataManagement();
   const [isLoading, setIsLoading] = useState(true);
+  const navigation = useNavigation();
   useFocusEffect(
     useCallback(() => {
       const loadRoomDetails = async () => {
@@ -87,54 +88,71 @@ export default function RoomDetailView() {
         <View style={styles.ticketHeader}>
           <Text style={styles.ticketId}>{room.created_at.slice(-10, -6)}</Text>
         </View>
-
-        <View style={styles.timeContainer}>
-          <Text style={styles.timeLabel}>출발 시각</Text>
-          <Text style={styles.timeValue}>
-            {`${new Date(room.departure_time).getMonth() + 1}월 ${new Date(room.departure_time).getDate()}일 (${["일", "월", "화", "수", "목", "금", "토"][new Date(room.departure_time).getDay()]}) ${String(new Date(room.departure_time).getHours()).padStart(2, "0")}:${String(new Date(room.departure_time).getMinutes()).padStart(2, "0")}`}
-          </Text>
-        </View>
-        <View style={styles.routeSection}>
-          <View style={styles.routeItem}>
-            <Text style={styles.routeLabel}>출발</Text>
-            <Text style={styles.routeValue}>{room.origin}</Text>
+        <View style={styles.mainContent}>
+          {/* 1. 시간 정보 */}
+          <View style={styles.timeContainer}>
+            <Text style={styles.Label}>출발 시각</Text>
+            <Text style={styles.timeValue}>
+              {`${new Date(room.departure_time).getMonth() + 1}월 ${new Date(room.departure_time).getDate()}일 (${["일", "월", "화", "수", "목", "금", "토"][new Date(room.departure_time).getDay()]}) ${String(new Date(room.departure_time).getHours()).padStart(2, "0")}:${String(new Date(room.departure_time).getMinutes()).padStart(2, "0")}`}
+            </Text>
           </View>
-          <View style={styles.routeItem}>
-            <Text style={styles.routeLabel}>도착</Text>
-            <Text style={styles.routeValue}>{room.destination}</Text>
+          {/* 2. 경로 정보 */}
+          <View style={styles.routeSection}>
+            <View>
+              <Text style={styles.Label}>출발</Text>
+              <Text style={styles.routeValue}>{room.origin}</Text>
+            </View>
+            <View>
+              <Text style={styles.Label}>도착</Text>
+              <Text style={styles.routeValue}>{room.destination}</Text>
+            </View>
+          </View>
+          {/* 3. 인원수 정보 */}
+          <View style={styles.passengerSection}>
+            <Text style={styles.Label}>인원수</Text>
+            <Text style={styles.passengerCount}>
+              {room.users ? room.users.length : 0}/{room.limit_people}
+            </Text>
+          </View>
+          {/* 4. 장소 정보 */}
+          <View style={styles.placeSection}>
+            <Text style={styles.Label}>만남의 장소</Text>
+            <Text style={styles.detailsText}>
+              상세사항으로 받은 데이터를 만남의장소와 옷차림으로 쪼개서 db로
+              받고 글자수 제한 필요어디까지 받을건지 확인 필요 3줄 정도만
+            </Text>
           </View>
         </View>
 
-        <View style={styles.passengerSection}>
-          <Text style={styles.passengerCount}>
-            인원수 {room.users ? room.users.length : 0}/{room.limit_people}
-          </Text>
-        </View>
-
-        <View style={styles.detailsSection}>
-          <Text style={styles.detailsText}>{room.details}</Text>
-        </View>
-
-        {/* 점선 구간 */}
+        {/* 5. 구분선 */}
         <View style={styles.separatorContainer}>
           <View style={styles.dottedLine} />
           <View style={styles.leftCircle} />
           <View style={styles.rightCircle} />
         </View>
-
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.iconButton}>
-            <Ionicons name="chatbubbles-outline" size={24} color="#666666" />
-            <Text style={styles.iconButtonText}>채팅</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.iconButton}>
-            <Ionicons name="people-outline" size={24} color="#666666" />
-            <Text style={styles.iconButtonText}>동승자</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.iconButton} onPress={handleLeaveRoom}>
-            <Ionicons name="exit-outline" size={24} color="#666666" />
-            <Text style={styles.iconButtonText}>나가기</Text>
-          </TouchableOpacity>
+        <View style={styles.bottomContent}>
+          {/* 6. 버튼 영역 */}
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.iconButton}>
+              <Ionicons
+                name="chatbubble-outline"
+                size={32}
+                onPress={() => navigation.navigate("Chat")}
+              />
+              <Text style={styles.iconButtonText}>채팅</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.iconButton}>
+              <Ionicons name="people-outline" size={32} color="#666666" />
+              <Text style={styles.iconButtonText}>동승자</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={handleLeaveRoom}
+            >
+              <Ionicons name="exit-outline" size={32} color="#666666" />
+              <Text style={styles.iconButtonText}>나가기</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </View>
@@ -142,6 +160,125 @@ export default function RoomDetailView() {
 }
 
 const styles = StyleSheet.create({
+  mainContent: {
+    flex: 4,
+  },
+  bottomContent: {
+    flex: 1,
+    justifyContent: "center",
+    marginTop: "auto",
+    width: "100%",
+  },
+  container: {
+    flex: 1,
+    backgroundColor: "#6049E2",
+    alignItems: "center",
+  },
+  ticketContainer: {
+    width: "90%",
+    height: "85%",
+    padding: "3%",
+    borderRadius: width * 0.05,
+    backgroundColor: "#fff",
+    position: "relative",
+  },
+  ticketHeader: {
+    backgroundColor: "#EAE5FE",
+    borderTopLeftRadius: width * 0.05,
+    borderTopRightRadius: width * 0.05,
+    justifyContent: "center",
+    height: "8%",
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+  },
+  ticketId: {
+    fontSize: 25,
+    marginLeft: "3%",
+    color: "#333",
+  },
+  timeContainer: {
+    marginTop: "15%",
+    marginBottom: "5%",
+  },
+  timeValue: {
+    fontSize: 25,
+    color: "#000000",
+  },
+  routeSection: {
+    flexDirection: "row",
+    marginBottom: "5%",
+    justifyContent: "space-between",
+  },
+  routeValue: {
+    fontSize: 30,
+    fontWeight: "600",
+    color: "#000000",
+  },
+  passengerSection: {
+    alignItems: "flex-end",
+    marginBottom: "5%",
+  },
+  Label: {
+    fontSize: 20,
+    color: "#6F6F6F",
+    marginBottom: "0.5%",
+  },
+  passengerCount: {
+    fontSize: 25,
+    color: "#000000",
+  },
+  placeSection: {
+    height: "18%",
+  },
+  detailsText: {
+    fontSize: 16,
+  },
+  separatorContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: "80%",
+  },
+  dottedLine: {
+    flex: 1,
+    borderBottomWidth: 2,
+    borderStyle: "dashed",
+    borderColor: "#C3C3C3",
+  },
+  leftCircle: {
+    position: "absolute",
+    left: -width * 0.05,
+    width: width * 0.1,
+    height: width * 0.1,
+    backgroundColor: "#6049E2",
+    borderRadius: width * 0.05,
+  },
+  rightCircle: {
+    position: "absolute",
+    right: -width * 0.05,
+    width: width * 0.1,
+    height: width * 0.1,
+    backgroundColor: "#6049E2",
+    borderRadius: width * 0.05,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around",
+  },
+  iconButton: {
+    alignItems: "center",
+  },
+  iconButtonText: {
+    marginTop: 8,
+    fontSize: 14,
+  },
+
   loadingContainer: {
     flex: 1,
     alignItems: "center",
@@ -154,21 +291,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 10,
   },
-  container: {
-    flex: 1,
-    backgroundColor: "#6049E2",
-    alignItems: "center",
-  },
-  headerContainer: {
-    height: 80,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  header: {
-    paddingTop: "2%",
-    fontSize: 20,
-    color: "#ffffff",
-  },
   centeredMessageContainer: {
     flex: 1,
     justifyContent: "center",
@@ -178,131 +300,5 @@ const styles = StyleSheet.create({
     fontSize: width * 0.05,
     color: "#333",
     textAlign: "center",
-  },
-  ticketContainer: {
-    width: width * 0.92,
-    height: height * 0.8,
-    padding: width * 0.05,
-    borderRadius: width * 0.05,
-    backgroundColor: "#fff",
-    position: "relative",
-  },
-  ticketHeader: {
-    backgroundColor: "#EAE5FE",
-    borderTopLeftRadius: width * 0.05,
-    borderTopRightRadius: width * 0.05,
-    paddingVertical: height * 0.02,
-    alignItems: "flex-start",
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    borderBottomWidth: 1,
-    borderColor: "#ddd",
-  },
-  ticketId: {
-    fontSize: width * 0.06,
-    fontWeight: "bold",
-    marginLeft: width * 0.025,
-    color: "#333",
-  },
-  timeContainer: {
-    marginTop: height * 0.07,
-  },
-  timeLabel: {
-    fontSize: 16,
-    color: "#666666",
-    marginBottom: 8,
-  },
-  timeValue: {
-    fontSize: 20,
-    color: "#000000",
-  },
-  routeSection: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginVertical: 10,
-  },
-  routeItem: {
-    flex: 1,
-  },
-  routeLabel: {
-    fontSize: 16,
-    color: "#666666",
-    marginBottom: 8,
-  },
-  routeValue: {
-    fontSize: 24,
-    fontWeight: "600",
-    color: "#000000",
-  },
-
-  passengerSection: {
-    alignItems: "flex-end",
-    paddingHorizontal: 20,
-    marginTop: 10,
-  },
-  passengerCount: {
-    fontSize: 16,
-    color: "#000000",
-  },
-  detailsSection: {
-    padding: 65,
-    marginTop: 10,
-    borderWidth: 1,
-    borderColor: "#EEEEEE",
-    borderRadius: 8,
-    marginHorizontal: 20,
-    backgroundColor: "#FAFAFA",
-  },
-  detailsText: {
-    fontSize: 16,
-    color: "#666666",
-    lineHeight: 24,
-  },
-
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginTop: 20,
-  },
-  iconButton: {
-    alignItems: "center",
-  },
-  iconButtonText: {
-    marginTop: 8,
-    fontSize: 14,
-    color: "#666666",
-  },
-
-  separatorContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    position: "relative",
-    marginBottom: height * 0.02,
-    marginTop: height * 0.1,
-  },
-  dottedLine: {
-    flex: 1,
-    borderBottomWidth: 2,
-    borderStyle: "dashed",
-    borderColor: "#C3C3C3",
-  },
-  leftCircle: {
-    position: "absolute",
-    left: -width * 0.1,
-    width: width * 0.1,
-    height: width * 0.1,
-    backgroundColor: "#6049E2",
-    borderRadius: width * 0.05,
-  },
-  rightCircle: {
-    position: "absolute",
-    right: -width * 0.1,
-    width: width * 0.1,
-    height: width * 0.1,
-    backgroundColor: "#6049E2",
-    borderRadius: width * 0.05,
   },
 });
