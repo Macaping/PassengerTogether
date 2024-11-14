@@ -9,10 +9,13 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
+import { useAuthUser } from "@/hooks/useAuthUser";
 
 export default function MyPage() {
   const { height } = useWindowDimensions();
   const iconSize = height * 0.25;
+
+  const { userData } = useAuthUser();
 
   const handleSignOut = async () => {
     signOutUser().then(() => {
@@ -29,8 +32,8 @@ export default function MyPage() {
           color="#4641A7"
         />
 
-        <Text style={styles.userName}>하라마라탕</Text>
-        <Text style={styles.userEmail}>haram@gmail.com</Text>
+        <Text style={styles.userName}>{userData?.nickname ?? "Nickname"}</Text>
+        <Text style={styles.userEmail}>{userData?.email ?? "Email"}</Text>
       </View>
 
       <TouchableOpacity style={styles.logoutButton} onPress={handleSignOut}>

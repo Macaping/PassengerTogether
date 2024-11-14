@@ -4,18 +4,19 @@ import { useEffect, useState } from "react";
 
 export function useAuthUser() {
   const [user, setUser] = useState<User | null>(null);
+  const [userData, setUserData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // 초기 사용자 상태 확인
     getUserFromSupabase()
       .then((value: void | { user: User }) => {
-        setUser(user);
+        const currentUser = value?.user ?? null;
+        setUser(currentUser); //로그인 유저 auth정보 저장
+        if (currentUser?.id) {
+          getUserByUUID(currentUser.id).then((data) => setUserData(data)); //로그인 유저 users테이블 정보 저장
+        }
       })
-      .then(() => {
-        setLoading(false);
-        if (!user) throw Error("유저가 없습니다.");
-      })
+      .finally(() => setLoading(false))
       .catch((error: Error) => {
         console.log(error.message);
       });
@@ -24,27 +25,44 @@ export function useAuthUser() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user ?? null);
+      const currentUser = session?.user ?? null;
+      setUser(currentUser);
+
+      if (currentUser?.id) {
+        getUserByUUID(currentUser.id).then((data) => setUserData(data));
+      } else {
+        setUserData(null);
+      }
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
-  return { user, loading };
+  return { user, userData, loading };
 }
-
+//로그인 유저 auth정보 가져오기
 export async function getUserFromSupabase() {
-  return (
-    supabase.auth
-      .getUser()
-      // 사용자 id 가져오기
-      .then((value: UserResponse) => {
-        if (value.error) throw value.error;
-        return value.data;
-      })
-      // 오류 처리
-      .catch((error: AuthError) => {
-        console.log("사용자 정보를 가져오는 중 오류 발생:", error.message);
-      })
-  );
+  return supabase.auth
+    .getUser()
+    .then((value: UserResponse) => {
+      if (value.error) throw value.error;
+      return value.data;
+    })
+    .catch((error: AuthError) => {
+      console.log("사용자 정보를 가져오는 중 오류 발생:", error.message);
+    });
+}
+//users테이블에서 로그인 유저의 정보 받아오기
+export async function getUserByUUID(uuid: string) {
+  const { data, error } = await supabase
+    .from("users")
+    .select("*")
+    .eq("user_id", uuid);
+
+  if (error) {
+    console.error("UUID로 사용자 정보를 가져오는 중 오류 발생:", error.message);
+    return null;
+  }
+
+  return data?.[0] ?? null;
 }
