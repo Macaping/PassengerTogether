@@ -3,7 +3,7 @@ import { supabase } from "@/lib/supabase";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { PostgrestSingleResponse, UserResponse } from "@supabase/supabase-js";
-import { router, useNavigation } from "expo-router";
+import { router } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
   ActivityIndicator,
@@ -19,7 +19,6 @@ const { width } = Dimensions.get("window");
 export default function RoomDetailView() {
   const { room, fetchRoomDetails } = useUserDataManagement();
   const [isLoading, setIsLoading] = useState(true);
-  const navigation = useNavigation();
   useFocusEffect(
     useCallback(() => {
       const loadRoomDetails = async () => {
@@ -135,7 +134,7 @@ export default function RoomDetailView() {
               <Ionicons
                 name="chatbubble-outline"
                 size={32}
-                onPress={() => navigation.navigate("Chat")}
+                onPress={() => router.push("/Chat")}
               />
               <Text style={styles.iconButtonText}>채팅</Text>
             </TouchableOpacity>
