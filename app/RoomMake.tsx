@@ -14,7 +14,7 @@ import {
 } from "react-native";
 import { Dimensions } from "react-native"; //Dimensions API를 이용해 화면의 너비나 높이에 따라 fontSize를 설정
 
-const { width, height } = Dimensions.get("window"); //Dimensions 이용
+const { width } = Dimensions.get("window"); //Dimensions 이용
 
 export default function RoomMakeView() {
   const {
