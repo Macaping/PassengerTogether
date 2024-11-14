@@ -4,10 +4,8 @@ import React from "react";
 import { TabBarIcon } from "@/components/navigation/TabBarIcon";
 import { Colors } from "@/constants/Colors";
 import { useAuthUser } from "@/hooks/useAuthUser";
-import { useColorScheme } from "@/hooks/useColorScheme";
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
   const { user, loading } = useAuthUser();
 
   if (loading) {
@@ -17,7 +15,7 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
+        tabBarActiveTintColor: "#6049E2",
         headerStyle: { backgroundColor: "#6049E2" },
         headerTintColor: "#ffffff",
         headerTitleAlign: "center",
