@@ -21,20 +21,10 @@ export default function TabLayout() {
         headerStyle: { backgroundColor: "#6049E2" },
         headerTintColor: "#ffffff",
         headerTitleAlign: "center",
+        headerShadowVisible: false,
+        tabBarHideOnKeyboard: true,
       }}
     >
-      <Tabs.Screen
-        name="RoomDetail"
-        options={{
-          title: "나의 파티",
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon
-              name={focused ? "ticket" : "ticket-outline"}
-              color={color}
-            />
-          ),
-        }}
-      />
       <Tabs.Screen
         name="index"
         options={{
@@ -48,34 +38,46 @@ export default function TabLayout() {
           ),
         }}
       />
-      {/* user가 있으면 마이 페이지, 없으면 로그인 */}
-      {user ? (
-        <Tabs.Screen
-          name="MyPage"
-          options={{
-            title: "마이 페이지",
-            tabBarIcon: ({ color, focused }) => (
-              <TabBarIcon
-                name={focused ? "person-circle" : "person-circle-outline"}
-                color={color}
-              />
-            ),
-          }}
-        />
-      ) : (
-        <Tabs.Screen
-          name="SignIn"
-          options={{
-            title: "로그인",
-            tabBarIcon: ({ color, focused }) => (
-              <TabBarIcon
-                name={focused ? "log-in" : "log-in-outline"}
-                color={color}
-              />
-            ),
-          }}
-        />
-      )}
+      <Tabs.Screen
+        name="RoomDetail"
+        options={{
+          title: "나의 파티",
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon
+              name={focused ? "ticket" : "ticket-outline"}
+              color={color}
+            />
+          ),
+          href: user ? undefined : null,
+        }}
+      />
+      <Tabs.Screen
+        name="MyPage"
+        options={{
+          title: "마이 페이지",
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon
+              name={focused ? "person" : "person-outline"}
+              color={color}
+            />
+          ),
+          href: user ? undefined : null,
+        }}
+      />
+      <Tabs.Screen
+        name="SignIn"
+        options={{
+          title: "로그인",
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon
+              name={focused ? "log-in" : "log-in-outline"}
+              color={color}
+            />
+          ),
+          href: user ? null : undefined,
+          headerShown: false,
+        }}
+      />
     </Tabs>
   );
 }

@@ -18,9 +18,7 @@ export default function MyPage() {
   const { userData } = useAuthUser();
 
   const handleSignOut = async () => {
-    signOutUser().then(() => {
-      router.replace("/(tabs)/SignIn");
-    });
+    signOutUser().then(() => router.replace("/SignIn"));
   };
 
   return (

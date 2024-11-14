@@ -28,7 +28,6 @@ const Header = ({
   today: Date;
 }) => (
   <View style={headerStyles.headerContainer}>
-    <Text style={headerStyles.title}>방 리스트</Text>
     <Text style={headerStyles.date}>{today}</Text>
     <View style={headerStyles.routeContainer}>
       <Text style={headerStyles.locationName}>{origin}</Text>
@@ -48,11 +47,6 @@ const headerStyles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#6049E2",
     height: height * 0.2,
-  },
-  title: {
-    paddingTop: height * 0.01,
-    fontSize: 20,
-    color: "#ffffff",
   },
   date: {
     width: "80%",

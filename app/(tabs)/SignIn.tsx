@@ -1,5 +1,5 @@
 import { signInUser } from "@/utils/auth.utils";
-import { router } from "expo-router";
+import { Link, router } from "expo-router";
 import React, { useState } from "react";
 import {
   StyleSheet,
@@ -50,13 +50,11 @@ export default function SignInView() {
       </TouchableOpacity>
 
       <Text style={styles.footerText}>
-        아직 회원이 아니신가요?
-        <Text
-          style={styles.signupText}
-          onPress={() => router.push("/(tabs)/SignUp")}
-        >
-          {"  "}회원가입
-        </Text>
+        <Text>아직 회원이 아니신가요?</Text>
+        <Text>{"  "}</Text>
+        <Link style={styles.signupText} href="/SignUp">
+          회원가입
+        </Link>
       </Text>
     </View>
   );

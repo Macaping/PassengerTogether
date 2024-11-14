@@ -18,7 +18,8 @@ export default function SignUpView() {
 
   const handleSignUp = async () => {
     signUpUser(email, password, confirmPassword, nickname)
-      .then(() => router.replace("/(tabs)/"))
+      .then(() => router.dismissAll()) // 모든 화면 닫기
+      .then(() => router.replace("/(tabs)/")) // 탭 화면으로 이동
       .catch((e: string) => setErrorMessage(e));
   };
 
