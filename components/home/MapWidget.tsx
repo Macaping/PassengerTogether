@@ -1,24 +1,41 @@
 import * as Location from "expo-location";
+import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import MapView, { Marker, Polyline } from "react-native-maps";
 
 export function MapWidget({
-  location,
   coordinates,
   selectedDeparture,
   selectedDestination,
   route,
-  errorMsg,
   mapRef,
 }: {
-  location: Location.LocationObjectCoords | null;
   coordinates: { [key: string]: { latitude: number; longitude: number } };
   selectedDeparture: string;
   selectedDestination: string;
   route: { latitude: number; longitude: number }[] | null;
-  errorMsg: string | null;
   mapRef: React.RefObject<MapView>;
 }) {
+  const [location, setLocation] =
+    useState<Location.LocationObjectCoords | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        setErrorMsg("위치 권한이 거부되었습니다.");
+        return;
+      }
+      let currentLocation = await Location.getCurrentPositionAsync({});
+      if (currentLocation && currentLocation.coords) {
+        setLocation(currentLocation.coords);
+      } else {
+        setErrorMsg("위치를 가져오는 데 실패했습니다.");
+      }
+    })();
+  }, []);
+
   return (
     <View style={styles.mapInfoBox}>
       {location ? (

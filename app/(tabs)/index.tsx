@@ -3,7 +3,6 @@ import { MapWidget } from "@/components/home/MapWidget";
 import { 방_탐색 } from "@/components/home/방_탐색";
 import { 방장_하기 } from "@/components/home/방장_하기";
 import { DateTimePickerEvent } from "@react-native-community/datetimepicker";
-import * as Location from "expo-location";
 import React, { useEffect, useRef, useState } from "react";
 import { Dimensions, StyleSheet, View } from "react-native";
 import MapView from "react-native-maps";
@@ -32,30 +31,11 @@ export default function HomeView() {
   const [modalVisible, setModalVisible] = useState(false);
   const [changingLocationType, setChangingLocationType] = useState("departure");
 
-  const [location, setLocation] =
-    useState<Location.LocationObjectCoords | null>(null);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [route, setRoute] = useState<{ latitude: number; longitude: number }[]>(
     [],
   );
   const [distance, setDistance] = useState<number | null>(null);
   const [duration, setDuration] = useState<number | null>(null);
-
-  useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        setErrorMsg("위치 권한이 거부되었습니다.");
-        return;
-      }
-      let currentLocation = await Location.getCurrentPositionAsync({});
-      if (currentLocation && currentLocation.coords) {
-        setLocation(currentLocation.coords);
-      } else {
-        setErrorMsg("위치를 가져오는 데 실패했습니다.");
-      }
-    })();
-  }, []);
 
   useEffect(() => {
     fetchRouteData();
@@ -146,12 +126,10 @@ export default function HomeView() {
   return (
     <View style={styles.container}>
       <MapWidget
-        location={location}
         coordinates={coordinates}
         selectedDeparture={selectedDeparture}
         selectedDestination={selectedDestination}
         route={route}
-        errorMsg={errorMsg}
         mapRef={mapRef}
       />
 
