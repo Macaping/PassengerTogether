@@ -401,7 +401,7 @@ const map_styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: "75%",
-    zIndex: -1,
+    zIndex: 0,
     borderWidth: 1,
     borderColor: "#ccc",
   },
