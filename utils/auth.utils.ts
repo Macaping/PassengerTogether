@@ -1,5 +1,11 @@
+import { supabase } from "@/lib/supabase";
 import { signInWithEmail, signOut, signUpWithEmail } from "@/services/auth";
-import { AuthError, PostgrestError, User } from "@supabase/supabase-js";
+import {
+  AuthError,
+  PostgrestError,
+  User,
+  UserResponse,
+} from "@supabase/supabase-js";
 
 // 로그인
 export async function signInUser(
@@ -65,4 +71,31 @@ export async function signOutUser(): Promise<void> {
   return signOut().catch((e: Error) => {
     console.error(e.message);
   });
+}
+
+//로그인 유저 auth정보 가져오기
+export async function getUserFromSupabase() {
+  return supabase.auth
+    .getUser()
+    .then((value: UserResponse) => {
+      if (value.error) throw value.error;
+      return value.data;
+    })
+    .catch((error: AuthError) => {
+      console.log("사용자 정보를 가져오는 중 오류 발생:", error.message);
+    });
+}
+//users테이블에서 로그인 유저의 정보 받아오기
+export async function getUserByUUID(uuid: string) {
+  const { data, error } = await supabase
+    .from("users")
+    .select("*")
+    .eq("user_id", uuid);
+
+  if (error) {
+    console.error("UUID로 사용자 정보를 가져오는 중 오류 발생:", error.message);
+    return null;
+  }
+
+  return data?.[0] ?? null;
 }
