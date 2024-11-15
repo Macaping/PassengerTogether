@@ -1,6 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import { PostgrestError } from "@supabase/supabase-js";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 
 const useLoadRooms = (
   origin: string,
@@ -10,19 +10,13 @@ const useLoadRooms = (
   const [loading, setLoading] = useState(false);
   const [rooms, setRooms] = useState<any[] | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [hasFetched, setHasFetched] = useState(false); // 초기화 여부 플래그 추가
+  const hasFetchedRef = useRef(false); // fetch 실행 여부
 
   // 기준 시간을 ISO 형식으로 변환
   const minDepartureTimeIso = minDepartureTime.toISOString();
-
-  // 선택한 날짜를 "YYYY-MM-DD" 형식으로 변환하여 사용
-  const selectedDate = minDepartureTime.toISOString().split("T")[0]; // "YYYY-MM-DD" 형식
-
+  const selectedDate = minDepartureTime.toISOString().split("T")[0]; // YYYY-MM-DD
 
   const fetchRooms = useCallback(async () => {
-    // 조건이 없을 때 fetch를 중단
-    
-
     try {
       setLoading(true);
       const { data, error } = await supabase
@@ -30,7 +24,7 @@ const useLoadRooms = (
         .select("*")
         .eq("origin", origin)
         .eq("destination", destination)
-        .gte("departure_time", minDepartureTimeIso) // 기준 시간 이후 방만 가져옴
+        .gte("departure_time", minDepartureTimeIso)
         .order("departure_time", { ascending: true });
 
       if (error) {
@@ -38,31 +32,30 @@ const useLoadRooms = (
         throw error;
       }
 
-      // 클라이언트 측에서 선택한 날짜와 일치하는 항목만 필터링
+      // 필터링된 데이터
       const filteredData = data?.filter(
         (room) =>
           new Date(room.departure_time).toISOString().split("T")[0] ===
           selectedDate,
       );
 
-      console.log("Filtered data:", filteredData); // 필터링된 데이터 확인용 로그
+      console.log("Filtered data:", filteredData); // 로그가 한 번만 출력되게 설정
       setRooms(filteredData || []);
-      setHasFetched(true); // fetch가 완료된 경우 플래그 설정
+      hasFetchedRef.current = true; // fetch 완료 상태 업데이트
     } catch (error) {
       setError((error as PostgrestError).message);
     } finally {
       setLoading(false);
     }
-  }, [origin, destination, minDepartureTimeIso, selectedDate, hasFetched]);
+  }, [origin, destination, minDepartureTimeIso, selectedDate]);
 
-
+  // fetchRooms를 조건이 맞을 때 한 번만 실행
   useEffect(() => {
-    if (!hasFetched && origin && destination && minDepartureTime) {
+    if (!hasFetchedRef.current && origin && destination && minDepartureTime) {
       console.log("Fetching rooms...");
       fetchRooms();
     }
-  }, [fetchRooms, hasFetched, origin, destination, minDepartureTime]);
-
+  }, [fetchRooms]); // `fetchRooms` 자체가 의존성을 포함하므로 추가 의존성 불필요
 
   useEffect(() => {
     // 리얼타임 데이터베이스 변경 감지
@@ -82,47 +75,30 @@ const useLoadRooms = (
           const eventDate = eventTime
             ? eventTime.toISOString().split("T")[0]
             : null;
+
           if (
             payload.eventType === "INSERT" &&
             payload.new?.origin === origin &&
             payload.new?.destination === destination &&
             eventTime &&
-            eventDate === selectedDate && // 선택한 날짜와 일치하는지 확인
-            eventTime >= new Date(minDepartureTimeIso) // 기준 시간 비교
+            eventDate === selectedDate &&
+            eventTime >= new Date(minDepartureTimeIso)
           ) {
             console.log("INSERT detected:", payload.new);
             setRooms((current) => {
               if (!current) return [payload.new];
               const newRooms = [...current, payload.new];
-              // departure_time으로 정렬
               return newRooms.sort(
                 (a, b) =>
                   new Date(a.departure_time).getTime() -
                   new Date(b.departure_time).getTime(),
               );
             });
-          } else if (payload.eventType === "DELETE") {
-            setRooms((current) =>
-              current
-                ? current.filter((room) => room.id !== payload.old.id)
-                : null,
-            );
-          } else if (payload.eventType === "UPDATE") {
-            setRooms((current) =>
-              current
-                ? current.map((room) =>
-                    room.id === payload.new.id ? payload.new : room,
-                  )
-                : null,
-            );
           }
         },
       )
       .subscribe();
 
-    //fetchRooms();
-
-    // Clean up on unmount
     return () => {
       channel.unsubscribe();
     };
