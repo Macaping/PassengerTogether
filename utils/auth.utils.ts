@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import { signInWithEmail, signOut, signUpWithEmail } from "@/services/auth";
+import * as Notifications from "expo-notifications";
 import {
   AuthError,
   PostgrestError,
@@ -7,17 +8,68 @@ import {
   UserResponse,
 } from "@supabase/supabase-js";
 
+// Expo 푸시 토큰을 가져오는 함수
+async function getExpoPushToken() {
+  try {
+    const { status: existingStatus } =
+      await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+
+    if (existingStatus !== "granted") {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+
+    if (finalStatus === "granted") {
+      const token = (await Notifications.getExpoPushTokenAsync()).data;
+      if (!token) {
+        console.warn("푸시 토큰을 받아오지 못했습니다.");
+      }
+      return token;
+    } else {
+      console.warn("푸시 알림 권한이 없습니다.");
+      return null;
+    }
+  } catch (error) {
+    console.error("푸시 토큰을 가져오는 중 오류 발생:", error.message);
+    return null;
+  }
+}
+
 // 로그인
 export async function signInUser(
   email: string,
   password: string,
 ): Promise<User> {
   if (!email || !password) throw "이메일과 비밀번호를 입력해주세요.";
-  return signInWithEmail(email, password).catch((e: AuthError) => {
-    if (e.message === "Invalid login credentials")
+
+  let user: User | null = null;
+  try {
+    user = await signInWithEmail(email, password);
+  } catch (e) {
+    if (e instanceof AuthError && e.message === "Invalid login credentials") {
       throw "이메일 또는 비밀번호가 일치하지 않습니다.";
-    else throw e.message;
-  });
+    } else {
+      throw e.message;
+    }
+  }
+
+  if (user && user.id) {
+    // 로그인 후 푸시 토큰 저장
+    const token = await getExpoPushToken();
+    if (token) {
+      const { error } = await supabase
+        .from("users")
+        .update({ expo_push_token: token })
+        .eq("user_id", user.id);
+
+      if (error) {
+        console.error("푸시 토큰 저장 중 오류 발생:", error.message);
+      }
+    }
+  }
+
+  return user;
 }
 
 // 회원가입
@@ -36,16 +88,38 @@ export async function signUpUser(
     throw "비밀번호는 최소 8자 이상, 하나 이상의 대문자, 소문자, 숫자 및 특수 문자가 필요합니다.";
   if (nickname.length < 2) throw "닉네임은 2자 이상이어야 합니다.";
 
-  return signUpWithEmail(email, password, nickname).catch(
-    (e: AuthError | PostgrestError) => {
-      if (e.message === "User already registered")
-        throw "이미 사용 중인 이메일입니다.";
-      // 닉네임이 중복되었을 때 발생하는 오류라고 판단함.
-      if (e.message === "Database error saving new user")
-        throw "사용할 수 없는 닉네임입니다.";
-      else throw e.message;
-    },
-  );
+  let user: User | null = null;
+  try {
+    user = await signUpWithEmail(email, password, nickname);
+  } catch (e) {
+    if (e instanceof AuthError && e.message === "User already registered") {
+      throw "이미 사용 중인 이메일입니다.";
+    } else if (
+      e instanceof PostgrestError &&
+      e.message === "Database error saving new user"
+    ) {
+      throw "사용할 수 없는 닉네임입니다.";
+    } else {
+      throw e.message;
+    }
+  }
+
+  if (user && user.id) {
+    // 회원가입 후 푸시 토큰 저장
+    const token = await getExpoPushToken();
+    if (token) {
+      const { error } = await supabase
+        .from("users")
+        .update({ expo_push_token: token })
+        .eq("user_id", user.id);
+
+      if (error) {
+        console.error("푸시 토큰 저장 중 오류 발생:", error.message);
+      }
+    }
+  }
+
+  return user;
 }
 
 // 사전에 데이터가 올바른지 확인하는 함수
@@ -73,29 +147,38 @@ export async function signOutUser(): Promise<void> {
   });
 }
 
-//로그인 유저 auth정보 가져오기
+// 로그인 유저 auth 정보 가져오기
 export async function getUserFromSupabase() {
-  return supabase.auth
-    .getUser()
-    .then((value: UserResponse) => {
-      if (value.error) throw value.error;
-      return value.data;
-    })
-    .catch((error: AuthError) => {
-      console.log("사용자 정보를 가져오는 중 오류 발생:", error.message);
-    });
+  try {
+    const { data, error } = await supabase.auth.getUser();
+    if (error) {
+      throw error;
+    }
+    return data;
+  } catch (error) {
+    console.error("사용자 정보를 가져오는 중 오류 발생:", error.message);
+  }
 }
-//users테이블에서 로그인 유저의 정보 받아오기
-export async function getUserByUUID(uuid: string) {
-  const { data, error } = await supabase
-    .from("users")
-    .select("*")
-    .eq("user_id", uuid);
 
-  if (error) {
-    console.error("UUID로 사용자 정보를 가져오는 중 오류 발생:", error.message);
+// users 테이블에서 로그인 유저의 정보 받아오기
+export async function getUserByUUID(uuid: string) {
+  try {
+    const { data, error } = await supabase
+      .from("users")
+      .select("*")
+      .eq("user_id", uuid);
+
+    if (error) {
+      console.error(
+        "UUID로 사용자 정보를 가져오는 중 오류 발생:",
+        error.message,
+      );
+      return null;
+    }
+
+    return data?.[0] ?? null;
+  } catch (error) {
+    console.error("사용자 정보를 가져오는 중 오류 발생:", error.message);
     return null;
   }
-
-  return data?.[0] ?? null;
 }

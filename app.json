@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "PassengerTogether",
-    "slug": "PassengerTogether",
+    "slug": "passengertogether",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -36,6 +36,15 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "62dda903-b65f-4f00-8256-43eae13b4e70"
+      }
+    },
+    "owner": "kangguyong"
   }
 }

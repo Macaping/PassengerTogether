@@ -1,5 +1,6 @@
 import { Tabs } from "expo-router";
-import React from "react";
+import React, { useEffect } from "react";
+import * as Notifications from "expo-notifications";
 
 import { TabBarIcon } from "@/components/navigation/TabBarIcon";
 import { Colors } from "@/constants/Colors";
@@ -7,6 +8,38 @@ import { useAuthUser } from "@/hooks/useAuthUser";
 
 export default function TabLayout() {
   const { user, loading } = useAuthUser();
+
+  useEffect(() => {
+    // 알림 처리기 설정
+    Notifications.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: true,
+        shouldSetBadge: false,
+      }),
+    });
+
+    // 알림 수신 리스너 등록
+    const subscriptionReceived = Notifications.addNotificationReceivedListener(
+      (notification) => {
+        console.log("알림 수신:", notification);
+        // 여기에서 알림 수신 시 추가적인 처리를 할 수 있습니다.
+      },
+    );
+
+    // 알림 응답 리스너 등록 (사용자가 알림을 클릭했을 때)
+    const subscriptionResponse =
+      Notifications.addNotificationResponseReceivedListener((response) => {
+        console.log("사용자가 알림을 클릭했습니다:", response);
+        // 여기에서 사용자가 알림을 클릭했을 때 추가적인 처리를 할 수 있습니다.
+      });
+
+    return () => {
+      // 컴포넌트가 언마운트 될 때 리스너 제거
+      subscriptionReceived.remove();
+      subscriptionResponse.remove();
+    };
+  }, []);
 
   if (loading) {
     return null; // 또는 로딩 인디케이터 표시
