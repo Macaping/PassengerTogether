@@ -15,7 +15,7 @@ import {
 } from "react-native";
 import MapView, { Marker, Polyline } from "react-native-maps";
 
-const { width, height } = Dimensions.get("window"); //Dimensions 이용
+const { width } = Dimensions.get("window"); //Dimensions 이용
 
 export default function HomeView() {
   const locations = ["천안역", "천안아산역", "선문대", "탕정역", "두정동 롯데"];
@@ -401,7 +401,7 @@ const map_styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: "75%",
-    zIndex: -1,
+    zIndex: 0,
     borderWidth: 1,
     borderColor: "#ccc",
   },
