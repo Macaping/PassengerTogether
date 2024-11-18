@@ -1,3 +1,4 @@
+import { Separator } from "@/components/room_details/separator";
 import useUserDataManagement from "@/hooks/userDataManagement";
 import { supabase } from "@/lib/supabase";
 import { Ionicons } from "@expo/vector-icons";
@@ -122,11 +123,7 @@ export default function RoomDetailView() {
         </View>
 
         {/* 5. 구분선 */}
-        <View style={styles.separatorContainer}>
-          <View style={styles.dottedLine} />
-          <View style={styles.leftCircle} />
-          <View style={styles.rightCircle} />
-        </View>
+        <Separator />
         <View style={styles.bottomContent}>
           {/* 6. 버튼 영역 */}
           <View style={styles.buttonContainer}>
@@ -157,6 +154,11 @@ export default function RoomDetailView() {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#6049E2",
+    alignItems: "center",
+  },
   mainContent: {
     flex: 4,
   },
@@ -165,11 +167,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: "auto",
     width: "100%",
-  },
-  container: {
-    flex: 1,
-    backgroundColor: "#6049E2",
-    alignItems: "center",
   },
   ticketContainer: {
     width: "90%",
@@ -231,37 +228,6 @@ const styles = StyleSheet.create({
   },
   detailsText: {
     fontSize: 16,
-  },
-  separatorContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    position: "absolute",
-    left: 0,
-    right: 0,
-    top: "80%",
-  },
-  dottedLine: {
-    flex: 1,
-    borderBottomWidth: 2,
-    borderStyle: "dashed",
-    borderColor: "#C3C3C3",
-  },
-  leftCircle: {
-    position: "absolute",
-    left: -width * 0.05,
-    width: width * 0.1,
-    height: width * 0.1,
-    backgroundColor: "#6049E2",
-    borderRadius: width * 0.05,
-  },
-  rightCircle: {
-    position: "absolute",
-    right: -width * 0.05,
-    width: width * 0.1,
-    height: width * 0.1,
-    backgroundColor: "#6049E2",
-    borderRadius: width * 0.05,
   },
   buttonContainer: {
     flexDirection: "row",
