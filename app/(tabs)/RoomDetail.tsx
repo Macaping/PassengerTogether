@@ -50,7 +50,11 @@ export default function RoomDetailView() {
 
         {/* 시간 정보 */}
         <View style={styles.timeBox}>
-          <Time date={new Date(room.departure_time)} />
+          <Time
+            date={
+              room.departure_time ? new Date(room.departure_time) : new Date()
+            }
+          />
         </View>
         {/* 경로 정보 */}
         <View style={styles.routeBox}>

@@ -4,8 +4,8 @@ export default function NumPeople({
   current,
   max,
 }: {
-  current: number;
-  max: number;
+  current: number | null;
+  max: number | null;
 }) {
   return (
     <View style={styles.container}>
