@@ -7,22 +7,13 @@ import PartyEmpty from "@/components/my_party/party_empty";
 import { PartyHeader } from "@/components/my_party/party_header";
 import { Separator } from "@/components/my_party/separator";
 import Time from "@/components/my_party/time";
+import 나가기 from "@/components/my_party/나가기";
+import 동승자 from "@/components/my_party/동승자";
+import 채팅 from "@/components/my_party/채팅";
 import useUserDataManagement from "@/hooks/userDataManagement";
-import { supabase } from "@/lib/supabase";
-import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
-import { PostgrestSingleResponse, UserResponse } from "@supabase/supabase-js";
-import { router } from "expo-router";
 import React, { useCallback, useState } from "react";
-import {
-  Dimensions,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-
-const { width } = Dimensions.get("window");
+import { StyleSheet, View } from "react-native";
 
 export default function RoomDetailView() {
   const { room, fetchRoomDetails } = useUserDataManagement();
@@ -45,33 +36,6 @@ export default function RoomDetailView() {
     return <Loading />;
   }
 
-  const handleLeaveRoom = async () => {
-    supabase.auth
-      .getUser()
-      // 사용자 정보 가져오기
-      .then((value: UserResponse) => {
-        if (value.error) throw value.error;
-        return value.data.user.id;
-      })
-      // 사용자를 방에서 나가게 하기
-      .then((userId: string) => {
-        supabase
-          .from("users")
-          .update({ current_party: null })
-          .eq("user_id", userId)
-          .then((value: PostgrestSingleResponse<null>) => {
-            if (value.error) throw value.error;
-            return value.data;
-          });
-      })
-      // 처음 페이지로 이동
-      .then(() => router.dismissAll())
-      // 오류 처리
-      .catch((error: Error) => {
-        console.error("사용자 정보 가져오기 오류:", error);
-      });
-  };
-
   // 방 정보가 없을 때
   if (!room) {
     return <PartyEmpty />;
@@ -81,7 +45,7 @@ export default function RoomDetailView() {
   return (
     <View style={styles.background}>
       <View style={styles.container}>
-        {/* 번호 */}
+        {/* 헤더와 방번호 */}
         <PartyHeader id={String(room.created_at.slice(-10, -6))} />
 
         {/* 시간 정보 */}
@@ -110,22 +74,9 @@ export default function RoomDetailView() {
         </View>
         {/* 버튼 영역 */}
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.iconButton}>
-            <Ionicons
-              name="chatbubble-outline"
-              size={32}
-              onPress={() => router.push("/Chat")}
-            />
-            <Text style={styles.iconButtonText}>채팅</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.iconButton}>
-            <Ionicons name="people-outline" size={32} color="#666666" />
-            <Text style={styles.iconButtonText}>동승자</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.iconButton} onPress={handleLeaveRoom}>
-            <Ionicons name="exit-outline" size={32} color="#666666" />
-            <Text style={styles.iconButtonText}>나가기</Text>
-          </TouchableOpacity>
+          <채팅 />
+          <동승자 />
+          <나가기 />
         </View>
       </View>
     </View>
@@ -167,13 +118,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-around",
     margin: 20,
-  },
-
-  iconButton: {
-    alignItems: "center",
-  },
-  iconButtonText: {
-    marginTop: 8,
-    fontSize: 14,
   },
 });
