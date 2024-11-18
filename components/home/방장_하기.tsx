@@ -22,7 +22,7 @@ export function 방장_하기({ departure, destination, date }: 방장_하기Pro
       }}
       style={styles.button}
     >
-      <Text style={styles.text}>방 탐색</Text>
+      <Text style={styles.text}>방장 하기</Text>
     </Link>
   );
 }
