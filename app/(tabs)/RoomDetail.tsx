@@ -1,4 +1,5 @@
-import { Separator } from "@/components/room_details/separator";
+import { Separator } from "@/components/my_party/separator";
+import { PartyHeader } from "@/components/my_party/party_header";
 import useUserDataManagement from "@/hooks/userDataManagement";
 import { supabase } from "@/lib/supabase";
 import { Ionicons } from "@expo/vector-icons";
@@ -46,7 +47,7 @@ export default function RoomDetailView() {
   // 방 정보가 없을 때
   if (!room) {
     return (
-      <View style={styles.container}>
+      <View style={styles.background}>
         <View style={styles.centeredMessageContainer}>
           <Text style={styles.centeredMessageText}>
             현재 참여한 방이 없습니다.
@@ -85,83 +86,102 @@ export default function RoomDetailView() {
 
   // 방 정보가 있을 때
   return (
-    <View style={styles.container}>
-      <View style={styles.ticketContainer}>
-        <View style={styles.ticketHeader}>
-          <Text style={styles.ticketId}>{room.created_at.slice(-10, -6)}</Text>
-        </View>
-        <View style={styles.mainContent}>
-          {/* 1. 시간 정보 */}
-          <View style={styles.timeContainer}>
-            <Text style={styles.Label}>출발 시각</Text>
-            <Text style={styles.timeValue}>
-              {`${new Date(room.departure_time).getMonth() + 1}월 ${new Date(room.departure_time).getDate()}일 (${["일", "월", "화", "수", "목", "금", "토"][new Date(room.departure_time).getDay()]}) ${String(new Date(room.departure_time).getHours()).padStart(2, "0")}:${String(new Date(room.departure_time).getMinutes()).padStart(2, "0")}`}
-            </Text>
-          </View>
-          {/* 2. 경로 정보 */}
-          <View style={styles.routeSection}>
-            <View>
-              <Text style={styles.Label}>출발</Text>
-              <Text style={styles.routeValue}>{room.origin}</Text>
-            </View>
-            <View>
-              <Text style={styles.Label}>도착</Text>
-              <Text style={styles.routeValue}>{room.destination}</Text>
-            </View>
-          </View>
-          {/* 3. 인원수 정보 */}
-          <View style={styles.passengerSection}>
-            <Text style={styles.Label}>인원수</Text>
-            <Text style={styles.passengerCount}>
-              {room.users ? room.users.length : 0}/{room.limit_people}
-            </Text>
-          </View>
-          {/* 4. 장소 정보 */}
-          <View style={styles.placeSection}>
-            <Text style={styles.Label}>만남의 장소</Text>
-            <Text style={styles.detailsText}>
-              상세사항으로 받은 데이터를 만남의장소와 옷차림으로 쪼개서 db로
-              받고 글자수 제한 필요어디까지 받을건지 확인 필요 3줄 정도만
-            </Text>
-          </View>
-        </View>
-
-        {/* 5. 구분선 */}
-        <Separator />
-        <View style={styles.bottomContent}>
-          {/* 6. 버튼 영역 */}
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.iconButton}>
-              <Ionicons
-                name="chatbubble-outline"
-                size={32}
-                onPress={() => router.push("/Chat")}
-              />
-              <Text style={styles.iconButtonText}>채팅</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.iconButton}>
-              <Ionicons name="people-outline" size={32} color="#666666" />
-              <Text style={styles.iconButtonText}>동승자</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.iconButton}
-              onPress={handleLeaveRoom}
-            >
-              <Ionicons name="exit-outline" size={32} color="#666666" />
-              <Text style={styles.iconButtonText}>나가기</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+    <View style={styles.background}>
+      <View style={styles.container}>
+        {/* 번호 */}
+        <PartyHeader id={String(room.created_at.slice(-10, -6))} />
+        <View></View>
       </View>
     </View>
   );
+  // return (
+  //   <View style={styles.container}>
+  //     <View style={styles.ticketContainer}>
+  //       <View style={styles.ticketHeader}>
+  //         <Text style={styles.ticketId}>{room.created_at.slice(-10, -6)}</Text>
+  //       </View>
+  //       <View style={styles.mainContent}>
+  //         {/* 1. 시간 정보 */}
+  //         <View style={styles.timeContainer}>
+  //           <Text style={styles.Label}>출발 시각</Text>
+  //           <Text style={styles.timeValue}>
+  //             {`${new Date(room.departure_time).getMonth() + 1}월 ${new Date(room.departure_time).getDate()}일 (${["일", "월", "화", "수", "목", "금", "토"][new Date(room.departure_time).getDay()]}) ${String(new Date(room.departure_time).getHours()).padStart(2, "0")}:${String(new Date(room.departure_time).getMinutes()).padStart(2, "0")}`}
+  //           </Text>
+  //         </View>
+  //         {/* 2. 경로 정보 */}
+  //         <View style={styles.routeSection}>
+  //           <View>
+  //             <Text style={styles.Label}>출발</Text>
+  //             <Text style={styles.routeValue}>{room.origin}</Text>
+  //           </View>
+  //           <View>
+  //             <Text style={styles.Label}>도착</Text>
+  //             <Text style={styles.routeValue}>{room.destination}</Text>
+  //           </View>
+  //         </View>
+  //         {/* 3. 인원수 정보 */}
+  //         <View style={styles.passengerSection}>
+  //           <Text style={styles.Label}>인원수</Text>
+  //           <Text style={styles.passengerCount}>
+  //             {room.users ? room.users.length : 0}/{room.limit_people}
+  //           </Text>
+  //         </View>
+  //         {/* 4. 장소 정보 */}
+  //         <View style={styles.placeSection}>
+  //           <Text style={styles.Label}>만남의 장소</Text>
+  //           <Text style={styles.detailsText}>
+  //             상세사항으로 받은 데이터를 만남의장소와 옷차림으로 쪼개서 db로
+  //             받고 글자수 제한 필요어디까지 받을건지 확인 필요 3줄 정도만
+  //           </Text>
+  //         </View>
+  //       </View>
+
+  //       {/* 5. 구분선 */}
+  //       <Separator />
+  //       <View style={styles.bottomContent}>
+  //         {/* 6. 버튼 영역 */}
+  //         <View style={styles.buttonContainer}>
+  //           <TouchableOpacity style={styles.iconButton}>
+  //             <Ionicons
+  //               name="chatbubble-outline"
+  //               size={32}
+  //               onPress={() => router.push("/Chat")}
+  //             />
+  //             <Text style={styles.iconButtonText}>채팅</Text>
+  //           </TouchableOpacity>
+  //           <TouchableOpacity style={styles.iconButton}>
+  //             <Ionicons name="people-outline" size={32} color="#666666" />
+  //             <Text style={styles.iconButtonText}>동승자</Text>
+  //           </TouchableOpacity>
+  //           <TouchableOpacity
+  //             style={styles.iconButton}
+  //             onPress={handleLeaveRoom}
+  //           >
+  //             <Ionicons name="exit-outline" size={32} color="#666666" />
+  //             <Text style={styles.iconButtonText}>나가기</Text>
+  //           </TouchableOpacity>
+  //         </View>
+  //       </View>
+  //     </View>
+  //   </View>
+  // );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  background: {
     flex: 1,
     backgroundColor: "#6049E2",
-    alignItems: "center",
+    // alignItems: "center",
+  },
+  container: {
+    flex: 1,
+    margin: "5%",
+    // alignItems: "center",
+    // justifyContent: "center",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    // 자식 요소가 부모의 경계선을 넘지 않도록 설정
+    overflow: "hidden",
   },
   mainContent: {
     flex: 4,
@@ -171,30 +191,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: "auto",
     width: "100%",
-  },
-  ticketContainer: {
-    width: "90%",
-    height: "85%",
-    padding: "3%",
-    borderRadius: width * 0.05,
-    backgroundColor: "#fff",
-    position: "relative",
-  },
-  ticketHeader: {
-    backgroundColor: "#EAE5FE",
-    borderTopLeftRadius: width * 0.05,
-    borderTopRightRadius: width * 0.05,
-    justifyContent: "center",
-    height: "8%",
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-  },
-  ticketId: {
-    fontSize: 25,
-    marginLeft: "3%",
-    color: "#333",
   },
   timeContainer: {
     marginTop: "15%",
