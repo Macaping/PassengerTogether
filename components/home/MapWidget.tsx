@@ -1,13 +1,11 @@
 import * as Location from "expo-location";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import MapView, { LatLng, Marker, Polyline, Region } from "react-native-maps";
 
 interface MapWidgetProps {
   departure: LatLng | null;
-  // setDeparture: React.Dispatch<React.SetStateAction<LatLng>>;
   destination: LatLng | null;
-  // setDestination: React.Dispatch<React.SetStateAction<LatLng>>;
 }
 
 export function fetchRouteData() {}
@@ -83,6 +81,32 @@ export function MapWidget({
     fetchRouteData();
   }, [departure, destination]);
 
+  const mapRef = useRef<MapView | null>(null);
+
+  // 출발지가 변경될 때마다 지도를 이동합니다.
+  useEffect(() => {
+    if (departure) {
+      mapRef.current?.animateToRegion({
+        latitude: departure.latitude,
+        longitude: departure.longitude,
+        latitudeDelta: 0.025,
+        longitudeDelta: 0.025,
+      });
+    }
+  }, [departure]);
+
+  // 도착지가 변경될 때마다 지도를 이동합니다.
+  useEffect(() => {
+    if (destination) {
+      mapRef.current?.animateToRegion({
+        latitude: destination.latitude,
+        longitude: destination.longitude,
+        latitudeDelta: 0.025,
+        longitudeDelta: 0.025,
+      });
+    }
+  }, [destination]);
+
   if (errorMsg) {
     return (
       <View style={styles.loadingContainer}>
@@ -94,6 +118,7 @@ export function MapWidget({
 
   return (
     <MapView
+      ref={mapRef}
       style={styles.map}
       initialRegion={initialRegion}
       showsUserLocation={true}
