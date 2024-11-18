@@ -1,4 +1,4 @@
-import { View, StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 export function Separator() {
   return (
@@ -14,9 +14,6 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     alignItems: "center",
-    // justifyContent: "center",
-    // position: "relative",
-    // width: "100%",
   },
   점선: {
     flex: 1,

@@ -148,13 +148,10 @@ const styles = StyleSheet.create({
   background: {
     flex: 1,
     backgroundColor: "#6049E2",
-    // alignItems: "center",
   },
   container: {
     flex: 1,
     margin: 20,
-    // alignItems: "center",
-    // justifyContent: "center",
     backgroundColor: "#FFFFFF",
     borderRadius: 20,
     // 자식 요소가 부모의 경계선을 넘지 않도록 설정
@@ -175,11 +172,9 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
   },
   details: {
-    // flex: 1,
     padding: 20,
   },
   buttonContainer: {
-    // flex: 1,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-around",

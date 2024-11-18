@@ -19,7 +19,6 @@ export default function NumPeople({
 
 const styles = StyleSheet.create({
   container: {
-    // padding: 20,
     alignItems: "flex-end", // 우측 정렬
   },
   label: {
