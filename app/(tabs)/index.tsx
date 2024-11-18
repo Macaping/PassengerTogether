@@ -93,6 +93,7 @@ const styles = StyleSheet.create({
     // 맨 아래로 정렬
     justifyContent: "flex-end",
   },
+  // 절대 위치로 지도를 띄웁니다.
   map: {
     position: "absolute",
     top: 0,
@@ -103,13 +104,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ccc",
   },
+  // 인터페이스를 담는 박스
   interface: {
     padding: "5%",
     gap: 20,
   },
+  // 버튼을 담는 박스
   buttonContainer: {
-    height: 50,
+    // 가로 방향으로 정렬
     flexDirection: "row",
+    // 버튼 사이의 간격
     gap: 20,
   },
 });
