@@ -1,9 +1,10 @@
-import { createRoom } from "@/hooks/createRoom";
 import useJoinRoom from "@/hooks/useJoinRoom";
+import { CreateRoom } from "@/services/create_room";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import {
+  Dimensions, //Dimensions API를 이용해 화면의 너비나 높이에 따라 fontSize를 설정
   FlatList,
   Modal,
   StyleSheet,
@@ -12,7 +13,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Dimensions } from "react-native"; //Dimensions API를 이용해 화면의 너비나 높이에 따라 fontSize를 설정
 
 const { width } = Dimensions.get("window"); //Dimensions 이용
 
@@ -85,7 +85,7 @@ export default function RoomMakeView() {
 
   const handleCreateRoom = async () => {
     // 방 생성
-    const roomData = await createRoom({
+    const roomData = await CreateRoom({
       departure_time: selectedDate.toISOString(),
       origin: departure as string,
       destination: destination as string,
