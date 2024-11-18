@@ -1,4 +1,7 @@
-import DateTimePicker from "@react-native-community/datetimepicker";
+import DateTimePicker, {
+  DateTimePickerEvent,
+} from "@react-native-community/datetimepicker";
+import { useState } from "react";
 import {
   Dimensions,
   FlatList,
@@ -11,23 +14,77 @@ import {
 
 const { width } = Dimensions.get("window"); //Dimensions 이용
 
+interface InformationBoxProps {
+  selectedDeparture: string;
+  setSelectedDeparture: (location: string) => void;
+  selectedDestination: string;
+  setSelectedDestination: (location: string) => void;
+  date: Date;
+  setDate: (date: Date) => void;
+  locations: string[];
+  distance: number | null;
+  duration: number | null;
+}
+
 export function InformationBox({
   selectedDeparture,
+  setSelectedDeparture,
   selectedDestination,
+  setSelectedDestination,
   date,
-  showDatePicker,
-  showTimePicker,
-  modalVisible,
-  changingLocationType,
+  setDate,
   locations,
   distance,
   duration,
-  openLocationModal,
-  setModalVisible,
-  handleDateChange,
-  handleTimeChange,
-  handleLocationSelect,
-}) {
+}: InformationBoxProps) {
+  const [changingLocationType, setChangingLocationType] = useState("departure");
+  const [modalVisible, setModalVisible] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
+
+  const handleLocationSelect = (location: string) => {
+    if (changingLocationType === "departure") {
+      setSelectedDeparture(location);
+    } else {
+      setSelectedDestination(location);
+    }
+    setModalVisible(false);
+  };
+
+  const handleDateChange = (
+    _event: DateTimePickerEvent,
+    selectedDate?: Date | undefined,
+  ): void => {
+    setShowDatePicker(false);
+    if (selectedDate) {
+      const newDate = new Date(date);
+      newDate.setFullYear(
+        selectedDate.getFullYear(),
+        selectedDate.getMonth(),
+        selectedDate.getDate(),
+      );
+      setDate(newDate);
+    }
+  };
+
+  const handleTimeChange = (
+    _event: DateTimePickerEvent,
+    selectedTime?: Date,
+  ) => {
+    setShowTimePicker(false);
+    if (selectedTime) {
+      const newDate = new Date(date);
+      newDate.setHours(selectedTime.getHours());
+      newDate.setMinutes(selectedTime.getMinutes());
+      setDate(newDate);
+    }
+  };
+
+  const openLocationModal = (type: "departure" | "destination") => {
+    setChangingLocationType(type);
+    setModalVisible(true);
+  };
+
   // 상호작용 UI
   return (
     <View style={main_styles.infoBox}>

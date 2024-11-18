@@ -2,7 +2,6 @@ import { InformationBox } from "@/components/home/InformationBox";
 import { MapWidget } from "@/components/home/MapWidget";
 import { 방_탐색 } from "@/components/home/방_탐색";
 import { 방장_하기 } from "@/components/home/방장_하기";
-import { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import React, { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { LatLng } from "react-native-maps";
@@ -25,6 +24,8 @@ export default function HomeView() {
   const [selectedDeparture, setSelectedDeparture] = useState<string>("천안역");
   const [selectedDestination, setSelectedDestination] =
     useState<string>("천안아산역");
+
+  // selectedDeparture, selectedDestination이 변경될 때마다 departure, destination을 변경합니다.
   useEffect(() => {
     if (selectedDeparture) {
       setDeparture(coordinates[selectedDeparture]);
@@ -34,60 +35,12 @@ export default function HomeView() {
     }
   }, [selectedDeparture, selectedDestination]);
 
+  // 날짜 정보
   const [date, setDate] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [showTimePicker, setShowTimePicker] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [changingLocationType, setChangingLocationType] = useState("departure");
 
   // 경로 정보
   const [distance, setDistance] = useState<number | null>(null);
   const [duration, setDuration] = useState<number | null>(null);
-
-  const handleDateChange = (
-    _event: DateTimePickerEvent,
-    selectedDate?: Date | undefined,
-  ): void => {
-    setShowDatePicker(false);
-    if (selectedDate) {
-      const newDate = new Date(date);
-      newDate.setFullYear(
-        selectedDate.getFullYear(),
-        selectedDate.getMonth(),
-        selectedDate.getDate(),
-      );
-      setDate(newDate);
-    }
-  };
-
-  const handleTimeChange = (
-    _event: DateTimePickerEvent,
-    selectedTime?: Date,
-  ) => {
-    setShowTimePicker(false);
-    if (selectedTime) {
-      const newDate = new Date(date);
-      newDate.setHours(selectedTime.getHours());
-      newDate.setMinutes(selectedTime.getMinutes());
-      setDate(newDate);
-    }
-  };
-
-  const openLocationModal = (type: "departure" | "destination") => {
-    setChangingLocationType(type);
-    setModalVisible(true);
-  };
-
-  const handleLocationSelect = (location: string) => {
-    if (changingLocationType === "departure") {
-      setSelectedDeparture(location);
-      setDeparture(coordinates[location]);
-    } else {
-      setSelectedDestination(location);
-      setDestination(coordinates[location]);
-    }
-    setModalVisible(false);
-  };
 
   return (
     <View style={styles.container}>
@@ -104,20 +57,14 @@ export default function HomeView() {
         {/* 상호작용 UI */}
         <InformationBox
           selectedDeparture={selectedDeparture}
+          setSelectedDeparture={setSelectedDeparture}
           selectedDestination={selectedDestination}
+          setSelectedDestination={setSelectedDestination}
           date={date}
-          showDatePicker={showDatePicker}
-          showTimePicker={showTimePicker}
-          modalVisible={modalVisible}
-          changingLocationType={changingLocationType}
+          setDate={setDate}
           locations={locations}
           distance={distance}
           duration={duration}
-          openLocationModal={openLocationModal}
-          setModalVisible={setModalVisible}
-          handleDateChange={handleDateChange}
-          handleTimeChange={handleTimeChange}
-          handleLocationSelect={handleLocationSelect}
         />
 
         {/* 버튼 */}
