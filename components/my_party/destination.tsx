@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
 
-export default function Destination({ location }: { location: String }) {
+export default function Destination({ location }: { location: string }) {
   return (
     <View style={styles.container}>
       <Text style={styles.label}>도착</Text>
