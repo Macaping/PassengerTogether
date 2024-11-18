@@ -286,6 +286,10 @@ const choice_styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  itemText: {
+    fontSize: width * 0.05,
+    color: "#000",
+  },
   separator: {
     height: 1,
   },
