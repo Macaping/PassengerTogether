@@ -19,20 +19,22 @@ const { width } = Dimensions.get("window");
 
 export default function RoomDetailView() {
   const { room, fetchRoomDetails } = useUserDataManagement();
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
+
+  // 포커스가 맞춰졌을 때 방 정보를 가져옴
   useFocusEffect(
     useCallback(() => {
-      const loadRoomDetails = async () => {
-        setIsLoading(true);
+      async function fetchData() {
+        setLoading(true);
         await fetchRoomDetails();
-        setIsLoading(false);
-      };
-
-      loadRoomDetails();
+        setLoading(false);
+      }
+      fetchData();
     }, []),
   );
 
-  if (isLoading) {
+  // 로딩 중일 때
+  if (loading) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#0000ff" />
@@ -41,6 +43,7 @@ export default function RoomDetailView() {
     );
   }
 
+  // 방 정보가 없을 때
   if (!room) {
     return (
       <View style={styles.container}>
@@ -80,6 +83,7 @@ export default function RoomDetailView() {
       });
   };
 
+  // 방 정보가 있을 때
   return (
     <View style={styles.container}>
       <View style={styles.ticketContainer}>
