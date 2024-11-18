@@ -1,6 +1,7 @@
 import Departure from "@/components/my_party/departure";
 import Destination from "@/components/my_party/destination";
 import Details from "@/components/my_party/details";
+import Loading from "@/components/my_party/loading";
 import NumPeople from "@/components/my_party/num_people";
 import { PartyHeader } from "@/components/my_party/party_header";
 import { Separator } from "@/components/my_party/separator";
@@ -13,7 +14,6 @@ import { PostgrestSingleResponse, UserResponse } from "@supabase/supabase-js";
 import { router } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
-  ActivityIndicator,
   Dimensions,
   StyleSheet,
   Text,
@@ -41,12 +41,7 @@ export default function RoomDetailView() {
 
   // 로딩 중일 때
   if (loading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0000ff" />
-        <Text style={styles.loadingText}>로딩 중...</Text>
-      </View>
-    );
+    return <Loading />;
   }
 
   // 방 정보가 없을 때
@@ -189,18 +184,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 
-  loadingContainer: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#e0f0ff",
-  },
-  loadingText: {
-    fontSize: width * 0.05,
-    color: "#333",
-    textAlign: "center",
-    marginTop: 10,
-  },
   centeredMessageContainer: {
     flex: 1,
     justifyContent: "center",
