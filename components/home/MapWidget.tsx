@@ -79,7 +79,7 @@ export function MapWidget({
         .catch((error) => console.error("Error fetching route data:", error));
     }
     fetchRouteData();
-  }, [departure, destination]);
+  }, [MAP_KEY, departure, destination, setDistance, setDuration]);
 
   const mapRef = useRef<MapView | null>(null);
 
