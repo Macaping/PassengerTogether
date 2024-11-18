@@ -3,6 +3,7 @@ import Destination from "@/components/my_party/destination";
 import Details from "@/components/my_party/details";
 import Loading from "@/components/my_party/loading";
 import NumPeople from "@/components/my_party/num_people";
+import PartyEmpty from "@/components/my_party/party_empty";
 import { PartyHeader } from "@/components/my_party/party_header";
 import { Separator } from "@/components/my_party/separator";
 import Time from "@/components/my_party/time";
@@ -44,19 +45,6 @@ export default function RoomDetailView() {
     return <Loading />;
   }
 
-  // 방 정보가 없을 때
-  if (!room) {
-    return (
-      <View style={styles.background}>
-        <View style={styles.centeredMessageContainer}>
-          <Text style={styles.centeredMessageText}>
-            현재 참여한 방이 없습니다.
-          </Text>
-        </View>
-      </View>
-    );
-  }
-
   const handleLeaveRoom = async () => {
     supabase.auth
       .getUser()
@@ -83,6 +71,11 @@ export default function RoomDetailView() {
         console.error("사용자 정보 가져오기 오류:", error);
       });
   };
+
+  // 방 정보가 없을 때
+  if (!room) {
+    return <PartyEmpty />;
+  }
 
   // 방 정보가 있을 때
   return (
@@ -182,16 +175,5 @@ const styles = StyleSheet.create({
   iconButtonText: {
     marginTop: 8,
     fontSize: 14,
-  },
-
-  centeredMessageContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  centeredMessageText: {
-    fontSize: width * 0.05,
-    color: "#333",
-    textAlign: "center",
   },
 });
