@@ -1,7 +1,7 @@
-import useJoinRoom from "@/hooks/useJoinRoom";
 import { CreateRoom } from "@/services/create_room";
+import { JoinRoom } from "@/services/join_room";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import {
   Dimensions, //Dimensions API를 이용해 화면의 너비나 높이에 따라 fontSize를 설정
@@ -85,16 +85,26 @@ export default function RoomMakeView() {
 
   const handleCreateRoom = async () => {
     // 방 생성
-    const roomData = await CreateRoom({
+    CreateRoom({
       departure_time: selectedDate.toISOString(),
       origin: departure as string,
       destination: destination as string,
       limit_people: numPassengers,
       users: [],
       details: details,
-    });
-    // 방 생성한 사람이 방에 참가
-    await useJoinRoom(roomData.id);
+    })
+      .then((room) => {
+        // 방 생성한 사람이 방에 참가
+        JoinRoom(room.id);
+      })
+      .then(() => {
+        // 방 생성 성공 시
+        router.dismissAll();
+        router.replace("/(tabs)/RoomDetail");
+      })
+      .catch((error) => {
+        console.error("Failed to create room:", error);
+      });
   };
 
   return (
