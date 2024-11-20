@@ -1,5 +1,6 @@
-import useJoinRoom from "@/hooks/useJoinRoom";
 import useLoadRooms from "@/hooks/useLoadRooms";
+import { JoinRoom } from "@/services/join_room";
+import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -14,7 +15,6 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 
 const { height } = Dimensions.get("window");
 
@@ -448,10 +448,16 @@ export default function RoomListView() {
 
   const handleJoinRoom = (room) => {
     if (!room) return;
-    useJoinRoom(room.id).then(() => {
-      setModalVisible(false);
-      router.replace("/(tabs)/RoomDetail");
-    });
+    JoinRoom(room.id)
+      .then(() => {
+        router.replace("/(tabs)/RoomDetail");
+      })
+      .catch((error) => {
+        console.error(error);
+      })
+      .finally(() => {
+        setModalVisible(false);
+      });
   };
 
   if (loading) {
