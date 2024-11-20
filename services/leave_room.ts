@@ -1,18 +1,31 @@
-import { useParty } from "@/hooks/useParty";
-import { useSession } from "@/hooks/useSession";
 import { supabase } from "@/lib/supabase";
+import { Room } from "./room";
+import { User } from "./user";
 
-export function LeaveRoom() {
+export async function LeaveRoom() {
   // 사용자 데이터
-  const { user } = useSession();
+  const user = await User();
   if (!user?.id) throw Error("사용자 정보가 없습니다.");
 
-  // 사용자가 속한 방 데이터
-  const { roomData } = useParty();
-  if (!roomData) throw Error("방 정보가 없습니다.");
+  // 사용자가 속한 방 아이디
+  let currentPartyId: string | null = null;
+  await supabase
+    .from("users")
+    .select("current_party")
+    .eq("user_id", user.id)
+    .single()
+    .then((value) => {
+      if (value.error) throw value.error;
+      currentPartyId = value.data?.current_party;
+    });
+  if (!currentPartyId) throw Error("방 정보가 없습니다.");
+
+  // 방 데이터
+  const room = await Room(currentPartyId);
+  if (!room) throw Error("방 정보가 없습니다.");
 
   // 방 데이터에서 사용자가 있으면 제거
-  const users = roomData.users || [];
+  const users = room.users || [];
   if (users.includes(user.id)) {
     users.splice(users.indexOf(user.id), 1);
   }
@@ -21,7 +34,7 @@ export function LeaveRoom() {
   supabase
     .from("rooms")
     .update({ users })
-    .eq("id", roomData.id)
+    .eq("id", room.id)
     .then((value) => {
       if (value.error) throw value.error;
     })

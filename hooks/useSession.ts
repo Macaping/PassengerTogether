@@ -1,20 +1,28 @@
 import { supabase } from "@/lib/supabase";
-import { User } from "@supabase/supabase-js";
-import { useEffect, useState } from "react";
+import { Session } from "@supabase/supabase-js";
+import { useEffect, useRef } from "react";
 
 export function useSession() {
-  const [user, setUser] = useState<User | null>(null);
+  const session = useRef<Session | null>(null);
+
   useEffect(() => {
+    // 초기화
+    supabase.auth
+      .getSession()
+      .then((value) => (session.current = value.data.session));
+
+    // 실시간 구독
     const { data: authListener } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setUser(session?.user ?? null);
+      (event, sessionRealtime) => {
+        session.current = sessionRealtime;
       },
     );
 
     return () => {
+      // 구독 해제
       authListener?.subscription.unsubscribe();
     };
   }, []);
 
-  return { user };
+  return { session };
 }

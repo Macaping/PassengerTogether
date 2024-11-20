@@ -1,7 +1,6 @@
 import Departure from "@/components/my_party/departure";
 import Destination from "@/components/my_party/destination";
 import Details from "@/components/my_party/details";
-import Loading from "@/components/my_party/loading";
 import NumPeople from "@/components/my_party/num_people";
 import PartyEmpty from "@/components/my_party/party_empty";
 import { PartyHeader } from "@/components/my_party/party_header";
@@ -10,29 +9,104 @@ import Time from "@/components/my_party/time";
 import 나가기 from "@/components/my_party/나가기";
 import 동승자 from "@/components/my_party/동승자";
 import 채팅 from "@/components/my_party/채팅";
-import { useParty } from "@/hooks/useParty";
-import useUserDataManagement from "@/hooks/userDataManagement";
-import { useFocusEffect } from "@react-navigation/native";
-import React, { useCallback, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { supabase } from "@/lib/supabase";
+import { Database } from "@/lib/supabase_type";
+import { User } from "@supabase/supabase-js";
+import { router } from "expo-router";
+import React, { useEffect, useState } from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+
+type UserData = Database["public"]["Tables"]["users"]["Row"];
+type RoomData = Database["public"]["Tables"]["rooms"]["Row"];
 
 export default function RoomDetailView() {
-  const { roomData: room } = useParty();
+  // 유저 계정 가져오기
+  const [user, setUser] = useState<User | null>(null);
+  useEffect(() => {
+    supabase.auth.getUser().then((value) => {
+      setUser(value.data.user);
+    });
+  }, []);
 
-  // const { room, fetchRoomDetails } = useUserDataManagement();
-  // const [loading, setLoading] = useState(true);
+  // 유저 정보 가져오기
+  const [userData, setUserData] = useState<UserData | null>(null);
+  useEffect(() => {
+    if (!user) {
+      setUserData(null);
+    } else {
+      supabase
+        .from("users")
+        .select("*")
+        .eq("user_id", user.id)
+        .single()
+        .then((value) => {
+          setUserData(value.data);
+        });
+    }
+  }, [user]);
 
-  // 포커스가 맞춰졌을 때 방 정보를 가져옴
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     async function fetchData() {
-  //       setLoading(true);
-  //       await fetchRoomDetails();
-  //       setLoading(false);
-  //     }
-  //     fetchData();
-  //   }, []),
-  // );
+  // 유저 정보 실시간 업데이트
+  supabase
+    .channel("users")
+    .on(
+      "postgres_changes",
+      {
+        event: "*",
+        schema: "public",
+        table: "users",
+        filter: `user_id=eq.${user?.id}`,
+      },
+      (payload) => {
+        setUserData(payload.new as UserData);
+      },
+    )
+    .subscribe();
+
+  // 방 정보 가져오기
+  const [roomData, setRoomData] = useState<RoomData | null>(null);
+  useEffect(() => {
+    if (!userData?.current_party) {
+      setRoomData(null);
+    } else {
+      console.log(userData);
+      supabase
+        .from("rooms")
+        .select("*")
+        .eq("id", userData.current_party)
+        .single()
+        .then((value) => {
+          setRoomData(value.data);
+        });
+      supabase
+        .channel("rooms")
+        .unsubscribe()
+        .then((value) => {
+          console.log(value);
+          console.log("unsubscribed");
+          supabase
+            .channel("rooms")
+            .on(
+              "postgres_changes",
+              {
+                event: "*",
+                schema: "public",
+                table: "rooms",
+                filter: `id=eq.${userData.current_party}`,
+              },
+              (payload) => {
+                console.log("payload:", payload.new);
+                setRoomData(payload.new as RoomData);
+                console.log("roomData:", roomData);
+              },
+            )
+            .subscribe();
+        });
+    }
+  }, [userData]);
+
+  const room = roomData;
+
+  // const { roomData: room } = useParty();
 
   // 로딩 중일 때
   // if (loading) {
@@ -84,6 +158,13 @@ export default function RoomDetailView() {
           <채팅 />
           <동승자 />
           <나가기 />
+          <TouchableOpacity
+            onPress={() => {
+              router.reload();
+            }}
+          >
+            <Text>새로고침</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </View>
