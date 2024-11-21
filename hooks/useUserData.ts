@@ -2,27 +2,31 @@ import { supabase } from "@/lib/supabase";
 import { Database } from "@/lib/supabase_type";
 import { useEffect, useState } from "react";
 import { useUser } from "./useUser";
-import { User } from "@supabase/supabase-js";
 
 type UserData = Database["public"]["Tables"]["users"]["Row"];
 
+/**
+ * 현재 사용자의 데이터를 가져오고 실시간으로 구독하는 커스텀 훅
+ *
+ * @remarks
+ * 이 훅은 Supabase의 실시간 구독 기능을 사용하여 사용자 데이터의 변경사항을 즉시 반영합니다.
+ *
+ * @example
+ * ```typescript
+ * const { userData } = useUserData();
+ * ```
+ */
 export function useUserData() {
-  // const { user } = useUser();
-  // 유저 계정 가져오기
-  const [user, setUser] = useState<User | null>(null);
-  useEffect(() => {
-    supabase.auth.getUser().then((value) => {
-      setUser(value.data.user);
-    });
-  }, []);
-
+  const { user } = useUser();
   const [userData, setUserData] = useState<UserData | null>(null);
 
   useEffect(() => {
+    // 초기화
     if (!user?.id) {
+      // 사용자가 없는 경우
       setUserData(null);
     } else {
-      // 초기화
+      // 사용자가 있는 경우
       supabase
         .schema("public")
         .from("users")
@@ -34,7 +38,7 @@ export function useUserData() {
         });
 
       // 실시간 구독
-      const subscription = supabase
+      supabase
         .channel("userData")
         .on(
           "postgres_changes",
@@ -46,12 +50,6 @@ export function useUserData() {
           },
           (payload) => {
             setUserData(payload.new as UserData);
-            supabase.getChannels().forEach((channel) => {
-              console.log(
-                "useUserData에서 발생. 구독 중인 채널:",
-                channel.subTopic,
-              );
-            });
           },
         )
         .subscribe();
@@ -66,5 +64,5 @@ export function useUserData() {
     };
   }, [user]);
 
-  return { userData, setUserData };
+  return { userData };
 }
