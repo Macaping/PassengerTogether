@@ -1,3 +1,4 @@
+import { useAuthUser } from "@/hooks/useAuthUser";
 import { signOutUser } from "@/utils/auth.utils";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router } from "expo-router";
@@ -9,7 +10,6 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
-import { useAuthUser } from "@/hooks/useAuthUser";
 
 export default function MyPage() {
   const { height } = useWindowDimensions();
@@ -32,6 +32,22 @@ export default function MyPage() {
 
         <Text style={styles.userName}>{userData?.nickname ?? "Nickname"}</Text>
         <Text style={styles.userEmail}>{userData?.email ?? "Email"}</Text>
+
+        {/*밑에 아이콘 세개 크기*/}
+        <View style={styles.iconContainer}>
+          <TouchableOpacity style={styles.profileIcon}>
+            <Ionicons name="mail-outline" size={60} color="#6C4AB6" />
+            <Text>메세지함</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.profileIcon}>
+            <Ionicons name="person-add-outline" size={30} color="#6C4AB6" />
+            <Text>친구추가</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.profileIcon}>
+            <Ionicons name="people-outline" size={30} color="#6C4AB6" />
+            <Text>친구목록</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <TouchableOpacity style={styles.logoutButton} onPress={handleSignOut}>
@@ -67,6 +83,16 @@ const styles = StyleSheet.create({
     fontSize: 23,
     fontWeight: "400",
     textAlign: "center",
+  },
+  iconContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    width: "100%",
+    bottom: "-15%",
+  },
+  profileIcon: {
+    alignItems: "center",
+    bottom: -60,
   },
   logoutButton: {
     flex: 1,
