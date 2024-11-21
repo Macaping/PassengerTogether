@@ -18,7 +18,7 @@ export default function ChatView() {
     noRoomMessage,
     setNewMessage,
     handleSendMessage,
-  } = useChat(); 
+  } = useChat();
   const { user } = useAuthUser();
 
   if (!user) {
@@ -59,17 +59,15 @@ export default function ChatView() {
           {item.message}
         </Text>
         <Text
-        style={[
-          styles.timestamp,
-          isMyMessage
-            ? styles.myTimestampText
-            : styles.otherTimestampText, // 타임스탬프 색상 동적으로 적용
-        ]}
-      >
-        {item.created_at
-          ? new Date(item.created_at).toLocaleTimeString()
-          : ""}
-      </Text>
+          style={[
+            styles.timestamp,
+            isMyMessage ? styles.myTimestampText : styles.otherTimestampText, // 타임스탬프 색상 동적으로 적용
+          ]}
+        >
+          {item.created_at
+            ? new Date(item.created_at).toLocaleTimeString()
+            : ""}
+        </Text>
       </View>
     );
   };
