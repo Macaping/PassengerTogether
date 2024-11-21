@@ -46,21 +46,23 @@ export default function RoomDetailView() {
   }, [user]);
 
   // 유저 정보 실시간 업데이트
-  supabase
-    .channel("users")
-    .on(
-      "postgres_changes",
-      {
-        event: "*",
-        schema: "public",
-        table: "users",
-        filter: `user_id=eq.${user?.id}`,
-      },
-      (payload) => {
-        setUserData(payload.new as UserData);
-      },
-    )
-    .subscribe();
+  if (user?.id) {
+    supabase
+      .channel("userData")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "users",
+          filter: `user_id=eq.${user?.id}`,
+        },
+        (payload) => {
+          setUserData(payload.new as UserData);
+        },
+      )
+      .subscribe();
+  }
 
   // 방 정보 가져오기
   const [roomData, setRoomData] = useState<RoomData | null>(null);
@@ -77,30 +79,36 @@ export default function RoomDetailView() {
         .then((value) => {
           setRoomData(value.data);
         });
+      supabase.getChannels().forEach((channel) => {
+        console.log("구독 중인 채널:", channel.subTopic);
+        if (channel.subTopic.includes("party")) {
+          channel.unsubscribe();
+        }
+      });
       supabase
-        .channel("rooms")
-        .unsubscribe()
-        .then((value) => {
-          console.log(value);
-          console.log("unsubscribed");
-          supabase
-            .channel("rooms")
-            .on(
-              "postgres_changes",
-              {
-                event: "*",
-                schema: "public",
-                table: "rooms",
-                filter: `id=eq.${userData.current_party}`,
-              },
-              (payload) => {
-                console.log("payload:", payload.new);
-                setRoomData(payload.new as RoomData);
-                console.log("roomData:", roomData);
-              },
-            )
-            .subscribe();
-        });
+        .channel("party")
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "rooms",
+            filter: `id=eq.${userData.current_party}`,
+          },
+          (payload) => {
+            console.log("payload:", payload.new);
+            setRoomData(payload.new as RoomData);
+            console.log("roomData:", roomData);
+          },
+        )
+        .subscribe();
+      console.log("구독 개수", supabase.getChannels().length);
+      supabase.getChannels().forEach((channel) => {
+        console.log("구독 중인 채널:", channel.subTopic);
+        if (channel.subTopic.includes("party")) {
+          console.log("party 채널 구독 중");
+        }
+      });
     }
   }, [userData]);
 
