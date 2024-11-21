@@ -2,57 +2,11 @@ import { supabase } from "@/lib/supabase";
 import { Database } from "@/lib/supabase_type";
 import { useEffect, useState } from "react";
 import { useUserData } from "./useUserData";
-import { User } from "@supabase/supabase-js";
 
 type Room = Database["public"]["Tables"]["rooms"]["Row"];
-type UserData = Database["public"]["Tables"]["users"]["Row"];
 
 export function useParty() {
-  // 유저 계정 가져오기
-  const [user, setUser] = useState<User | null>(null);
-  useEffect(() => {
-    supabase.auth.getUser().then((value) => {
-      setUser(value.data.user);
-    });
-  }, []);
-
-  // 유저 정보 가져오기
-  const [userData, setUserData] = useState<UserData | null>(null);
-  useEffect(() => {
-    if (!user) {
-      setUserData(null);
-    } else {
-      supabase
-        .from("users")
-        .select("*")
-        .eq("user_id", user.id)
-        .single()
-        .then((value) => {
-          setUserData(value.data);
-        });
-    }
-  }, [user]);
-
-  // 유저 정보 실시간 업데이트
-  if (user?.id) {
-    supabase
-      .channel("userData")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "users",
-          filter: `user_id=eq.${user?.id}`,
-        },
-        (payload) => {
-          setUserData(payload.new as UserData);
-        },
-      )
-      .subscribe();
-  }
-
-  // const { userData } = useUserData();
+  const { userData } = useUserData();
   const [roomData, setRoomData] = useState<Room | null>(null);
 
   // 참가하는 방의 ID가 다른 경우에 실행
