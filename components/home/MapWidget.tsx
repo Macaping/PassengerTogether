@@ -8,8 +8,6 @@ interface MapWidgetProps {
   destination: LatLng | null;
 }
 
-export function fetchRouteData() {}
-
 export function MapWidget({
   departure,
   destination,
@@ -56,6 +54,7 @@ export function MapWidget({
   const MAP_KEY = process.env.EXPO_PUBLIC_MAP_KEY || ""; //길찾기 api 키 가져옴
   const [route, setRoute] = useState<LatLng[]>([]);
 
+  // 출발지와 도착지가 변경될 때마다 길찾기를 수행합니다.
   useEffect(() => {
     if (departure && destination) {
       const url = `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${MAP_KEY}&start=${departure?.longitude},${departure.latitude}&end=${destination.longitude},${destination.latitude}`;
@@ -78,7 +77,6 @@ export function MapWidget({
         })
         .catch((error) => console.error("Error fetching route data:", error));
     }
-    fetchRouteData();
   }, [MAP_KEY, departure, destination, setDistance, setDuration]);
 
   const mapRef = useRef<MapView | null>(null);

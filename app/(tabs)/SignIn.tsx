@@ -16,7 +16,7 @@ export default function SignInView() {
 
   const handleSignIn = async () => {
     signInUser(email, password)
-      .then(() => router.replace("/(tabs)/"))
+      .then(() => router.replace("/(tabs)"))
       .catch((e: string) => setErrorMessage(e));
   };
 
