@@ -10,9 +10,8 @@ import 나가기 from "@/components/my_party/나가기";
 import 동승자 from "@/components/my_party/동승자";
 import 채팅 from "@/components/my_party/채팅";
 import { useParty } from "@/hooks/useParty";
-import { router } from "expo-router";
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 export default function RoomDetailView() {
   const { roomData: room } = useParty();
@@ -67,13 +66,6 @@ export default function RoomDetailView() {
           <채팅 />
           <동승자 />
           <나가기 />
-          <TouchableOpacity
-            onPress={() => {
-              router.reload();
-            }}
-          >
-            <Text>새로고침</Text>
-          </TouchableOpacity>
         </View>
       </View>
     </View>
