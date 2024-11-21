@@ -14,6 +14,7 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
+  TextInput,
 } from "react-native";
 
 const { height } = Dimensions.get("window");
@@ -112,6 +113,7 @@ const RoomDetailModal = ({
 }: RoomDetailModalProps) => {
   const slideAnim = useRef(new Animated.Value(height)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const [userInput, setUserInput] = useState("");
 
   useEffect(() => {
     if (visible) {
@@ -209,6 +211,15 @@ const RoomDetailModal = ({
           <View style={modalStyles.messageContainer}>
             <Text style={modalStyles.detailText}>만남의 장소</Text>
             <Text style={modalStyles.messageText}>{room.details}</Text>
+          </View>
+          <View style={modalStyles.messageContainer}>
+            <Text style={modalStyles.detailText}> 자신의 옷차림</Text>
+            <TextInput
+              style={modalStyles.inputField}
+              placeholder="서로를 알아볼 수 있도록 자세히 입력해주세요."
+              value={userInput}
+              onChangeText={setUserInput}
+            />
           </View>
 
           <TouchableOpacity
@@ -308,6 +319,16 @@ const modalStyles = StyleSheet.create({
     alignItems: "center",
     marginTop: "auto",
     marginBottom: 20,
+  },
+  inputField: {
+    borderColor: "#CCCCCC",
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginBottom: 16, // 참가하기 버튼과 간격 조정
+    fontSize: 16,
+    color: "#333333",
   },
   joinButtonText: {
     color: "white",
