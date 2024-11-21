@@ -47,6 +47,5 @@ const styles = StyleSheet.create({
   },
   icon: {
     color: "#FFFFFF",
-    // bottom: "50%", // 아이콘과 텍스트 사이 간격
   },
 });
