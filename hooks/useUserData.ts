@@ -10,8 +10,7 @@ export function useUserData() {
   const [userData, setUserData] = useState<UserData | null>(null);
 
   useEffect(() => {
-    supabase.channel("users").unsubscribe(); // 이전 구독 해제
-    if (!user) {
+    if (!user?.id) {
       setUserData(null);
     } else {
       // 초기화
@@ -27,7 +26,7 @@ export function useUserData() {
 
       // 실시간 구독
       const subscription = supabase
-        .channel("users")
+        .channel("userData")
         .on(
           "postgres_changes",
           {
@@ -38,18 +37,20 @@ export function useUserData() {
           },
           (payload) => {
             setUserData(payload.new as UserData);
+            supabase.getChannels().forEach((channel) => {
+              console.log("useUserData에서 발생. 구독 중인 채널:", channel.subTopic);
+            });
           },
         )
         .subscribe();
-
-      return () => {
-        // 구독 해제
-        subscription.unsubscribe();
-      };
     }
     return () => {
-      // 있는 경우 구독 해제
-      supabase.channel("users").unsubscribe();
+      // 이전 구독 해제
+      supabase.getChannels().forEach((channel) => {
+        if (channel.subTopic === "userData") {
+          channel.unsubscribe();
+        }
+      });
     };
   }, [user]);
 

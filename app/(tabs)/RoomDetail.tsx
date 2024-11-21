@@ -9,112 +9,13 @@ import Time from "@/components/my_party/time";
 import 나가기 from "@/components/my_party/나가기";
 import 동승자 from "@/components/my_party/동승자";
 import 채팅 from "@/components/my_party/채팅";
-import { supabase } from "@/lib/supabase";
-import { Database } from "@/lib/supabase_type";
-import { User } from "@supabase/supabase-js";
+import { useParty } from "@/hooks/useParty";
 import { router } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-type UserData = Database["public"]["Tables"]["users"]["Row"];
-type RoomData = Database["public"]["Tables"]["rooms"]["Row"];
-
 export default function RoomDetailView() {
-  // 유저 계정 가져오기
-  const [user, setUser] = useState<User | null>(null);
-  useEffect(() => {
-    supabase.auth.getUser().then((value) => {
-      setUser(value.data.user);
-    });
-  }, []);
-
-  // 유저 정보 가져오기
-  const [userData, setUserData] = useState<UserData | null>(null);
-  useEffect(() => {
-    if (!user) {
-      setUserData(null);
-    } else {
-      supabase
-        .from("users")
-        .select("*")
-        .eq("user_id", user.id)
-        .single()
-        .then((value) => {
-          setUserData(value.data);
-        });
-    }
-  }, [user]);
-
-  // 유저 정보 실시간 업데이트
-  if (user?.id) {
-    supabase
-      .channel("userData")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "users",
-          filter: `user_id=eq.${user?.id}`,
-        },
-        (payload) => {
-          setUserData(payload.new as UserData);
-        },
-      )
-      .subscribe();
-  }
-
-  // 방 정보 가져오기
-  const [roomData, setRoomData] = useState<RoomData | null>(null);
-  useEffect(() => {
-    if (!userData?.current_party) {
-      setRoomData(null);
-    } else {
-      console.log(userData);
-      supabase
-        .from("rooms")
-        .select("*")
-        .eq("id", userData.current_party)
-        .single()
-        .then((value) => {
-          setRoomData(value.data);
-        });
-      supabase.getChannels().forEach((channel) => {
-        console.log("구독 중인 채널:", channel.subTopic);
-        if (channel.subTopic.includes("party")) {
-          channel.unsubscribe();
-        }
-      });
-      supabase
-        .channel("party")
-        .on(
-          "postgres_changes",
-          {
-            event: "*",
-            schema: "public",
-            table: "rooms",
-            filter: `id=eq.${userData.current_party}`,
-          },
-          (payload) => {
-            console.log("payload:", payload.new);
-            setRoomData(payload.new as RoomData);
-            console.log("roomData:", roomData);
-          },
-        )
-        .subscribe();
-      console.log("구독 개수", supabase.getChannels().length);
-      supabase.getChannels().forEach((channel) => {
-        console.log("구독 중인 채널:", channel.subTopic);
-        if (channel.subTopic.includes("party")) {
-          console.log("party 채널 구독 중");
-        }
-      });
-    }
-  }, [userData]);
-
-  const room = roomData;
-
-  // const { roomData: room } = useParty();
+  const { roomData: room } = useParty();
 
   // 로딩 중일 때
   // if (loading) {
