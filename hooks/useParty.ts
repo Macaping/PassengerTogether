@@ -8,56 +8,6 @@ type Room = Database["public"]["Tables"]["rooms"]["Row"];
 type UserData = Database["public"]["Tables"]["users"]["Row"];
 
 export function useParty() {
-  // const { userData } = useUserData();
-  // const [roomData, setRoomData] = useState<Room | null>(null);
-
-  // // 참가하는 방의 ID가 다른 경우에 실행
-  // useEffect(() => {
-  //   if (!userData?.current_party) {
-  //     setRoomData(null);
-  //   } else {
-  //     // 초기화
-  //     supabase
-  //       .from("rooms")
-  //       .select("*")
-  //       .eq("id", userData.current_party)
-  //       .single()
-  //       .then((value) => {
-  //         setRoomData(value.data);
-  //       });
-
-  //     // 실시간 구독
-  //     const subscription = supabase
-  //       .channel("party")
-  //       .on(
-  //         "postgres_changes",
-  //         {
-  //           event: "*",
-  //           schema: "public",
-  //           table: "rooms",
-  //           filter: `id=eq.${userData.current_party}`,
-  //         },
-  //         (payload) => {
-  //           setRoomData(payload.new as Room);
-  //           supabase.getChannels().forEach((channel) => {
-  //             console.log("useParty에서 발생. 구독 중인 채널:", channel.subTopic);
-  //           });
-  //         },
-  //       )
-  //       .subscribe();
-  //   }
-  //   return () => {
-  //     // 이전 구독 해제
-  //     supabase.getChannels().forEach((channel) => {
-  //       if (channel.subTopic === "party") {
-  //         channel.unsubscribe();
-  //       }
-  //     });
-  //   };
-  // }, [userData]);
-
-  // return { roomData };
-
   // 유저 계정 가져오기
   const [user, setUser] = useState<User | null>(null);
   useEffect(() => {
@@ -102,13 +52,15 @@ export function useParty() {
       .subscribe();
   }
 
-  // 방 정보 가져오기
-  const [roomData, setRoomData] = useState<RoomData | null>(null);
+  // const { userData } = useUserData();
+  const [roomData, setRoomData] = useState<Room | null>(null);
+
+  // 참가하는 방의 ID가 다른 경우에 실행
   useEffect(() => {
     if (!userData?.current_party) {
       setRoomData(null);
     } else {
-      console.log(userData);
+      // 초기화
       supabase
         .from("rooms")
         .select("*")
@@ -117,13 +69,9 @@ export function useParty() {
         .then((value) => {
           setRoomData(value.data);
         });
-      supabase.getChannels().forEach((channel) => {
-        console.log("구독 중인 채널:", channel.subTopic);
-        if (channel.subTopic.includes("party")) {
-          channel.unsubscribe();
-        }
-      });
-      supabase
+
+      // 실시간 구독
+      const subscription = supabase
         .channel("party")
         .on(
           "postgres_changes",
@@ -134,20 +82,25 @@ export function useParty() {
             filter: `id=eq.${userData.current_party}`,
           },
           (payload) => {
-            console.log("payload:", payload.new);
             setRoomData(payload.new as Room);
-            console.log("roomData:", roomData);
+            supabase.getChannels().forEach((channel) => {
+              console.log(
+                "useParty에서 발생. 구독 중인 채널:",
+                channel.subTopic,
+              );
+            });
           },
         )
         .subscribe();
-      console.log("구독 개수", supabase.getChannels().length);
+    }
+    return () => {
+      // 이전 구독 해제
       supabase.getChannels().forEach((channel) => {
-        console.log("구독 중인 채널:", channel.subTopic);
-        if (channel.subTopic.includes("party")) {
-          console.log("party 채널 구독 중");
+        if (channel.subTopic === "party") {
+          channel.unsubscribe();
         }
       });
-    }
+    };
   }, [userData]);
 
   return { roomData };
