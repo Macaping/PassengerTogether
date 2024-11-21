@@ -37,6 +37,7 @@ export default function ChatView() {
       user_id: string | null;
       message: string;
       created_at: string | null;
+      nickname?: string; // 닉네임 추가
     };
   }) => {
     const isMyMessage = item.user_id === user?.id; // 현재 로그인한 사용자와 메시지 발신자를 비교
@@ -48,7 +49,7 @@ export default function ChatView() {
         ]}
       >
         {!isMyMessage && (
-          <Text style={styles.userId}>{item.user_id ?? "Unknown User"}</Text>
+          <Text style={styles.userId}>{item.nickname ?? "Unknown User"}</Text>
         )}
         <Text
           style={[
