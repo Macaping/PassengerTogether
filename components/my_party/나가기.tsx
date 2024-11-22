@@ -7,15 +7,13 @@ import { styles } from "./icon_styles";
 
 export default function 나가기() {
   const [isLeaveModalVisible, setIsLeaveModalVisible] = useState(false);
-  const handleLeaveRoom = async () => {
+  function handleLeaveRoom() {
     LeaveRoom()
-      // 처음 페이지로 이동
-      .then(() => router.replace("/(tabs)"))
-      // 오류 처리
-      .catch((error: Error) =>
-        console.error("사용자 정보 가져오기 오류:", error),
-      );
-  };
+      .then(() => {
+        router.replace("/(tabs)");
+      })
+      .catch((error: Error) => console.error("나가기 오류:", error));
+  }
 
   return (
     <>

@@ -11,10 +11,10 @@ import {
   Modal,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
-  TextInput,
 } from "react-native";
 
 const { height } = Dimensions.get("window");
@@ -445,7 +445,9 @@ export default function RoomListView() {
   if (!departure || !destination || !date) {
     return (
       <View style={styles.container}>
-        <Text>방 목록을 조회할 조건이 없습니다. 방 탐색 버튼을 통해 이동해주세요.</Text>
+        <Text>
+          방 목록을 조회할 조건이 없습니다. 방 탐색 버튼을 통해 이동해주세요.
+        </Text>
       </View>
     );
   }
@@ -463,7 +465,6 @@ export default function RoomListView() {
     day: "numeric",
     weekday: "short",
   });
-
 
   const handleRoomPress = (room) => {
     setSelectedRoom(room);
