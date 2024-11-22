@@ -11,10 +11,10 @@ import {
   Modal,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
-  TextInput,
 } from "react-native";
 
 const { height } = Dimensions.get("window");
@@ -441,6 +441,18 @@ export default function RoomListView() {
   const minDepartureTime = date ? new Date(date) : new Date();
 
   // 출발지, 도착지, 기준 시간을 파라미터로 useLoadRooms 호출
+  // 조건이 맞지 않으면 조회 중단하기 위해서 추가적인 조건 체크
+  if (!departure || !destination || !date) {
+    return (
+      <View style={styles.container}>
+        <Text>
+          방 목록을 조회할 조건이 없습니다. 방 탐색 버튼을 통해 이동해주세요.
+        </Text>
+      </View>
+    );
+  }
+
+  // 출발지, 도착지, 기준 시간을 파라미터로 useLoadRooms 호출
   const { rooms, loading, error } = useLoadRooms(
     departure,
     destination,
@@ -453,14 +465,6 @@ export default function RoomListView() {
     day: "numeric",
     weekday: "short",
   });
-
-  //    const parsedDate = date ? new Date(date) : new Date();
-  /*    const formattedDate = parsedDate.toLocaleDateString('ko-KR', {
-        month: 'long',
-        day: 'numeric',
-        weekday: 'short'
-    });
-*/
 
   const handleRoomPress = (room) => {
     setSelectedRoom(room);

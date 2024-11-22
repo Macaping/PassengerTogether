@@ -10,13 +10,13 @@ interface ExsitModalProps {
 }
 
 export default function ExsitModal({ isVisible, onClose }: ExsitModalProps) {
-  const handleLeaveRoom = async () => {
+  function handleLeaveRoom() {
     LeaveRoom()
-      .then(() => router.replace("/(tabs)"))
-      .catch((error: Error) =>
-        console.error("사용자 정보 가져오기 오류:", error),
-      );
-  };
+      .then(() => {
+        router.replace("/(tabs)");
+      })
+      .catch((error: Error) => console.error("나가기 오류:", error));
+  }
 
   return (
     <Modal

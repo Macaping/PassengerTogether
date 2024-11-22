@@ -1,9 +1,8 @@
-import { LeaveRoom } from "@/services/leave_room";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
-import { styles } from "./icon_styles";
 import ExsitModal from "./exsit_modal"; // exsit_modal 컴포넌트 가져오기
+import { styles } from "./icon_styles";
 
 export default function 나가기() {
   const [isLeaveModalVisible, setIsLeaveModalVisible] = useState(false);
