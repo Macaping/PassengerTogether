@@ -1,4 +1,5 @@
 import useLoadRooms from "@/hooks/useLoadRooms";
+import { Database } from "@/lib/supabase_type";
 import { JoinRoom } from "@/services/join_room";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
@@ -86,17 +87,7 @@ const headerStyles = StyleSheet.create({
   },
 });
 
-type Room = {
-  id: string;
-  created_at: string;
-  origin: string;
-  destination: string;
-  departure_time: Date;
-  limit_people: number;
-  users: string[];
-  status: string;
-  details: string;
-};
+type Room = Database["public"]["Tables"]["rooms"]["Row"];
 
 type RoomDetailModalProps = {
   visible: boolean;
