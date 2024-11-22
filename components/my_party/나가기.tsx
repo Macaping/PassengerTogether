@@ -6,6 +6,7 @@ import 나가기Modal from "./나가기_modal";
 
 export default function 나가기() {
   const [isLeaveModalVisible, setIsLeaveModalVisible] = useState(false);
+
   return (
     <View>
       <TouchableOpacity
