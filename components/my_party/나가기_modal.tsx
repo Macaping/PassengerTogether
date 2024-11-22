@@ -1,15 +1,14 @@
 import { LeaveRoom } from "@/services/leave_room";
 import { router } from "expo-router";
-import { Text, TouchableOpacity, Modal, View, StyleSheet } from "react-native";
-import { styles } from "./icon_styles";
 import React from "react";
+import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-interface ExsitModalProps {
+interface 나가기ModalProps {
   isVisible: boolean;
   onClose: () => void;
 }
 
-export default function ExsitModal({ isVisible, onClose }: ExsitModalProps) {
+export default function 나가기Modal({ isVisible, onClose }: 나가기ModalProps) {
   function handleLeaveRoom() {
     LeaveRoom()
       .then(() => {
@@ -29,12 +28,14 @@ export default function ExsitModal({ isVisible, onClose }: ExsitModalProps) {
         <View style={modalStyles.modalView}>
           <Text style={modalStyles.modalText}>방을 나가시겠습니까?</Text>
           <View style={modalStyles.buttonContainer}>
+            {/* 아니오 */}
             <TouchableOpacity
               style={[modalStyles.button, modalStyles.cancelButton]}
               onPress={onClose}
             >
               <Text style={modalStyles.buttonText}>아니오</Text>
             </TouchableOpacity>
+            {/* 예 */}
             <TouchableOpacity
               style={[modalStyles.button, modalStyles.confirmButton]}
               onPress={() => {
@@ -62,10 +63,10 @@ const modalStyles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 20,
     padding: "10%",
+    gap: 20,
   },
   buttonContainer: {
     flexDirection: "row",
-    marginTop: 20,
     gap: 20,
   },
   button: {

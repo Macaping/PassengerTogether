@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
-import ExsitModal from "./exsit_modal"; // exsit_modal 컴포넌트 가져오기
+import 나가기Modal from "./나가기_modal"; // exsit_modal 컴포넌트 가져오기
 import { styles } from "./icon_styles";
 
 export default function 나가기() {
@@ -16,7 +16,7 @@ export default function 나가기() {
         <Ionicons name="people-outline" size={32} color="#666666" />
         <Text style={styles.buttonText}>나가기</Text>
       </TouchableOpacity>
-      <ExsitModal
+      <나가기Modal
         isVisible={isLeaveModalVisible}
         onClose={() => setIsLeaveModalVisible(false)}
       />
