@@ -1,10 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import { Text, TouchableOpacity } from "react-native";
 import { styles } from "./icon_styles";
-import { useRouter } from "expo-router";
 
 export default function 동승자() {
-  const router = useRouter();
   return (
     <TouchableOpacity
       style={styles.button}
