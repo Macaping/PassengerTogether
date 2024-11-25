@@ -73,12 +73,23 @@ export function InformationBox({
   ) => {
     setShowTimePicker(false);
     if (selectedTime) {
+      const currentDate = new Date();
       const newDate = new Date(date);
       newDate.setHours(selectedTime.getHours());
       newDate.setMinutes(selectedTime.getMinutes());
+
+      // 검증: 현재 시간보다 이전인지 확인
+      if (newDate < currentDate) {
+        alert("현재 시간보다 이전의 시간은 선택할 수 없습니다.");
+        return;
+      }
+
       setDate(newDate);
     }
   };
+
+  // 현재 시간을 기준으로 제한 설정
+  const currentDate = new Date();
 
   const openLocationModal = (type: "departure" | "destination") => {
     setChangingLocationType(type);
@@ -183,6 +194,7 @@ export function InformationBox({
           mode="date"
           display="default"
           onChange={handleDateChange}
+          minimumDate={currentDate} // 현재 날짜보다 이전 선택 불가
         />
       )}
 
