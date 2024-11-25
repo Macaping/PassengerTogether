@@ -75,6 +75,10 @@ export default function TabLayout() {
           headerShown: false,
         }}
       />
+      <Tabs.Screen
+        name="CheckPassenger"
+        options={{ title: "동승자", href: null }}
+      />
     </Tabs>
   );
 }
