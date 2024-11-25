@@ -7,7 +7,7 @@ export default function 동승자() {
   return (
     <TouchableOpacity
       style={styles.button}
-      onPress={() => router.push("/CheckPassenger")}
+      onPress={() => router.push("/(tabs)CheckPassenger")}
     >
       <Ionicons name="people-outline" size={32} color="#666666" />
       <Text style={styles.buttonText}>동승자</Text>

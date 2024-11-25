@@ -466,15 +466,9 @@ export default function RoomListView() {
   const handleJoinRoom = (room: Room) => {
     if (!room) return;
     JoinRoom(room.id)
-      .then(() => {
-        router.replace("/(tabs)/RoomDetail");
-      })
-      .catch((error) => {
-        console.error(error);
-      })
-      .finally(() => {
-        setModalVisible(false);
-      });
+      .then(() => router.replace("/(tabs)/RoomDetail"))
+      .catch((error) => console.error(error))
+      .finally(() => setModalVisible(false));
   };
 
   return (

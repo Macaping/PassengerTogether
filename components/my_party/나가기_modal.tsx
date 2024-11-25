@@ -16,9 +16,7 @@ export default function 나가기Modal({
 
   function handleLeaveRoom() {
     LeaveRoom()
-      .then(() => {
-        router.replace("/(tabs)");
-      })
+      .then(() => router.replace("/(tabs)"))
       .catch((error: Error) => console.error("나가기 오류:", error));
   }
 
