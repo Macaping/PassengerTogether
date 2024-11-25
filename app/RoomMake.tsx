@@ -1,10 +1,11 @@
 import { CreateRoom } from "@/services/create_room";
 import { JoinRoom } from "@/services/join_room";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { router, useLocalSearchParams } from "expo-router";
+import { router } from "expo-router";
 import React, { useState } from "react";
 import {
-  Dimensions, //Dimensions API를 이용해 화면의 너비나 높이에 따라 fontSize를 설정
+  Alert,
+  Dimensions,
   FlatList,
   Modal,
   StyleSheet,
@@ -14,75 +15,39 @@ import {
   View,
 } from "react-native";
 
-const { width } = Dimensions.get("window"); //Dimensions 이용
+const { width } = Dimensions.get("window");
 
 export default function RoomMakeView() {
-  const {
-    selectedDeparture = "기본 출발지",
-    selectedDestination = "기본 도착지",
-    date,
-  } = useLocalSearchParams();
-
-  // date가 배열이면 첫 번째 요소를 가져오고, 그렇지 않으면 date 그대로 사용
-  const initialDate = Array.isArray(date)
-    ? new Date(date[0])
-    : new Date(date || new Date());
-
-  const [departure, setDeparture] = useState(selectedDeparture);
-  const [destination, setDestination] = useState(selectedDestination);
-  //  const [selectedDate, setSelectedDate] = useState(new Date(date));
-  const [selectedDate, setSelectedDate] = useState(initialDate);
+  const [departure, setDeparture] = useState("천안역");
+  const [destination, setDestination] = useState("천안아산역");
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [numPassengers, setNumPassengers] = useState(0);
+  const [details, setDetails] = useState("");
+  const [meetingPlace, setMeetingPlace] = useState("");
+  const [modalVisible, setModalVisible] = useState(false);
+  const [changingType, setChangingType] = useState("departure");
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [changingLocationType, setChangingLocationType] = useState("departure");
-  const [details, setDetails] = useState("");
-  const [numPassengers, setNumPassengers] = useState(0); // 동승자 인원 추가
+
   const locations = ["천안역", "천안아산역", "선문대", "탕정역", "두정동 롯데"];
 
-  const handleDateChange = (event: any, selectedDate: Date | undefined) => {
+  //날짜 변경 호출함수
+  const handleDateChange = (event, date) => {
+    if (date) setSelectedDate(new Date(date));
     setShowDatePicker(false);
-    if (selectedDate) {
-      setSelectedDate(new Date(selectedDate));
-    }
   };
 
-  const handleTimeChange = (event: any, selectedTime: Date | undefined) => {
+  //시간 변경 호출함수
+  const handleTimeChange = (event, time) => {
+    if (time) {
+      const updatedDate = new Date(selectedDate);
+      updatedDate.setHours(time.getHours(), time.getMinutes());
+      setSelectedDate(updatedDate);
+    }
     setShowTimePicker(false);
-    if (selectedTime) {
-      const newDate = new Date(selectedDate);
-      newDate.setHours(selectedTime.getHours());
-      newDate.setMinutes(selectedTime.getMinutes());
-      setSelectedDate(newDate);
-    }
   };
 
-  const openLocationModal = (type: "departure" | "destination") => {
-    setChangingLocationType(type);
-    setModalVisible(true);
-  };
-
-  const handleLocationSelect = (location: string) => {
-    if (changingLocationType === "departure") {
-      setDeparture(location);
-    } else {
-      setDestination(location);
-    }
-    setModalVisible(false);
-  };
-
-  const incrementPassengers = () => {
-    if (numPassengers < 3) {
-      setNumPassengers(numPassengers + 1);
-    }
-  };
-
-  const decrementPassengers = () => {
-    if (numPassengers > 0) {
-      setNumPassengers(numPassengers - 1);
-    }
-  };
-
+  //방만들때 호출되는 함수
   const handleCreateRoom = async () => {
     // 방 생성
     CreateRoom({
@@ -91,7 +56,7 @@ export default function RoomMakeView() {
       destination: destination as string,
       limit_people: numPassengers,
       users: [],
-      details: details,
+      details: `${meetingPlace}`, // 장소와 세부사항을 합쳐 전송
     })
       .then((room) => {
         // 방 생성한 사람이 방에 참가
@@ -100,144 +65,150 @@ export default function RoomMakeView() {
       .then(() => {
         // 방 생성 성공 시
         router.dismissAll();
-        router.replace("/(tabs)/RoomDetail");
+        Alert.alert("성공", "방장이 되신걸 환영합니다!");
+        router.replace("/(tabs)/RoomDetail"); // 방 상세 페이지로 이동
       })
-      .catch((error) => console.error("Failed to create room:", error));
+      .catch((error) => {
+        console.error("Failed to create room:", error);
+        Alert.alert("오류", "방 생성에 실패했습니다. 다시 시도해주세요.");
+      });
   };
 
   return (
     <View style={styles.container}>
-      <View style={main_styles.infoBox}>
-        {/* 출발지와 도착지 선택 */}
-        <View style={main_styles.locationSection}>
-          <Text style={main_styles.locationLabel}>출발</Text>
-          <Text style={main_styles.locationLabel}>도착</Text>
-        </View>
-
-        <View style={main_styles.locationSelectorRow}>
-          <TouchableOpacity
-            style={main_styles.routeContainer}
-            onPress={() => openLocationModal("departure")}
-          >
-            <Text style={main_styles.routeText}>{departure}</Text>
-          </TouchableOpacity>
-
-          <Text style={main_styles.arrow}>→</Text>
-
-          <TouchableOpacity
-            style={main_styles.routeContainer}
-            onPress={() => openLocationModal("destination")}
-          >
-            <Text style={main_styles.routeText}>{destination}</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* 출발지 및 도착지 선택 모달 */}
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => setModalVisible(false)}
+      {/* 출발-도착 */}
+      <View style={styles.row}>
+        <Text style={styles.label}>출발</Text>
+        <Text style={styles.label}>도착</Text>
+      </View>
+      <View style={styles.row}>
+        {/* 출발지 선택 버튼 */}
+        <TouchableOpacity
+          style={styles.box}
+          onPress={() => {
+            setChangingType("departure");
+            setModalVisible(true);
+          }}
         >
-          <View style={choice_styles.modalView}>
-            <FlatList
-              data={locations.filter(
-                (item) =>
-                  (changingLocationType === "departure" &&
-                    item !== destination) ||
-                  (changingLocationType === "destination" &&
-                    item !== departure),
-              )}
-              keyExtractor={(item) => item}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={choice_styles.item}
-                  onPress={() => handleLocationSelect(item)}
-                >
-                  <Text style={choice_styles.itemText}>{item}</Text>
-                </TouchableOpacity>
-              )}
-            />
-          </View>
-        </Modal>
+          <Text style={styles.text}>{departure}</Text>
+        </TouchableOpacity>
+        <Text style={styles.arrow}>→</Text>
+        {/* 도착지 선택 버튼 */}
+        <TouchableOpacity
+          style={styles.box}
+          onPress={() => {
+            setChangingType("destination");
+            setModalVisible(true);
+          }}
+        >
+          <Text style={styles.text}>{destination}</Text>
+        </TouchableOpacity>
+      </View>
 
-        {/* 날짜와 시간 선택 */}
-        <Text style={passenger_styles.infoTitle}>출발 시간</Text>
-        <View style={date_styles.dateTimeRow}>
-          <TouchableOpacity
-            onPress={() => setShowDatePicker(true)}
-            style={date_styles.dateTimeButton}
-          >
-            <Text style={date_styles.dateText}>
-              {selectedDate.toLocaleDateString()}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => setShowTimePicker(true)}
-            style={date_styles.dateTimeButton}
-          >
-            <Text style={date_styles.dateText}>
-              {selectedDate.toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        {showDatePicker && (
-          <DateTimePicker
-            value={selectedDate}
-            mode="date"
-            display="default"
-            onChange={handleDateChange}
-          />
-        )}
-        {showTimePicker && (
-          <DateTimePicker
-            value={selectedDate}
-            mode="time"
-            display="default"
-            minuteInterval={5}
-            onChange={handleTimeChange}
-          />
-        )}
-
-        {/* 동승자 인원 선택 */}
-        <Text style={passenger_styles.infoTitle}>동승자</Text>
-        <View style={passenger_styles.passengerContainer}>
-          <TouchableOpacity
-            onPress={decrementPassengers}
-            disabled={numPassengers === 0}
-            style={passenger_styles.passengerButton}
-          >
-            <Text style={passenger_styles.passengerButtonText}>-</Text>
-          </TouchableOpacity>
-          <Text style={passenger_styles.passengerText}>{numPassengers}명</Text>
-          <TouchableOpacity
-            onPress={incrementPassengers}
-            disabled={numPassengers === 3}
-            style={passenger_styles.passengerButton}
-          >
-            <Text style={passenger_styles.passengerButtonText}>+</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* 세부사항 입력 */}
-        <Text style={passenger_styles.infoTitle}>세부사항</Text>
-        <TextInput
-          style={passenger_styles.textInput}
-          placeholder="만남 장소와 옷차림을 기입해주세요"
-          multiline
-          value={details}
-          onChangeText={setDetails}
+      {/* 출발 시간 UI */}
+      <Text style={styles.sectionTitle}>출발 시간</Text>
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={styles.box}
+          onPress={() => setShowDatePicker(true)} //날짜 선택 창 여는것
+        >
+          <Text style={styles.text}>{selectedDate.toLocaleDateString()}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.box}
+          onPress={() => setShowTimePicker(true)} //시간 선택 창 여는것
+        >
+          <Text style={styles.text}>
+            {selectedDate.toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </Text>
+        </TouchableOpacity>
+      </View>
+      {showDatePicker && (
+        <DateTimePicker
+          value={selectedDate}
+          mode="date"
+          onChange={handleDateChange}
         />
+      )}
+      {showTimePicker && (
+        <DateTimePicker
+          value={selectedDate}
+          mode="time"
+          onChange={handleTimeChange}
+        />
+      )}
+
+      {/* 만남의 장소 */}
+      <Text style={styles.sectionTitle}>만남의 장소</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="어디서 모일건가요?"
+        value={meetingPlace}
+        onChangeText={setMeetingPlace}
+      />
+
+      {/* 세부사항 */}
+      <Text style={styles.sectionTitle}>나의 옷차림</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="오늘의 OOTD 입력!"
+        multiline
+        value={details}
+        onChangeText={setDetails}
+      />
+
+      {/* 동승자 선택 */}
+      <Text style={styles.sectionTitle}>동승자</Text>
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={styles.counterButton}
+          onPress={() => setNumPassengers(Math.max(numPassengers - 1, 0))}
+        >
+          <Text style={styles.counterText}>-</Text>
+        </TouchableOpacity>
+        <Text style={styles.text}>{numPassengers}명</Text>
+        <TouchableOpacity
+          style={styles.counterButton}
+          onPress={() => setNumPassengers(Math.min(numPassengers + 1, 3))}
+        >
+          <Text style={styles.counterText}>+</Text>
+        </TouchableOpacity>
       </View>
 
       {/* 방 만들기 버튼 */}
-      <TouchableOpacity style={styles.submitButton} onPress={handleCreateRoom}>
-        <Text style={styles.submitButtonText}>방만들기</Text>
+      <TouchableOpacity style={styles.createButton} onPress={handleCreateRoom}>
+        <Text style={styles.createButtonText}>방만들기</Text>
       </TouchableOpacity>
+
+      {/* 모달창*/}
+      <Modal visible={modalVisible} transparent>
+        <View style={styles.modal}>
+          <FlatList
+            data={locations.filter(
+              (loc) =>
+                (changingType === "departure" && loc !== destination) ||
+                (changingType === "destination" && loc !== departure),
+            )}
+            keyExtractor={(item) => item}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                onPress={() => {
+                  changingType === "departure"
+                    ? setDeparture(item)
+                    : setDestination(item);
+                  setModalVisible(false);
+                }}
+                style={styles.modalItem}
+              >
+                <Text>{item}</Text>
+              </TouchableOpacity>
+            )}
+          />
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -245,156 +216,86 @@ export default function RoomMakeView() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    padding: 20,
+    backgroundColor: "#fff",
   },
-  header: {
-    backgroundColor: "#6B59CC",
-    paddingVertical: "4.5%",
-    alignItems: "center",
-  },
-  headerText: {
-    color: "#FFFFFF",
-    fontSize: width * 0.045,
-    fontWeight: "bold",
-  },
-  submitButton: {
-    backgroundColor: "#A99CE3",
-    paddingVertical: "5%",
-    borderRadius: 10,
-    marginHorizontal: "5%",
-    alignItems: "center",
-  },
-  submitButtonText: {
-    color: "#FFFFFF",
-    fontSize: width * 0.04,
-  },
-});
-
-const main_styles = StyleSheet.create({
-  infoBox: {
-    backgroundColor: "#FFFFFF",
-    padding: "18%",
-    margin: "5%",
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 3,
-    alignItems: "center",
-  },
-  locationSection: {
+  row: {
     flexDirection: "row",
     justifyContent: "space-between",
-    width: "70%",
-    marginBottom: "15%",
+    alignItems: "center",
+    marginVertical: 10,
   },
-  locationLabel: {
-    fontSize: width * 0.037,
+  label: {
+    flex: 1,
+    textAlign: "center",
+    fontSize: 16,
     color: "#888",
   },
-  locationSelectorRow: {
-    flexDirection: "row",
+  box: {
+    flex: 1,
+    padding: 10,
+    borderWidth: 1,
+    borderRadius: 5,
     alignItems: "center",
-    //justifyContent: 'center', // 중앙 정렬
-    justifyContent: "space-evenly",
-    width: "140%",
-    marginBottom: "40%",
+    justifyContent: "center",
+    marginHorizontal: 5,
   },
-  routeContainer: {
-    width: width * 0.35,
-    alignItems: "center",
-    //paddingVertical: '3%',
-    //borderColor: '#6B59CC',
-    //borderWidth: 1,
-    //borderRadius: 8,
-  },
-  routeText: {
-    fontSize: width * 0.073,
+  text: {
+    fontSize: 18,
     color: "#6B59CC",
-    fontWeight: "bold",
-    textAlign: "center",
   },
   arrow: {
-    fontSize: width * 0.07,
+    fontSize: 20,
     color: "#6B59CC",
-    marginHorizontal: "6%",
+    marginHorizontal: 5,
   },
-});
-
-const choice_styles = StyleSheet.create({
-  modalView: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    paddingVertical: "10%",
-    paddingHorizontal: "10%",
-    alignItems: "stretch",
-  },
-  item: {
-    backgroundColor: "white",
-    padding: "5%",
-    marginVertical: "1.5%",
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  itemText: {},
-});
-
-const date_styles = StyleSheet.create({
-  dateTimeRow: {
-    flexDirection: "row",
-    justifyContent: "center",
-    width: "80%",
-    marginTop: "6%",
-  },
-  dateTimeButton: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 5,
-    marginHorizontal: "4.5%",
-  },
-  dateText: {
-    fontSize: width * 0.063,
-    color: "#6B59CC",
-  },
-});
-
-const passenger_styles = StyleSheet.create({
-  infoTitle: {
-    marginTop: "5%",
-    fontSize: width * 0.037,
-    fontWeight: "bold",
+  sectionTitle: {
+    fontSize: 16,
     color: "#888",
+    marginVertical: 10,
   },
-  passengerContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: "6%",
-  },
-  passengerButton: {
-    backgroundColor: "#A99CE3",
-    padding: "5%",
-    borderRadius: 5,
-    marginHorizontal: "7%",
-  },
-  passengerButtonText: {
-    color: "#FFFFFF",
-    fontSize: width * 0.04,
-  },
-  passengerText: {
-    fontSize: width * 0.04,
-    color: "#6B59CC",
-  },
-  textInput: {
-    width: "80%",
+  input: {
+    width: "100%",
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 5,
-    padding: "5%",
-    marginTop: "5%",
-    fontSize: width * 0.038,
+    padding: 10,
+    marginVertical: 10,
+  },
+  counterButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#A99CE3",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  counterText: {
+    color: "#fff",
+    fontSize: 20,
+  },
+  createButton: {
+    backgroundColor: "#6B59CC",
+    padding: 15,
+    alignItems: "center",
+    borderRadius: 5,
+    marginTop: 20,
+  },
+  createButtonText: {
+    color: "#fff",
+    fontSize: 18,
+  },
+  modal: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    padding: 20,
+  },
+  modalItem: {
+    backgroundColor: "#fff",
+    padding: 15,
+    marginVertical: 5,
+    borderRadius: 5,
+    alignItems: "center",
   },
 });
