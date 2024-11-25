@@ -72,6 +72,16 @@ export default function RootLayout() {
               headerTintColor: "#ffffff",
             }}
           />
+          <Stack.Screen
+            name="RoomMake"
+            options={{
+              title: "방 만들기",
+              headerTitleAlign: "center",
+              headerShadowVisible: false,
+              headerStyle: { backgroundColor: "#6049E2" },
+              headerTintColor: "#ffffff",
+            }}
+          />
         </Stack>
       </NavigationContainer>
     </>

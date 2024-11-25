@@ -76,34 +76,8 @@ export default function RoomMakeView() {
 
   return (
     <View style={styles.container}>
-      {/* 출발-도착 */}
-      <View style={styles.row}>
-        <Text style={styles.label}>출발</Text>
-        <Text style={styles.label}>도착</Text>
-      </View>
-      <View style={styles.row}>
-        {/* 출발지 선택 버튼 */}
-        <TouchableOpacity
-          style={styles.box}
-          onPress={() => {
-            setChangingType("departure");
-            setModalVisible(true);
-          }}
-        >
-          <Text style={styles.text}>{departure}</Text>
-        </TouchableOpacity>
-        <Text style={styles.arrow}>→</Text>
-        {/* 도착지 선택 버튼 */}
-        <TouchableOpacity
-          style={styles.box}
-          onPress={() => {
-            setChangingType("destination");
-            setModalVisible(true);
-          }}
-        >
-          <Text style={styles.text}>{destination}</Text>
-        </TouchableOpacity>
-      </View>
+      
+
 
       {/* 출발 시간 UI */}
       <Text style={styles.sectionTitle}>출발 시간</Text>
@@ -160,23 +134,7 @@ export default function RoomMakeView() {
         onChangeText={setDetails}
       />
 
-      {/* 동승자 선택 */}
-      <Text style={styles.sectionTitle}>동승자</Text>
-      <View style={styles.row}>
-        <TouchableOpacity
-          style={styles.counterButton}
-          onPress={() => setNumPassengers(Math.max(numPassengers - 1, 0))}
-        >
-          <Text style={styles.counterText}>-</Text>
-        </TouchableOpacity>
-        <Text style={styles.text}>{numPassengers}명</Text>
-        <TouchableOpacity
-          style={styles.counterButton}
-          onPress={() => setNumPassengers(Math.min(numPassengers + 1, 3))}
-        >
-          <Text style={styles.counterText}>+</Text>
-        </TouchableOpacity>
-      </View>
+
 
       {/* 방 만들기 버튼 */}
       <TouchableOpacity style={styles.createButton} onPress={handleCreateRoom}>
