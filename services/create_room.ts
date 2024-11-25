@@ -4,14 +4,12 @@ export async function CreateRoom({
   departure_time,
   origin,
   destination,
-  limit_people,
   users = [],
   details,
 }: {
   departure_time: string;
   origin: string;
   destination: string;
-  limit_people: number;
   users: string[];
   details: string;
 }) {
@@ -19,8 +17,6 @@ export async function CreateRoom({
     departure_time: departure_time,
     origin: origin,
     destination: destination,
-    // 최대 인원은 4명으로 고정됨
-    // limit_people: limit_people,
     users: users,
     details: details,
   };
