@@ -9,7 +9,9 @@ type User = Database["public"]["Tables"]["users"]["Row"];
 export default function useChat() {
   const { user } = useUser();
   const [roomId, setRoomId] = useState<User["current_party"] | null>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<(Message & { nickname?: string })[]>(
+    [],
+  ); // 닉네임 포함
   const [newMessage, setNewMessage] = useState<string>("");
   const [noRoomMessage, setNoRoomMessage] = useState<boolean>(false);
   const [messageChannel, setMessageChannel] = useState<any>(null);
@@ -44,7 +46,7 @@ export default function useChat() {
   useEffect(() => {
     let channel: any;
     if (roomId) {
-      fetchMessages(roomId);
+      fetchMessagesWithNicknames(roomId);
       if (messageChannel) supabase.removeChannel(messageChannel);
       channel = supabase
         .channel("messages:" + roomId)
@@ -56,9 +58,24 @@ export default function useChat() {
             table: "messages",
             filter: `room_id=eq.${roomId}`,
           },
-          (payload) => {
-            if (payload.eventType === "INSERT")
-              setMessages((prev) => [...prev, payload.new as Message]);
+          async (payload) => {
+            if (payload.eventType === "INSERT") {
+              const newMessage = payload.new as Message;
+
+              // 사용자 닉네임 가져오기
+              const { data: userData, error: userError } = await supabase
+                .from("users")
+                .select("nickname")
+                .eq("user_id", newMessage.user_id)
+                .single();
+              if (userError) console.error("Nickname fetch error:", userError);
+
+              // 닉네임 포함하여 메시지 추가
+              setMessages((prev) => [
+                ...prev,
+                { ...newMessage, nickname: userData?.nickname },
+              ]);
+            }
           },
         )
         .subscribe((status) => {
@@ -75,37 +92,33 @@ export default function useChat() {
     };
   }, [roomId]);
 
-  const subscribeToCurrentParty = (userId: string) => {
-    const userChannel = supabase
-      .channel("user_updates")
-      .on(
-        "postgres_changes",
-        {
-          event: "UPDATE",
-          schema: "public",
-          table: "users",
-          filter: `user_id=eq.${userId}`,
-        },
-        (payload) => {
-          const updatedCurrentParty = (payload.new as User).current_party;
-          if (updatedCurrentParty === null)
-            setNoRoomMessage(true), setRoomId(null);
-          else if (updatedCurrentParty !== roomId)
-            setRoomId(updatedCurrentParty), setNoRoomMessage(false);
-        },
-      )
-      .subscribe();
-    setUserChannel(userChannel);
-  };
-
-  const fetchMessages = async (roomId: string) => {
-    const { data, error } = await supabase
+  const fetchMessagesWithNicknames = async (roomId: string) => {
+    const { data: messageData, error: messageError } = await supabase
       .from("messages")
       .select("*")
       .eq("room_id", roomId)
       .order("created_at", { ascending: true });
-    if (error) console.error("Message fetch error:", error.message);
-    else setMessages(data || []);
+
+    if (messageError) {
+      console.error("Message fetch error:", messageError.message);
+      return;
+    }
+
+    // 닉네임 매핑
+    const messagesWithNicknames = await Promise.all(
+      messageData.map(async (message) => {
+        const { data: userData, error: userError } = await supabase
+          .from("users")
+          .select("nickname")
+          .eq("user_id", message.user_id)
+          .single();
+        if (userError) console.error("Nickname fetch error:", userError);
+
+        return { ...message, nickname: userData?.nickname };
+      }),
+    );
+
+    setMessages(messagesWithNicknames);
   };
 
   const handleSendMessage = async () => {
