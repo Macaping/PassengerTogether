@@ -28,13 +28,13 @@ export default function RoomMakeView() {
   const locations = ["천안역", "천안아산역", "선문대", "탕정역", "두정동 롯데"];
 
   //날짜 변경 호출함수
-  const handleDateChange = (event, date) => {
+  const handleDateChange = (event: any, date: Date | undefined) => {
     if (date) setSelectedDate(new Date(date));
     setShowDatePicker(false);
   };
 
   //시간 변경 호출함수
-  const handleTimeChange = (event, time) => {
+  const handleTimeChange = (event: any, time: Date | undefined) => {
     if (time) {
       const updatedDate = new Date(selectedDate);
       updatedDate.setHours(time.getHours(), time.getMinutes());
@@ -45,29 +45,27 @@ export default function RoomMakeView() {
 
   //방만들때 호출되는 함수
   const handleCreateRoom = async () => {
-    // 방 생성
-    CreateRoom({
-      departure_time: selectedDate.toISOString(),
-      origin: departure as string,
-      destination: destination as string,
-      limit_people: numPassengers,
-      users: [],
-      details: `${meetingPlace}`, // 장소와 세부사항을 합쳐 전송
-    })
-      .then((room) => {
-        // 방 생성한 사람이 방에 참가
-        JoinRoom(room.id);
-      })
-      .then(() => {
-        // 방 생성 성공 시
-        router.dismissAll();
-        Alert.alert("성공", "방장이 되신걸 환영합니다!");
-        router.replace("/(tabs)/RoomDetail"); // 방 상세 페이지로 이동
-      })
-      .catch((error) => {
-        console.error("Failed to create room:", error);
-        Alert.alert("오류", "방 생성에 실패했습니다. 다시 시도해주세요.");
+    try {
+      // 방 생성
+      const room = await CreateRoom({
+        departure_time: selectedDate.toISOString(),
+        origin: departure as string,
+        destination: destination as string,
+        users: [],
+        details: `${meetingPlace}`, // 장소와 세부사항을 합쳐 전송
       });
+
+      // 방 생성한 사람이 방에 참가
+      room && (await JoinRoom(room.id));
+
+      // 방 생성 성공 시
+      router.dismissAll();
+      Alert.alert("성공", "방장이 되신걸 환영합니다!");
+      router.replace("/(tabs)/RoomDetail"); // 방 상세 페이지로 이동
+    } catch (error) {
+      console.error("Failed to create room:", error);
+      Alert.alert("오류", "방 생성에 실패했습니다. 다시 시도해주세요.");
+    }
   };
 
   return (
