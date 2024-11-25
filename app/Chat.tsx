@@ -1,4 +1,5 @@
 import useChat from "@/hooks/useChat";
+import { useUser } from "@/hooks/useUser";
 import React from "react";
 import {
   Button,
@@ -18,7 +19,7 @@ export default function ChatView() {
     setNewMessage,
     handleSendMessage,
   } = useChat();
-  const { user } = useAuthUser();
+  const { user } = useUser();
 
   if (!user) {
     // user가 없으면 로딩 화면 표시
