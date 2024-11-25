@@ -36,15 +36,15 @@ export default function MyPage() {
         {/*밑에 아이콘 세개 크기*/}
         <View style={styles.iconContainer}>
           <TouchableOpacity style={styles.profileIcon}>
-            <Ionicons name="mail-outline" size={60} color="#6C4AB6" />
+            <Ionicons name="mail-outline" size={35} color="#6C4AB6" />
             <Text>메세지함</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.profileIcon}>
-            <Ionicons name="person-add-outline" size={30} color="#6C4AB6" />
+            <Ionicons name="person-add-outline" size={35} color="#6C4AB6" />
             <Text>친구추가</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.profileIcon}>
-            <Ionicons name="people-outline" size={30} color="#6C4AB6" />
+            <Ionicons name="people-outline" size={35} color="#6C4AB6" />
             <Text>친구목록</Text>
           </TouchableOpacity>
         </View>
@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   profileCard: {
-    flex: 7,
+    flex: 8, //카드 밑으로 늘리기
     backgroundColor: "#FFFFFF",
     borderRadius: 10,
     alignItems: "center",
@@ -87,12 +87,11 @@ const styles = StyleSheet.create({
   iconContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
-    width: "100%",
-    bottom: "-15%",
+    margin: "10%",
+    gap: 30,
   },
   profileIcon: {
     alignItems: "center",
-    bottom: -60,
   },
   logoutButton: {
     flex: 1,
@@ -102,9 +101,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderRadius: 8,
   },
+
   logoutButtonText: {
     color: "#888888",
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "bold",
   },
 });
