@@ -4,6 +4,7 @@ import Details from "@/components/my_party/details";
 import NumPeople from "@/components/my_party/num_people";
 import PartyEmpty from "@/components/my_party/party_empty";
 import { PartyHeader } from "@/components/my_party/party_header";
+import { roomstyles } from "@/components/my_party/room_styles";
 import { Separator } from "@/components/my_party/separator";
 import Time from "@/components/my_party/time";
 import 나가기 from "@/components/my_party/나가기";
@@ -28,8 +29,8 @@ export default function RoomDetailView() {
 
   // 방 정보가 있을 때
   return (
-    <View style={styles.background}>
-      <View style={styles.container}>
+    <View style={roomstyles.background}>
+      <View style={roomstyles.container}>
         {/* 헤더와 방번호 */}
         <PartyHeader id={String(room.created_at.slice(-10, -6))} />
 
@@ -62,7 +63,7 @@ export default function RoomDetailView() {
           <Separator />
         </View>
         {/* 버튼 영역 */}
-        <View style={styles.buttonContainer}>
+        <View style={roomstyles.buttonContainer}>
           <채팅 />
           <동승자 />
           <나가기 />
@@ -73,19 +74,6 @@ export default function RoomDetailView() {
 }
 
 const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-    backgroundColor: "#6049E2",
-  },
-  container: {
-    flex: 1,
-    margin: 20,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 20,
-    // 자식 요소가 부모의 경계선을 넘지 않도록 설정
-    overflow: "hidden",
-    gap: 10,
-  },
   timeBox: {
     marginHorizontal: 20,
   },
@@ -101,11 +89,5 @@ const styles = StyleSheet.create({
   },
   details: {
     padding: 20,
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-around",
-    margin: 20,
   },
 });

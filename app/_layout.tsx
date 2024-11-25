@@ -62,6 +62,16 @@ export default function RootLayout() {
               headerTintColor: "#ffffff",
             }}
           />
+          <Stack.Screen
+            name="Chat"
+            options={{
+              title: "채 팅 방",
+              headerTitleAlign: "center",
+              headerShadowVisible: false,
+              headerStyle: { backgroundColor: "#6049E2" },
+              headerTintColor: "#ffffff",
+            }}
+          />
         </Stack>
       </NavigationContainer>
     </>

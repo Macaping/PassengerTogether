@@ -13,7 +13,7 @@ export default function 나가기() {
         style={styles.button}
         onPress={() => setIsLeaveModalVisible(true)}
       >
-        <Ionicons name="people-outline" size={32} color="#666666" />
+        <Ionicons name="exit-outline" size={32} color="#666666" />
         <Text style={styles.buttonText}>나가기</Text>
       </TouchableOpacity>
       <나가기Modal
