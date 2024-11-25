@@ -1,4 +1,4 @@
-import { useAuthUser } from "@/hooks/useAuthUser";
+import { useUserData } from "@/hooks/useUserData";
 import { signOutUser } from "@/utils/auth.utils";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router } from "expo-router";
@@ -15,7 +15,7 @@ export default function MyPage() {
   const { height } = useWindowDimensions();
   const iconSize = height * 0.25;
 
-  const { userData } = useAuthUser();
+  const { userData } = useUserData();
 
   const handleSignOut = async () => {
     signOutUser().then(() => router.replace("/SignIn"));

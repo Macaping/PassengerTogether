@@ -3,14 +3,14 @@ import { router } from "expo-router";
 import { Text, TouchableOpacity } from "react-native";
 import { styles } from "./icon_styles";
 
-export default function 동승자() {
+export default function 이전() {
   return (
     <TouchableOpacity
       style={styles.button}
-      onPress={() => router.push("/CheckPassenger")}
+      onPress={() => router.replace("/RoomDetail")}
     >
-      <Ionicons name="people-outline" size={32} color="#666666" />
-      <Text style={styles.buttonText}>동승자</Text>
+      <Ionicons name="arrow-back-outline" size={32} color="#666666" />
+      <Text style={styles.buttonText}>이전</Text>
     </TouchableOpacity>
   );
 }

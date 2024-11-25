@@ -1,24 +1,25 @@
-import { LeaveRoom } from "@/services/leave_room";
 import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
-import { Text, TouchableOpacity } from "react-native";
+import { useState } from "react";
+import { Text, TouchableOpacity, View } from "react-native";
 import { styles } from "./icon_styles";
+import 나가기Modal from "./나가기_modal";
 
 export default function 나가기() {
-  const handleLeaveRoom = async () => {
-    LeaveRoom()
-      // 처음 페이지로 이동
-      .then(() => router.replace("/(tabs)"))
-      // 오류 처리
-      .catch((error: Error) =>
-        console.error("사용자 정보 가져오기 오류:", error),
-      );
-  };
+  const [isLeaveModalVisible, setIsLeaveModalVisible] = useState(false);
 
   return (
-    <TouchableOpacity style={styles.button} onPress={handleLeaveRoom}>
-      <Ionicons name="people-outline" size={32} color="#666666" />
-      <Text style={styles.buttonText}>나가기</Text>
-    </TouchableOpacity>
+    <View>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => setIsLeaveModalVisible(true)}
+      >
+        <Ionicons name="exit-outline" size={32} color="#666666" />
+        <Text style={styles.buttonText}>나가기</Text>
+      </TouchableOpacity>
+      <나가기Modal
+        isVisible={isLeaveModalVisible}
+        setVisible={setIsLeaveModalVisible}
+      />
+    </View>
   );
 }

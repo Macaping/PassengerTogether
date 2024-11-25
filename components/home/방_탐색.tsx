@@ -15,9 +15,9 @@ export function 방_탐색({ departure, destination, date }: 방_탐색Props) {
       href={{
         pathname: "/RoomList",
         params: {
-          selectedDeparture: departure,
-          selectedDestination: destination,
-          date: date.toISOString(),
+          departure: departure,
+          destination: destination,
+          date: date,
         },
       }}
       style={styles.button}

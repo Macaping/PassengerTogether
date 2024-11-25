@@ -1,15 +1,14 @@
+import useChat from "@/hooks/useChat";
 import React from "react";
 import {
-  View,
-  Text,
-  TextInput,
   Button,
   FlatList,
   StyleSheet,
+  Text,
+  TextInput,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import useChat from "@/hooks/useChat";
-import { useAuthUser } from "@/hooks/useAuthUser";
 
 export default function ChatView() {
   const {

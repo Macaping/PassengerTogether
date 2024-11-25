@@ -1,40 +1,26 @@
 import Departure from "@/components/my_party/departure";
 import Destination from "@/components/my_party/destination";
 import Details from "@/components/my_party/details";
-import Loading from "@/components/my_party/loading";
 import NumPeople from "@/components/my_party/num_people";
 import PartyEmpty from "@/components/my_party/party_empty";
 import { PartyHeader } from "@/components/my_party/party_header";
+import { roomstyles } from "@/components/my_party/room_styles";
 import { Separator } from "@/components/my_party/separator";
 import Time from "@/components/my_party/time";
 import 나가기 from "@/components/my_party/나가기";
 import 동승자 from "@/components/my_party/동승자";
 import 채팅 from "@/components/my_party/채팅";
-import useUserDataManagement from "@/hooks/userDataManagement";
-import { useFocusEffect } from "@react-navigation/native";
-import React, { useCallback, useState } from "react";
+import { useParty } from "@/hooks/useParty";
+import React from "react";
 import { StyleSheet, View } from "react-native";
 
 export default function RoomDetailView() {
-  const { room, fetchRoomDetails } = useUserDataManagement();
-  const [loading, setLoading] = useState(true);
-
-  // 포커스가 맞춰졌을 때 방 정보를 가져옴
-  useFocusEffect(
-    useCallback(() => {
-      async function fetchData() {
-        setLoading(true);
-        await fetchRoomDetails();
-        setLoading(false);
-      }
-      fetchData();
-    }, []),
-  );
+  const { roomData: room } = useParty();
 
   // 로딩 중일 때
-  if (loading) {
-    return <Loading />;
-  }
+  // if (loading) {
+  //   return <Loading />;
+  // }
 
   // 방 정보가 없을 때
   if (!room) {
@@ -43,8 +29,8 @@ export default function RoomDetailView() {
 
   // 방 정보가 있을 때
   return (
-    <View style={styles.background}>
-      <View style={styles.container}>
+    <View style={roomstyles.background}>
+      <View style={roomstyles.container}>
         {/* 헤더와 방번호 */}
         <PartyHeader id={String(room.created_at.slice(-10, -6))} />
 
@@ -77,7 +63,7 @@ export default function RoomDetailView() {
           <Separator />
         </View>
         {/* 버튼 영역 */}
-        <View style={styles.buttonContainer}>
+        <View style={roomstyles.buttonContainer}>
           <채팅 />
           <동승자 />
           <나가기 />
@@ -88,19 +74,6 @@ export default function RoomDetailView() {
 }
 
 const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-    backgroundColor: "#6049E2",
-  },
-  container: {
-    flex: 1,
-    margin: 20,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 20,
-    // 자식 요소가 부모의 경계선을 넘지 않도록 설정
-    overflow: "hidden",
-    gap: 10,
-  },
   timeBox: {
     marginHorizontal: 20,
   },
@@ -116,11 +89,5 @@ const styles = StyleSheet.create({
   },
   details: {
     padding: 20,
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-around",
-    margin: 20,
   },
 });

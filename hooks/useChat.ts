@@ -1,13 +1,13 @@
-import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import { useAuthUser } from "@/hooks/useAuthUser";
 import type { Database } from "@/lib/supabase_type";
+import { useEffect, useState } from "react";
+import { useUser } from "./useUser";
 
 type Message = Database["public"]["Tables"]["messages"]["Row"];
 type User = Database["public"]["Tables"]["users"]["Row"];
 
 export default function useChat() {
-  const { user, loading } = useAuthUser();
+  const { user } = useUser();
   const [roomId, setRoomId] = useState<User["current_party"] | null>(null);
   const [messages, setMessages] = useState<(Message & { nickname?: string })[]>(
     [],
