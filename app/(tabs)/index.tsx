@@ -36,7 +36,7 @@ export default function HomeView() {
   }, [selectedDeparture, selectedDestination]);
 
   // 날짜 정보
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState<Date>(new Date());
 
   // 경로 정보
   const [distance, setDistance] = useState<number | null>(null);

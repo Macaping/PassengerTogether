@@ -2,14 +2,14 @@ import { Tabs } from "expo-router";
 import React from "react";
 
 import { TabBarIcon } from "@/components/navigation/TabBarIcon";
-import { useAuthUser } from "@/hooks/useAuthUser";
+import { useUser } from "@/hooks/useUser";
 
 export default function TabLayout() {
-  const { user, loading } = useAuthUser();
+  const { user } = useUser();
 
-  if (loading) {
-    return null; // 또는 로딩 인디케이터 표시
-  }
+  // if (loading) {
+  //   return null; // 또는 로딩 인디케이터 표시
+  // }
 
   return (
     <Tabs
@@ -74,6 +74,10 @@ export default function TabLayout() {
           href: user ? null : undefined,
           headerShown: false,
         }}
+      />
+      <Tabs.Screen
+        name="CheckPassenger"
+        options={{ title: "동승자", href: null }}
       />
     </Tabs>
   );

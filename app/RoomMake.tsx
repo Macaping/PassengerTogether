@@ -1,19 +1,19 @@
+import { CreateRoom } from "@/services/create_room";
+import { JoinRoom } from "@/services/join_room";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { router } from "expo-router";
 import React, { useState } from "react";
 import {
-  View,
+  Alert,
+  Dimensions,
+  FlatList,
+  Modal,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  Modal,
-  FlatList,
-  StyleSheet,
-  Dimensions,
-  Alert,
+  View,
 } from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import { CreateRoom } from "@/services/create_room";
-import { JoinRoom } from "@/services/join_room";
-import { router } from "expo-router";
 
 const { width } = Dimensions.get("window");
 
@@ -49,22 +49,29 @@ export default function RoomMakeView() {
 
   //방만들때 호출되는 함수
   const handleCreateRoom = async () => {
-    try {
-      const room = await CreateRoom({
-        departure_time: selectedDate.toISOString(),
-        origin: departure,
-        destination: destination,
-        limit_people: numPassengers,
-        users: [], // 초기 생성자는 빈 배열
-        details: `${meetingPlace}`, // 장소와 세부사항을 합쳐 전송
+    // 방 생성
+    CreateRoom({
+      departure_time: selectedDate.toISOString(),
+      origin: departure as string,
+      destination: destination as string,
+      limit_people: numPassengers,
+      users: [],
+      details: `${meetingPlace}`, // 장소와 세부사항을 합쳐 전송
+    })
+      .then((room) => {
+        // 방 생성한 사람이 방에 참가
+        JoinRoom(room.id);
+      })
+      .then(() => {
+        // 방 생성 성공 시
+        router.dismissAll();
+        Alert.alert("성공", "방장이 되신걸 환영합니다!");
+        router.replace("/(tabs)/RoomDetail"); // 방 상세 페이지로 이동
+      })
+      .catch((error) => {
+        console.error("Failed to create room:", error);
+        Alert.alert("오류", "방 생성에 실패했습니다. 다시 시도해주세요.");
       });
-      await JoinRoom(room.id); // 생성한 방에 참여
-      Alert.alert("성공", "방장이 되신걸 환영합니다!");
-      router.replace("/(tabs)/RoomDetail"); // 방 상세 페이지로 이동
-    } catch (error) {
-      console.error("Failed to create room:", error);
-      Alert.alert("오류", "방 생성에 실패했습니다. 다시 시도해주세요.");
-    }
   };
 
   return (

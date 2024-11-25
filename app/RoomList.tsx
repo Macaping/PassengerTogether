@@ -1,4 +1,5 @@
-import useLoadRooms from "@/hooks/useLoadRooms";
+import { useRoomList } from "@/hooks/useRoomList";
+import { Database } from "@/lib/supabase_type";
 import { JoinRoom } from "@/services/join_room";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
@@ -11,6 +12,7 @@ import {
   Modal,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
@@ -18,29 +20,39 @@ import {
 
 const { height } = Dimensions.get("window");
 
-const Header = ({
+function Header({
   origin,
   destination,
-  today,
+  date: date,
 }: {
   origin: string;
   destination: string;
-  today: Date;
-}) => (
-  <View style={headerStyles.headerContainer}>
-    <Text style={headerStyles.date}>{today}</Text>
-    <View style={headerStyles.routeContainer}>
-      <Text style={headerStyles.locationName}>{origin}</Text>
-      <Ionicons
-        name="arrow-forward"
-        size={24}
-        color="#ffffff"
-        style={headerStyles.arrowIcon}
-      />
-      <Text style={headerStyles.locationName}>{destination}</Text>
+  date: Date;
+}) {
+  // 날짜 포맷을 변경합니다.
+  date = new Date(date);
+  const formattedDate = date.toLocaleTimeString("ko-KR", {
+    month: "long",
+    day: "numeric",
+    weekday: "short",
+  });
+
+  return (
+    <View style={headerStyles.headerContainer}>
+      <Text style={headerStyles.date}>{formattedDate}</Text>
+      <View style={headerStyles.routeContainer}>
+        <Text style={headerStyles.locationName}>{origin}</Text>
+        <Ionicons
+          name="arrow-forward"
+          size={24}
+          color="#ffffff"
+          style={headerStyles.arrowIcon}
+        />
+        <Text style={headerStyles.locationName}>{destination}</Text>
+      </View>
     </View>
-  </View>
-);
+  );
+}
 
 const headerStyles = StyleSheet.create({
   headerContainer: {
@@ -85,17 +97,7 @@ const headerStyles = StyleSheet.create({
   },
 });
 
-type Room = {
-  id: string;
-  created_at: string;
-  origin: string;
-  destination: string;
-  departure_time: Date;
-  limit_people: number;
-  users: string[];
-  status: string;
-  details: string;
-};
+type Room = Database["public"]["Tables"]["rooms"]["Row"];
 
 type RoomDetailModalProps = {
   visible: boolean;
@@ -112,6 +114,7 @@ const RoomDetailModal = ({
 }: RoomDetailModalProps) => {
   const slideAnim = useRef(new Animated.Value(height)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const [userInput, setUserInput] = useState("");
 
   useEffect(() => {
     if (visible) {
@@ -209,6 +212,15 @@ const RoomDetailModal = ({
           <View style={modalStyles.messageContainer}>
             <Text style={modalStyles.detailText}>만남의 장소</Text>
             <Text style={modalStyles.messageText}>{room.details}</Text>
+          </View>
+          <View style={modalStyles.messageContainer}>
+            <Text style={modalStyles.detailText}> 자신의 옷차림</Text>
+            <TextInput
+              style={modalStyles.inputField}
+              placeholder="서로를 알아볼 수 있도록 자세히 입력해주세요."
+              value={userInput}
+              onChangeText={setUserInput}
+            />
           </View>
 
           <TouchableOpacity
@@ -309,6 +321,16 @@ const modalStyles = StyleSheet.create({
     marginTop: "auto",
     marginBottom: 20,
   },
+  inputField: {
+    borderColor: "#CCCCCC",
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginBottom: 16, // 참가하기 버튼과 간격 조정
+    fontSize: 16,
+    color: "#333333",
+  },
   joinButtonText: {
     color: "white",
     fontSize: 16,
@@ -398,67 +420,22 @@ const itemStyles = StyleSheet.create({
 });
 
 export default function RoomListView() {
-  const [selectedRoom, setSelectedRoom] = useState(null);
+  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
 
-  // 출발지와 도착지 선택 파라미터를 받아오기
+  // href에서 넘겨준 파라미터를 가져옵니다.
   const {
-    selectedDeparture = "출발지",
-    selectedDestination = "도착지",
-    date,
-  } = useLocalSearchParams();
-
-  // 배열로 받을 경우 첫 번째 값만 사용
-  const departure = Array.isArray(selectedDeparture)
-    ? selectedDeparture[0]
-    : selectedDeparture;
-  const destination = Array.isArray(selectedDestination)
-    ? selectedDestination[0]
-    : selectedDestination;
-
-  // 사용자가 선택한 시간과 날짜를 minDepartureTime으로 설정
-  const minDepartureTime = date ? new Date(date) : new Date();
-
-  // 출발지, 도착지, 기준 시간을 파라미터로 useLoadRooms 호출
-  const { rooms, loading, error } = useLoadRooms(
-    departure,
-    destination,
-    minDepartureTime,
-  );
-
-  // 날짜 포맷
-  const formattedDate = minDepartureTime.toLocaleDateString("ko-KR", {
-    month: "long",
-    day: "numeric",
-    weekday: "short",
-  });
-
-  //    const parsedDate = date ? new Date(date) : new Date();
-  /*    const formattedDate = parsedDate.toLocaleDateString('ko-KR', {
-        month: 'long',
-        day: 'numeric',
-        weekday: 'short'
-    });
-*/
-
-  const handleRoomPress = (room) => {
-    setSelectedRoom(room);
-    setModalVisible(true);
+    departure = "출발지",
+    destination = "도착지",
+    date = new Date(),
+  } = useLocalSearchParams() as unknown as {
+    departure: string;
+    destination: string;
+    date: Date;
   };
 
-  const handleJoinRoom = (room) => {
-    if (!room) return;
-    JoinRoom(room.id)
-      .then(() => {
-        router.replace("/(tabs)/RoomDetail");
-      })
-      .catch((error) => {
-        console.error(error);
-      })
-      .finally(() => {
-        setModalVisible(false);
-      });
-  };
+  // 출발지, 도착지, 기준 시간을 파라미터로 실시간으로 방 목록을 조회합니다.
+  const { loading, roomList } = useRoomList({ departure, destination, date });
 
   if (loading) {
     return (
@@ -468,22 +445,36 @@ export default function RoomListView() {
     );
   }
 
-  if (error) {
+  // 방이 없을 경우
+  if (!roomList) {
     return (
       <View style={styles.container}>
-        <Text>Error: {error}</Text>
+        <Text>
+          방 목록을 조회할 조건이 없습니다. 방 탐색 버튼을 통해 이동해주세요.
+        </Text>
       </View>
     );
   }
 
+  // 방이 있는 경우
+
+  const handleRoomPress = (room: Room) => {
+    setSelectedRoom(room);
+    setModalVisible(true);
+  };
+
+  const handleJoinRoom = (room: Room) => {
+    if (!room) return;
+    JoinRoom(room.id)
+      .then(() => router.replace("/(tabs)/RoomDetail"))
+      .catch((error) => console.error(error))
+      .finally(() => setModalVisible(false));
+  };
+
   return (
     <View style={styles.container}>
       {/* Header 컴포넌트를 사용하여 화면 상단에 제목과 부제목을 표시합니다. */}
-      <Header
-        origin={selectedDeparture}
-        destination={selectedDestination}
-        today={formattedDate}
-      />
+      <Header origin={departure} destination={destination} date={date} />
       {/* FlatList 컴포넌트를 사용하여 방 목록을 표시합니다. */}
       <View style={listStyles.indexContainer}>
         <Text style={listStyles.indexText}>출발 시각</Text>
@@ -494,14 +485,15 @@ export default function RoomListView() {
           visible={modalVisible}
           room={selectedRoom}
           onClose={() => setModalVisible(false)}
-          onJoin={() => handleJoinRoom(selectedRoom)}
+          // 선택된 방이 있고 참가 버튼을 누르면 참가합니다.
+          onJoin={() => selectedRoom && handleJoinRoom(selectedRoom)}
         />
       </View>
       <View style={styles.container}>
         <View style={listStyles.columnCrossline} />
         <View style={listStyles.Container}>
           <FlatList
-            data={rooms}
+            data={roomList}
             // 컴포넌트 자체의 스타일을 정의합니다.
             style={listStyles.listContainer}
             // 아이템들을 구분할 구분선을 정의합니다.
@@ -512,9 +504,13 @@ export default function RoomListView() {
               // Item 컴포넌트에 전달할 props를 정의합니다.
               <Item
                 created_at={item.created_at}
-                departure_time={item.departure_time}
-                limit_people={item.limit_people}
-                users={item.users}
+                departure_time={
+                  item.departure_time
+                    ? new Date(item.departure_time)
+                    : new Date()
+                }
+                limit_people={item.limit_people ?? 0}
+                users={item.users ?? []}
                 status={item.status}
                 onPress={() => handleRoomPress(item)}
               />

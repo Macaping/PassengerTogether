@@ -1,4 +1,2 @@
 # expo managed workflow
 expo-env.d.ts
-# supabase type might not be available in github actions
-lib/supabase.ts
