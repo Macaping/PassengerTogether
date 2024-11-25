@@ -2,12 +2,10 @@ import RoomDetailModal from "@/components/room_list/modal";
 import { useRoomList } from "@/hooks/useRoomList";
 import { Database } from "@/lib/supabase_type";
 import { JoinRoom } from "@/services/join_room";
-import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
-  Dimensions,
   FlatList,
   StyleSheet,
   Text,
