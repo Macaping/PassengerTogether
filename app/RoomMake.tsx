@@ -102,9 +102,7 @@ export default function RoomMakeView() {
         router.dismissAll();
         router.replace("/(tabs)/RoomDetail");
       })
-      .catch((error) => {
-        console.error("Failed to create room:", error);
-      });
+      .catch((error) => console.error("Failed to create room:", error));
   };
 
   return (
