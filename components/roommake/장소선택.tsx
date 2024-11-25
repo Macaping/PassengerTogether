@@ -22,7 +22,9 @@ export default function 장소선택({
   locations: string[];
 }) {
   const [modalVisible, setModalVisible] = useState(false);
-  const [changingType, setChangingType] = useState<"departure" | "destination">("departure");
+  const [changingType, setChangingType] = useState<"departure" | "destination">(
+    "departure",
+  );
 
   return (
     <View>

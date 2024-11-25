@@ -1,3 +1,4 @@
+import 장소선택 from "@/components/roommake/장소선택";
 import { CreateRoom } from "@/services/create_room";
 import { JoinRoom } from "@/services/join_room";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -6,8 +7,6 @@ import React, { useState } from "react";
 import {
   Alert,
   Dimensions,
-  FlatList,
-  Modal,
   StyleSheet,
   Text,
   TextInput,
@@ -21,11 +20,8 @@ export default function RoomMakeView() {
   const [departure, setDeparture] = useState("천안역");
   const [destination, setDestination] = useState("천안아산역");
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [numPassengers, setNumPassengers] = useState(0);
   const [details, setDetails] = useState("");
   const [meetingPlace, setMeetingPlace] = useState("");
-  const [modalVisible, setModalVisible] = useState(false);
-  const [changingType, setChangingType] = useState("departure");
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
 
@@ -76,8 +72,13 @@ export default function RoomMakeView() {
 
   return (
     <View style={styles.container}>
-      
-
+      <장소선택
+        departure={departure}
+        setDeparture={setDeparture}
+        destination={destination}
+        setDestination={setDestination}
+        locations={locations}
+      />
 
       {/* 출발 시간 UI */}
       <Text style={styles.sectionTitle}>출발 시간</Text>
@@ -134,39 +135,10 @@ export default function RoomMakeView() {
         onChangeText={setDetails}
       />
 
-
-
       {/* 방 만들기 버튼 */}
       <TouchableOpacity style={styles.createButton} onPress={handleCreateRoom}>
         <Text style={styles.createButtonText}>방만들기</Text>
       </TouchableOpacity>
-
-      {/* 모달창*/}
-      <Modal visible={modalVisible} transparent>
-        <View style={styles.modal}>
-          <FlatList
-            data={locations.filter(
-              (loc) =>
-                (changingType === "departure" && loc !== destination) ||
-                (changingType === "destination" && loc !== departure),
-            )}
-            keyExtractor={(item) => item}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                onPress={() => {
-                  changingType === "departure"
-                    ? setDeparture(item)
-                    : setDestination(item);
-                  setModalVisible(false);
-                }}
-                style={styles.modalItem}
-              >
-                <Text>{item}</Text>
-              </TouchableOpacity>
-            )}
-          />
-        </View>
-      </Modal>
     </View>
   );
 }
