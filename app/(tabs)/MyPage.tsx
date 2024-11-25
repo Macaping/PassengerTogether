@@ -87,12 +87,11 @@ const styles = StyleSheet.create({
   iconContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
-    width: "80%",
-    bottom: "-15%",
+    margin: "10%",
+    gap: 30,
   },
   profileIcon: {
     alignItems: "center",
-    bottom: 50,
   },
   logoutButton: {
     flex: 1,
@@ -101,7 +100,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 8,
-    marginVertical: -5,
   },
 
   logoutButtonText: {
