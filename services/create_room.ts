@@ -6,12 +6,14 @@ export async function CreateRoom({
   destination,
   users = [],
   details,
+  room_name,
 }: {
   departure_time: string;
   origin: string;
   destination: string;
   users: string[];
   details: string;
+  room_name: string;
 }) {
   var room = {
     departure_time: departure_time,
@@ -19,6 +21,7 @@ export async function CreateRoom({
     destination: destination,
     users: users,
     details: details,
+    room_name: room_name,
   };
 
   try {

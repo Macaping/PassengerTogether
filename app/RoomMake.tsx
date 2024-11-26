@@ -6,13 +6,14 @@ import { CreateRoom } from "@/services/create_room";
 import { JoinRoom } from "@/services/join_room";
 import { router } from "expo-router";
 import React, { useState } from "react";
-import { Alert, StyleSheet, View } from "react-native";
+import { Alert, StyleSheet, TextInput, View,Text } from "react-native";
 
 export default function RoomMakeView() {
   const [departure, setDeparture] = useState("천안역");
   const [destination, setDestination] = useState("천안아산역");
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [details, setDetails] = useState("");
+  const [roomName, setRoomName] = useState("");
   const [meetingPlace, setMeetingPlace] = useState("");
 
   const locations = ["천안역", "천안아산역", "선문대", "탕정역", "두정동 롯데"];
@@ -28,6 +29,7 @@ export default function RoomMakeView() {
         destination: destination as string,
         users: [],
         details: `${meetingPlace}`, // 장소와 세부사항을 합쳐 전송
+        room_name: roomName,
       });
 
       // 방 생성한 사람이 방에 참가
@@ -52,12 +54,18 @@ export default function RoomMakeView() {
         setDestination={setDestination}
         locations={locations}
       />
-
       <시간선택
         selectedDate={selectedDate}
         onDateChange={(date) => setSelectedDate(date)}
       />
-
+      <Text style={styles.sectionTitle}>방제목</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="방제목"
+        multiline
+        value={roomName}
+        onChangeText={setRoomName}
+      />
       <장소옷차림입력
         meetingPlace={meetingPlace}
         details={details}
@@ -81,4 +89,17 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: "#fff",
   },
+  sectionTitle: {
+    fontSize: 16,
+    color: "#888",
+    marginVertical: 10,
+  },
+  input: {
+    width: "100%",
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    padding: 10,
+    marginVertical: 10,
+  }
 });
