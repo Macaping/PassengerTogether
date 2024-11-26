@@ -1,21 +1,12 @@
+import 방만들기 from "@/components/roommake/방만들기";
 import 시간선택 from "@/components/roommake/시간선택";
 import 장소선택 from "@/components/roommake/장소선택";
+import 장소옷차림입력 from "@/components/roommake/장소옷차림입력";
 import { CreateRoom } from "@/services/create_room";
 import { JoinRoom } from "@/services/join_room";
 import { router } from "expo-router";
 import React, { useState } from "react";
-import 장소옷차림입력 from "@/components/roommake/장소옷차림입력";
-import {
-  Alert,
-  Dimensions,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
-
-const { width } = Dimensions.get("window");
+import { Alert, StyleSheet, View } from "react-native";
 
 export default function RoomMakeView() {
   const [departure, setDeparture] = useState("천안역");
@@ -25,6 +16,7 @@ export default function RoomMakeView() {
   const [meetingPlace, setMeetingPlace] = useState("");
 
   const locations = ["천안역", "천안아산역", "선문대", "탕정역", "두정동 롯데"];
+  const isButtonDisabled = !meetingPlace || !details;
 
   //방만들때 호출되는 함수
   const handleCreateRoom = async () => {
@@ -74,9 +66,11 @@ export default function RoomMakeView() {
       />
 
       {/* 방 만들기 버튼 */}
-      <TouchableOpacity style={styles.createButton} onPress={handleCreateRoom}>
-        <Text style={styles.createButtonText}>방만들기</Text>
-      </TouchableOpacity>
+      <방만들기
+        onPress={handleCreateRoom}
+        disabled={isButtonDisabled}
+        text="방만들기"
+      />
     </View>
   );
 }
@@ -86,84 +80,5 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: "#fff",
-  },
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginVertical: 10,
-  },
-  label: {
-    flex: 1,
-    textAlign: "center",
-    fontSize: 16,
-    color: "#888",
-  },
-  box: {
-    flex: 1,
-    padding: 10,
-    borderWidth: 1,
-    borderRadius: 5,
-    alignItems: "center",
-    justifyContent: "center",
-    marginHorizontal: 5,
-  },
-  text: {
-    fontSize: 18,
-    color: "#6B59CC",
-  },
-  arrow: {
-    fontSize: 20,
-    color: "#6B59CC",
-    marginHorizontal: 5,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    color: "#888",
-    marginVertical: 10,
-  },
-  input: {
-    width: "100%",
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    padding: 10,
-    marginVertical: 10,
-  },
-  counterButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#A99CE3",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  counterText: {
-    color: "#fff",
-    fontSize: 20,
-  },
-  createButton: {
-    backgroundColor: "#6B59CC",
-    padding: 15,
-    alignItems: "center",
-    borderRadius: 5,
-    marginTop: 20,
-  },
-  createButtonText: {
-    color: "#fff",
-    fontSize: 18,
-  },
-  modal: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "center",
-    padding: 20,
-  },
-  modalItem: {
-    backgroundColor: "#fff",
-    padding: 15,
-    marginVertical: 5,
-    borderRadius: 5,
-    alignItems: "center",
   },
 });
