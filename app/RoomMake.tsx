@@ -47,6 +47,17 @@ export default function RoomMakeView() {
 
   return (
     <View style={styles.container}>
+      <장소선택
+        departure={departure}
+        setDeparture={setDeparture}
+        destination={destination}
+        setDestination={setDestination}
+        locations={locations}
+      />
+      <시간선택
+        selectedDate={selectedDate}
+        onDateChange={(date) => setSelectedDate(date)}
+      />
       <Text style={styles.sectionTitle}>방제목</Text>
       <TextInput
         style={styles.input}
@@ -55,19 +66,6 @@ export default function RoomMakeView() {
         value={roomName}
         onChangeText={setRoomName}
       />
-      <장소선택
-        departure={departure}
-        setDeparture={setDeparture}
-        destination={destination}
-        setDestination={setDestination}
-        locations={locations}
-      />
-
-      <시간선택
-        selectedDate={selectedDate}
-        onDateChange={(date) => setSelectedDate(date)}
-      />
-
       <장소옷차림입력
         meetingPlace={meetingPlace}
         details={details}
