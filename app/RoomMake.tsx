@@ -21,6 +21,7 @@ export default function RoomMakeView() {
   const [destination, setDestination] = useState("천안아산역");
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [details, setDetails] = useState("");
+  const [roomName, setRoomName] = useState("");
   const [meetingPlace, setMeetingPlace] = useState("");
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
@@ -53,6 +54,7 @@ export default function RoomMakeView() {
         destination: destination as string,
         users: [],
         details: `${meetingPlace}`, // 장소와 세부사항을 합쳐 전송
+        room_name: roomName,
       });
 
       // 방 생성한 사람이 방에 참가
@@ -77,7 +79,6 @@ export default function RoomMakeView() {
         setDestination={setDestination}
         locations={locations}
       />
-
       {/* 출발 시간 UI */}
       <Text style={styles.sectionTitle}>출발 시간</Text>
       <View style={styles.row}>
@@ -113,7 +114,14 @@ export default function RoomMakeView() {
           onChange={handleTimeChange}
         />
       )}
-
+      <Text style={styles.sectionTitle}>방제목</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="방제목"
+        multiline
+        value={roomName}
+        onChangeText={setRoomName}
+      />
       {/* 만남의 장소 */}
       <Text style={styles.sectionTitle}>만남의 장소</Text>
       <TextInput
