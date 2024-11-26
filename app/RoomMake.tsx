@@ -4,6 +4,7 @@ import { CreateRoom } from "@/services/create_room";
 import { JoinRoom } from "@/services/join_room";
 import { router } from "expo-router";
 import React, { useState } from "react";
+import 장소옷차림입력 from "@/components/roommake/장소옷차림입력";
 import {
   Alert,
   Dimensions,
@@ -65,23 +66,11 @@ export default function RoomMakeView() {
         onDateChange={(date) => setSelectedDate(date)}
       />
 
-      {/* 만남의 장소 */}
-      <Text style={styles.sectionTitle}>만남의 장소</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="어디서 모일건가요?"
-        value={meetingPlace}
-        onChangeText={setMeetingPlace}
-      />
-
-      {/* 세부사항 */}
-      <Text style={styles.sectionTitle}>나의 옷차림</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="오늘의 OOTD 입력!"
-        multiline
-        value={details}
-        onChangeText={setDetails}
+      <장소옷차림입력
+        meetingPlace={meetingPlace}
+        details={details}
+        onMeetingPlaceChange={setMeetingPlace}
+        onDetailsChange={setDetails}
       />
 
       {/* 방 만들기 버튼 */}

@@ -43,7 +43,9 @@ export default function 장소선택({
         >
           <Text style={styles.text}>{departure}</Text>
         </TouchableOpacity>
+
         <Text style={styles.arrow}>→</Text>
+
         <TouchableOpacity
           style={styles.box}
           onPress={() => {
