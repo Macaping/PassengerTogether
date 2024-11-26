@@ -32,7 +32,7 @@ export default function RoomDetailView() {
     <View style={roomstyles.background}>
       <View style={roomstyles.container}>
         {/* 헤더와 방번호 */}
-        <PartyHeader id={String(room.created_at.slice(-10, -6))} />
+        <PartyHeader id={String(room.room_name)} />
 
         {/* 시간 정보 */}
         <View style={styles.timeBox}>
