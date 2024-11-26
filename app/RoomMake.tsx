@@ -1,7 +1,7 @@
+import 시간선택 from "@/components/roommake/시간선택";
 import 장소선택 from "@/components/roommake/장소선택";
 import { CreateRoom } from "@/services/create_room";
 import { JoinRoom } from "@/services/join_room";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -22,26 +22,8 @@ export default function RoomMakeView() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [details, setDetails] = useState("");
   const [meetingPlace, setMeetingPlace] = useState("");
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [showTimePicker, setShowTimePicker] = useState(false);
 
   const locations = ["천안역", "천안아산역", "선문대", "탕정역", "두정동 롯데"];
-
-  //날짜 변경 호출함수
-  const handleDateChange = (event: any, date: Date | undefined) => {
-    if (date) setSelectedDate(new Date(date));
-    setShowDatePicker(false);
-  };
-
-  //시간 변경 호출함수
-  const handleTimeChange = (event: any, time: Date | undefined) => {
-    if (time) {
-      const updatedDate = new Date(selectedDate);
-      updatedDate.setHours(time.getHours(), time.getMinutes());
-      setSelectedDate(updatedDate);
-    }
-    setShowTimePicker(false);
-  };
 
   //방만들때 호출되는 함수
   const handleCreateRoom = async () => {
@@ -78,41 +60,10 @@ export default function RoomMakeView() {
         locations={locations}
       />
 
-      {/* 출발 시간 UI */}
-      <Text style={styles.sectionTitle}>출발 시간</Text>
-      <View style={styles.row}>
-        <TouchableOpacity
-          style={styles.box}
-          onPress={() => setShowDatePicker(true)} //날짜 선택 창 여는것
-        >
-          <Text style={styles.text}>{selectedDate.toLocaleDateString()}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.box}
-          onPress={() => setShowTimePicker(true)} //시간 선택 창 여는것
-        >
-          <Text style={styles.text}>
-            {selectedDate.toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
-          </Text>
-        </TouchableOpacity>
-      </View>
-      {showDatePicker && (
-        <DateTimePicker
-          value={selectedDate}
-          mode="date"
-          onChange={handleDateChange}
-        />
-      )}
-      {showTimePicker && (
-        <DateTimePicker
-          value={selectedDate}
-          mode="time"
-          onChange={handleTimeChange}
-        />
-      )}
+      <시간선택
+        selectedDate={selectedDate}
+        onDateChange={(date) => setSelectedDate(date)}
+      />
 
       {/* 만남의 장소 */}
       <Text style={styles.sectionTitle}>만남의 장소</Text>
