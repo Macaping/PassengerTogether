@@ -14,18 +14,21 @@ import 채팅 from "@/components/my_party/채팅";
 import { useParty } from "@/hooks/useParty";
 import { StyleSheet, View } from "react-native";
 import { useHostClothes } from "@/hooks/useHostClothes";
+
 export default function RoomDetailView() {
-  const { roomData: room } = useParty();
-  const { hostClothes, loading, error } = useHostClothes(room?.users || []);
-  // 로딩 중일 때
-  // if (loading) {
-  //   return <Loading />;
-  // }
+  const { roomData: room, loading: roomLoading } = useParty();
+  const { hostClothes, loading: clothesLoading, error } = useHostClothes(room?.users || []);
+
+  // 로딩 상태를 통합적으로 처리
+  if (roomLoading || clothesLoading) {
+    return <PartyEmpty />;
+  }
 
   // 방 정보가 없을 때
   if (!room) {
     return <PartyEmpty />;
   }
+
   // 방 정보가 있을 때
   return (
     <View style={roomstyles.background}>
