@@ -1,6 +1,7 @@
 import Departure from "@/components/my_party/departure";
 import Destination from "@/components/my_party/destination";
 import Details from "@/components/my_party/details";
+import Clothes from "@/components/my_party/clothes";
 import NumPeople from "@/components/my_party/num_people";
 import PartyEmpty from "@/components/my_party/party_empty";
 import { PartyHeader } from "@/components/my_party/party_header";
@@ -11,12 +12,11 @@ import 나가기 from "@/components/my_party/나가기";
 import 동승자 from "@/components/my_party/동승자";
 import 채팅 from "@/components/my_party/채팅";
 import { useParty } from "@/hooks/useParty";
-import React from "react";
 import { StyleSheet, View } from "react-native";
-
+import { useHostClothes } from "@/hooks/useHostClothes";
 export default function RoomDetailView() {
   const { roomData: room } = useParty();
-
+  const { hostClothes, loading, error } = useHostClothes(room?.users || []);
   // 로딩 중일 때
   // if (loading) {
   //   return <Loading />;
@@ -26,7 +26,6 @@ export default function RoomDetailView() {
   if (!room) {
     return <PartyEmpty />;
   }
-
   // 방 정보가 있을 때
   return (
     <View style={roomstyles.background}>
@@ -57,6 +56,10 @@ export default function RoomDetailView() {
         {/* 만남의 장소 */}
         <View style={styles.details}>
           <Details text={room.details} />
+        </View>
+        {/* 방장의 옷차림 */}
+        <View style={styles.details}>
+          <Clothes text={hostClothes || "정보 없음"} />
         </View>
         {/* 구분선 */}
         <View style={{ flex: 1, justifyContent: "flex-end" }}>
