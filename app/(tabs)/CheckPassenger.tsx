@@ -9,7 +9,7 @@ import { useUserData } from "@/hooks/useUserData";
 
 export default function CheckPassenger() {
   const { userData } = useUserData();
-  const { passengers, loading, error } = usePassengers(userData?.current_party);
+  const { passengers, loading } = usePassengers(userData?.current_party);
 
   if (loading) {
     return (

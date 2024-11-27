@@ -17,7 +17,7 @@ import { useHostClothes } from "@/hooks/useHostClothes";
 
 export default function RoomDetailView() {
   const { roomData: room, loading: roomLoading } = useParty();
-  const { hostClothes, loading: clothesLoading, error } = useHostClothes(room?.users || []);
+  const { hostClothes, loading: clothesLoading } = useHostClothes(room?.users || []);
 
   // 로딩 상태를 통합적으로 처리
   if (roomLoading || clothesLoading) {
