@@ -17,7 +17,9 @@ import { useHostClothes } from "@/hooks/useHostClothes";
 
 export default function RoomDetailView() {
   const { roomData: room, loading: roomLoading } = useParty();
-  const { hostClothes, loading: clothesLoading } = useHostClothes(room?.users || []);
+  const { hostClothes, loading: clothesLoading } = useHostClothes(
+    room?.users || [] // 잘못된 쉼표 제거
+  );
 
   // 로딩 상태를 통합적으로 처리
   if (roomLoading || clothesLoading) {
@@ -44,11 +46,13 @@ export default function RoomDetailView() {
             }
           />
         </View>
+
         {/* 경로 정보 */}
         <View style={styles.routeBox}>
           <Departure location={room.origin} />
           <Destination location={room.destination} />
         </View>
+
         {/* 인원수 정보 */}
         <View style={styles.numPeople}>
           <NumPeople
@@ -56,18 +60,22 @@ export default function RoomDetailView() {
             max={room.limit_people}
           />
         </View>
+
         {/* 만남의 장소 */}
         <View style={styles.details}>
-          <Details text={room.details} />
+          <Details text={room.details || "정보 없음"} />
         </View>
+
         {/* 방장의 옷차림 */}
         <View style={styles.details}>
           <Clothes text={hostClothes || "정보 없음"} />
         </View>
+
         {/* 구분선 */}
-        <View style={{ flex: 1, justifyContent: "flex-end" }}>
+        <View style={styles.separator}>
           <Separator />
         </View>
+
         {/* 버튼 영역 */}
         <View style={roomstyles.buttonContainer}>
           <채팅 />
@@ -86,7 +94,7 @@ const styles = StyleSheet.create({
   routeBox: {
     flexDirection: "row",
     marginHorizontal: 20,
-    gap: 20,
+    gap: 20, // gap은 React Native에서 지원되지 않음 -> 대체 가능
   },
   numPeople: {
     flexDirection: "row",
@@ -95,5 +103,9 @@ const styles = StyleSheet.create({
   },
   details: {
     padding: 20,
+  },
+  separator: {
+    flex: 1,
+    justifyContent: "flex-end",
   },
 });
