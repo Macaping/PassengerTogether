@@ -63,7 +63,6 @@ export default function RoomMakeView() {
       <TextInput
         style={styles.input}
         placeholder="방제목"
-        multiline
         value={roomName}
         onChangeText={setRoomName}
       />
