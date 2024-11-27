@@ -6,7 +6,7 @@ import { CreateRoom } from "@/services/create_room";
 import { JoinRoom } from "@/services/join_room";
 import { router } from "expo-router";
 import React, { useState } from "react";
-import { Alert, StyleSheet, TextInput, View,Text } from "react-native";
+import { Alert, StyleSheet, TextInput, View, Text } from "react-native";
 
 export default function RoomMakeView() {
   const [departure, setDeparture] = useState("천안역");
@@ -28,7 +28,8 @@ export default function RoomMakeView() {
         origin: departure as string,
         destination: destination as string,
         users: [],
-        details: `${meetingPlace}`, // 장소와 세부사항을 합쳐 전송
+        meetingPlace,
+        details,
         room_name: roomName,
       });
 
@@ -101,5 +102,5 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 10,
     marginVertical: 10,
-  }
+  },
 });

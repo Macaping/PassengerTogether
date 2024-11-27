@@ -11,6 +11,8 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
+import useClothes from "@/hooks/useClothes";
+import { useUser } from "@/hooks/useUser";
 
 type Room = Database["public"]["Tables"]["rooms"]["Row"];
 
@@ -32,6 +34,8 @@ export default function RoomDetailModal({
   const slideAnim = useRef(new Animated.Value(height)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [userInput, setUserInput] = useState("");
+  const { updateClothes, loading, error } = useClothes();
+  const { user } = useUser();
 
   useEffect(() => {
     if (visible) {
@@ -62,6 +66,21 @@ export default function RoomDetailModal({
       ]).start();
     }
   }, [visible]);
+
+  const handleJoin = async () => {
+    if (!room || !userInput.trim()) return;
+
+    try {
+      const result = await updateClothes(user?.id, userInput.trim());
+      if (result) {
+        onJoin(); // 참가 성공 시 처리
+      } else {
+        console.error("Failed to update clothes");
+      }
+    } catch (err) {
+      console.error("Error during join:", err);
+    }
+  };
 
   if (!room) return null;
 
@@ -141,12 +160,19 @@ export default function RoomDetailModal({
           </View>
 
           <TouchableOpacity
-            style={modalStyles.joinButton}
-            onPress={onJoin}
-            activeOpacity={0.8}
+            style={[
+              modalStyles.joinButton,
+              { backgroundColor: userInput.trim() ? "#6049E2" : "#CCCCCC" },
+            ]}
+            onPress={handleJoin}
+            activeOpacity={userInput.trim() ? 0.8 : 1}
+            disabled={!userInput.trim() || loading}
           >
-            <Text style={modalStyles.joinButtonText}>참가 하기</Text>
+            <Text style={modalStyles.joinButtonText}>
+              {loading ? "처리 중..." : "참가 하기"}
+            </Text>
           </TouchableOpacity>
+          {error && <Text style={{ color: "red" }}>{error}</Text>}
         </Animated.View>
       </View>
     </Modal>
