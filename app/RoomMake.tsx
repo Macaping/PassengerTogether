@@ -65,6 +65,7 @@ export default function RoomMakeView() {
         placeholder="방제목"
         value={roomName}
         onChangeText={setRoomName}
+        maxLength={10}
       />
       <장소옷차림입력
         meetingPlace={meetingPlace}
