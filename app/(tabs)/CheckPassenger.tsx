@@ -19,14 +19,6 @@ export default function CheckPassenger() {
     );
   }
 
-  if (error) {
-    return (
-      <View>
-        <Text>Error: {error}</Text>
-      </View>
-    );
-  }
-
   const renderPassengerItem = ({ item }: { item: (typeof passengers)[0] }) => (
     <View style={styles.passengerItem}>
       <Text style={styles.nickname}>{item.nickname}</Text>

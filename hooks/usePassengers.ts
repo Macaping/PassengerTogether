@@ -59,7 +59,33 @@ export function usePassengers(currentPartyId: string | null) {
       }
     };
 
+    // Initial data fetch
     fetchPassengers();
+
+    // Step 3: Set up a real-time subscription to the rooms table
+    const subscription = supabase
+      .channel("room-users-updates")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "rooms",
+          filter: `id=eq.${currentPartyId}`,
+        },
+        (payload) => {
+          if (payload.new?.users) {
+            // Refetch the updated passengers when the users column changes
+            fetchPassengers();
+          }
+        },
+      )
+      .subscribe();
+
+    // Cleanup the subscription on unmount
+    return () => {
+      supabase.removeChannel(subscription);
+    };
   }, [currentPartyId]);
 
   return { passengers, loading, error };
