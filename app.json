@@ -12,6 +12,16 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "62dda903-b65f-4f00-8256-43eae13b4e70"
+      }
+    },
+    "owner": "kangguyong"
+    },
     "ios": {
       "supportsTablet": true
     },
@@ -38,4 +48,3 @@
       "typedRoutes": true
     }
   }
-}

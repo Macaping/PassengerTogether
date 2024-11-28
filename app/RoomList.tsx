@@ -3,7 +3,7 @@ import List from "@/components/room_list/list";
 import RoomDetailModal from "@/components/room_list/modal";
 import { useRoomList } from "@/hooks/useRoomList";
 import { Database } from "@/lib/supabase_type";
-import { JoinRoom } from "@/services/join_room";
+import JoinRoom from "@/services/join_room";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
