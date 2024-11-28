@@ -3,7 +3,7 @@ import 시간선택 from "@/components/roommake/시간선택";
 import 장소선택 from "@/components/roommake/장소선택";
 import 장소옷차림입력 from "@/components/roommake/장소옷차림입력";
 import { CreateRoom } from "@/services/create_room";
-import { JoinRoom } from "@/services/join_room";
+import JoinRoom from "@/services/join_room";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { Alert, StyleSheet, TextInput, View, Text } from "react-native";
