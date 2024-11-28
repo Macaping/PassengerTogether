@@ -30,7 +30,6 @@ export default function 장소옷차림입력({
       <TextInput
         style={styles.input}
         placeholder="오늘의 OOTD 입력!"
-        multiline
         value={details}
         onChangeText={onDetailsChange}
       />

@@ -1,3 +1,4 @@
+import { useUserData } from "@/hooks/useUserData";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 
 interface CreateRoomButtonProps {
@@ -11,17 +12,23 @@ export default function CreateRoomButton({
   disabled = false,
   text,
 }: CreateRoomButtonProps) {
+  const { userData } = useUserData();
+
   return (
     <TouchableOpacity
-      style={[styles.button, disabled && styles.disabledButton]}
+      style={[
+        styles.button,
+        (disabled || userData?.current_party) && styles.disabledButton,
+      ]}
       onPress={onPress}
-      disabled={disabled}
+      disabled={disabled || !!userData?.current_party}
     >
-      <Text style={styles.buttonText}>{text}</Text>
+      <Text style={styles.buttonText}>
+        {userData?.current_party ? "이미 참여 중인 방이 있습니다" : text}
+      </Text>
     </TouchableOpacity>
   );
 }
-
 const styles = StyleSheet.create({
   button: {
     backgroundColor: "#6B59CC",
