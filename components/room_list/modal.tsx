@@ -1,7 +1,8 @@
+import { useUserData } from "@/hooks/useUserData";
 import { Database } from "@/lib/supabase_type";
 import React, { useEffect, useRef, useState } from "react";
 import {
-  Animated,
+  Animated, // Alert 추가
   Dimensions,
   Modal,
   StyleSheet,
@@ -11,8 +12,6 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import useClothes from "@/hooks/useClothes";
-import { useUser } from "@/hooks/useUser";
 
 type Room = Database["public"]["Tables"]["rooms"]["Row"];
 
@@ -34,8 +33,7 @@ export default function RoomDetailModal({
   const slideAnim = useRef(new Animated.Value(height)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [userInput, setUserInput] = useState("");
-  const { updateClothes, loading, error } = useClothes();
-  const { user } = useUser();
+  const { userData, updateClothes } = useUserData();
 
   useEffect(() => {
     if (visible) {
@@ -65,24 +63,26 @@ export default function RoomDetailModal({
         }),
       ]).start();
     }
-  }, [visible]);
+  }, [fadeAnim, slideAnim, visible]);
 
   const handleJoin = async () => {
+    // 들어가는 방의 정보가 없거나 입력값이 없으면 함수를 종료합니다.
     if (!room || !userInput.trim()) return;
 
     try {
-      const result = await updateClothes(user?.id, userInput.trim());
-      if (result) {
-        onJoin(); // 참가 성공 시 처리
-      } else {
-        console.error("Failed to update clothes");
+      if (!userData?.user_id) {
+        throw new Error("User ID not found");
       }
+      // 업데이트가 성공하면 onJoin을 호출하여 방에 참가합니다.
+      updateClothes(userInput.trim()).then(() => onJoin());
     } catch (err) {
       console.error("Error during join:", err);
     }
   };
 
   if (!room) return null;
+
+  const 버튼활성화 = Boolean(!userData?.current_party && userInput.trim());
 
   return (
     <Modal
@@ -97,7 +97,6 @@ export default function RoomDetailModal({
             modalStyles.backdrop,
             {
               opacity: fadeAnim,
-              transform: [{ translateY: height * 0.2 }], // Header height
             },
           ]}
         >
@@ -115,11 +114,8 @@ export default function RoomDetailModal({
           ]}
         >
           <View style={modalStyles.handleBar} />
-          <Text style={modalStyles.modalName}>
-            🏠 {room.created_at.slice(-10, -6)}
-          </Text>
+          <Text style={modalStyles.modalName}>🏠 {room.room_name}</Text>
 
-          {/* 출발 시각과 인원을 한 줄로 배치 */}
           <View style={modalStyles.headerSection}>
             <Text style={modalStyles.modalTime}>
               <Text style={modalStyles.labelText}>출발 시각: </Text>
@@ -156,23 +152,29 @@ export default function RoomDetailModal({
               placeholder="서로를 알아볼 수 있도록 자세히 입력해주세요."
               value={userInput}
               onChangeText={setUserInput}
+              editable={true}
             />
           </View>
 
           <TouchableOpacity
             style={[
               modalStyles.joinButton,
-              { backgroundColor: userInput.trim() ? "#6049E2" : "#CCCCCC" },
+              {
+                backgroundColor: 버튼활성화 ? "#6049E2" : "#CCCCCC",
+              },
             ]}
             onPress={handleJoin}
-            activeOpacity={userInput.trim() ? 0.8 : 1}
-            disabled={!userInput.trim() || loading}
+            // 활성화 여부에 따라 투명도 조절
+            activeOpacity={버튼활성화 ? 1 : 0.8}
+            // userInput의 텍스트가 있고, 이미 참여 중인 방이 없을 때만 버튼 활성화
+            disabled={!버튼활성화}
           >
             <Text style={modalStyles.joinButtonText}>
-              {loading ? "처리 중..." : "참가 하기"}
+              {userData?.current_party
+                ? "이미 참여 중인 방이 있습니다"
+                : "참가 하기"}
             </Text>
           </TouchableOpacity>
-          {error && <Text style={{ color: "red" }}>{error}</Text>}
         </Animated.View>
       </View>
     </Modal>
@@ -200,7 +202,7 @@ const modalStyles = StyleSheet.create({
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingHorizontal: 25,
-    height: height * 0.45,
+    height: height * 0.55,
     width: "100%",
   },
   handleBar: {
@@ -255,6 +257,7 @@ const modalStyles = StyleSheet.create({
     fontSize: 18,
     color: "#666666",
     lineHeight: 20,
+    height: 60,
   },
   joinButton: {
     backgroundColor: "#6049E2",
