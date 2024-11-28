@@ -13,6 +13,7 @@ export default function Item({
   created_at,
   departure_time,
   limit_people,
+  room_name,
   users,
   status,
   onPress,
@@ -22,6 +23,7 @@ export default function Item({
   limit_people: number;
   users: string[];
   status: string;
+  room_name: string;
   onPress: () => void;
 }) {
   return (
@@ -37,7 +39,9 @@ export default function Item({
         {new Date(departure_time).getMinutes().toString().padStart(2, "0")}
       </Text>
       {/* 방 번호 */}
-      <Text style={itemStyles.방_번호}>{created_at.slice(-10, -6)}</Text>
+      <Text style={itemStyles.방_번호}>
+        {room_name || created_at.slice(-10, -6)}
+      </Text>
       {/* 현재인원/최대인원 */}
       <Text style={itemStyles.현재인원_최대인원}>
         {users ? users.length : "0"}/{limit_people}

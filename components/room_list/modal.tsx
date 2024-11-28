@@ -2,6 +2,7 @@ import { Database } from "@/lib/supabase_type";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
+  Alert, // Alert 추가
   Dimensions,
   Modal,
   StyleSheet,
@@ -13,6 +14,7 @@ import {
 } from "react-native";
 import useClothes from "@/hooks/useClothes";
 import { useUser } from "@/hooks/useUser";
+import { supabase } from "@/lib/supabase"; // supabase 추가
 
 type Room = Database["public"]["Tables"]["rooms"]["Row"];
 
@@ -36,6 +38,26 @@ export default function RoomDetailModal({
   const [userInput, setUserInput] = useState("");
   const { updateClothes, loading, error } = useClothes();
   const { user } = useUser();
+  const [currentParty, setCurrentParty] = useState<string | null>(null); // 추가
+
+  // current_party를 확인하는 useEffect 추가
+  useEffect(() => {
+    const fetchUserParty = async () => {
+      if (user?.id) {
+        const { data, error } = await supabase
+          .from("users")
+          .select("current_party")
+          .eq("user_id", user.id)
+          .single();
+
+        if (data) {
+          setCurrentParty(data.current_party);
+        }
+      }
+    };
+
+    fetchUserParty();
+  }, [user]);
 
   useEffect(() => {
     if (visible) {
@@ -73,7 +95,7 @@ export default function RoomDetailModal({
     try {
       const result = await updateClothes(user?.id, userInput.trim());
       if (result) {
-        onJoin(); // 참가 성공 시 처리
+        onJoin();
       } else {
         console.error("Failed to update clothes");
       }
@@ -97,7 +119,6 @@ export default function RoomDetailModal({
             modalStyles.backdrop,
             {
               opacity: fadeAnim,
-              transform: [{ translateY: height * 0.2 }], // Header height
             },
           ]}
         >
@@ -115,11 +136,8 @@ export default function RoomDetailModal({
           ]}
         >
           <View style={modalStyles.handleBar} />
-          <Text style={modalStyles.modalName}>
-            🏠 {room.created_at.slice(-10, -6)}
-          </Text>
+          <Text style={modalStyles.modalName}>🏠 {room.room_name}</Text>
 
-          {/* 출발 시각과 인원을 한 줄로 배치 */}
           <View style={modalStyles.headerSection}>
             <Text style={modalStyles.modalTime}>
               <Text style={modalStyles.labelText}>출발 시각: </Text>
@@ -156,6 +174,7 @@ export default function RoomDetailModal({
               placeholder="서로를 알아볼 수 있도록 자세히 입력해주세요."
               value={userInput}
               onChangeText={setUserInput}
+              editable={!currentParty} // 추가
             />
           </View>
 
@@ -169,7 +188,11 @@ export default function RoomDetailModal({
             disabled={!userInput.trim() || loading}
           >
             <Text style={modalStyles.joinButtonText}>
-              {loading ? "처리 중..." : "참가 하기"}
+              {currentParty
+                ? "이미 참여 중인 방이 있습니다"
+                : loading
+                  ? "처리 중..."
+                  : "참가 하기"}
             </Text>
           </TouchableOpacity>
           {error && <Text style={{ color: "red" }}>{error}</Text>}
@@ -200,7 +223,7 @@ const modalStyles = StyleSheet.create({
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingHorizontal: 25,
-    height: height * 0.45,
+    height: height * 0.55,
     width: "100%",
   },
   handleBar: {
@@ -255,6 +278,7 @@ const modalStyles = StyleSheet.create({
     fontSize: 18,
     color: "#666666",
     lineHeight: 20,
+    height: 60,
   },
   joinButton: {
     backgroundColor: "#6049E2",
