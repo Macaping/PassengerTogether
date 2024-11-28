@@ -1,8 +1,10 @@
+import useClothes from "@/hooks/useClothes";
+import { useUser } from "@/hooks/useUser";
+import { supabase } from "@/lib/supabase"; // supabase 추가
 import { Database } from "@/lib/supabase_type";
 import React, { useEffect, useRef, useState } from "react";
 import {
-  Animated,
-  Alert, // Alert 추가
+  Animated, // Alert 추가
   Dimensions,
   Modal,
   StyleSheet,
@@ -12,9 +14,6 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import useClothes from "@/hooks/useClothes";
-import { useUser } from "@/hooks/useUser";
-import { supabase } from "@/lib/supabase"; // supabase 추가
 
 type Room = Database["public"]["Tables"]["rooms"]["Row"];
 
