@@ -64,5 +64,27 @@ export function useUserData() {
     };
   }, [user]);
 
-  return { userData };
+  /**
+   * Updates the clothes column for a user in the users table.
+   * @param userId - The user's ID (user_id).
+   * @param clothes - The outfit description to save.
+   * @returns The updated user data or null if failed.
+   */
+  const updateClothes = async (clothes: string) => {
+    if (!userData) {
+      throw new Error("User data is not loaded yet");
+    }
+
+    supabase
+      .from("users")
+      .update({ clothes: clothes })
+      .eq("user_id", userData.user_id)
+      .then((value) => {
+        if (value.error) {
+          throw new Error(value.error.message);
+        }
+      });
+  };
+
+  return { userData, updateClothes };
 }

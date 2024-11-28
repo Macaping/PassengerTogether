@@ -1,4 +1,3 @@
-import useClothes from "@/hooks/useClothes";
 import { useUserData } from "@/hooks/useUserData";
 import { Database } from "@/lib/supabase_type";
 import React, { useEffect, useRef, useState } from "react";
@@ -34,8 +33,7 @@ export default function RoomDetailModal({
   const slideAnim = useRef(new Animated.Value(height)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [userInput, setUserInput] = useState("");
-  const { updateClothes, loading, error } = useClothes();
-  const { userData } = useUserData();
+  const { userData, updateClothes } = useUserData();
 
   useEffect(() => {
     if (visible) {
@@ -65,27 +63,26 @@ export default function RoomDetailModal({
         }),
       ]).start();
     }
-  }, [visible]);
+  }, [fadeAnim, slideAnim, visible]);
 
   const handleJoin = async () => {
+    // 들어가는 방의 정보가 없거나 입력값이 없으면 함수를 종료합니다.
     if (!room || !userInput.trim()) return;
 
     try {
       if (!userData?.user_id) {
         throw new Error("User ID not found");
       }
-      const result = await updateClothes(userData?.user_id, userInput.trim());
-      if (result) {
-        onJoin();
-      } else {
-        console.error("Failed to update clothes");
-      }
+      // 업데이트가 성공하면 onJoin을 호출하여 방에 참가합니다.
+      updateClothes(userInput.trim()).then(() => onJoin());
     } catch (err) {
       console.error("Error during join:", err);
     }
   };
 
   if (!room) return null;
+
+  const 버튼활성화 = Boolean(!userData?.current_party && userInput.trim());
 
   return (
     <Modal
@@ -155,28 +152,29 @@ export default function RoomDetailModal({
               placeholder="서로를 알아볼 수 있도록 자세히 입력해주세요."
               value={userInput}
               onChangeText={setUserInput}
-              editable={!userData?.current_party} // party에 참가 중이면 수정 불가
+              editable={true}
             />
           </View>
 
           <TouchableOpacity
             style={[
               modalStyles.joinButton,
-              { backgroundColor: userInput.trim() ? "#6049E2" : "#CCCCCC" },
+              {
+                backgroundColor: 버튼활성화 ? "#6049E2" : "#CCCCCC",
+              },
             ]}
             onPress={handleJoin}
-            activeOpacity={userInput.trim() ? 0.8 : 1}
-            disabled={!userInput.trim() || loading}
+            // 활성화 여부에 따라 투명도 조절
+            activeOpacity={버튼활성화 ? 1 : 0.8}
+            // userInput의 텍스트가 있고, 이미 참여 중인 방이 없을 때만 버튼 활성화
+            disabled={!버튼활성화}
           >
             <Text style={modalStyles.joinButtonText}>
               {userData?.current_party
                 ? "이미 참여 중인 방이 있습니다"
-                : loading
-                  ? "처리 중..."
-                  : "참가 하기"}
+                : "참가 하기"}
             </Text>
           </TouchableOpacity>
-          {error && <Text style={{ color: "red" }}>{error}</Text>}
         </Animated.View>
       </View>
     </Modal>
