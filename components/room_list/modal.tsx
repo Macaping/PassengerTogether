@@ -22,8 +22,6 @@ type RoomDetailModalProps = {
   onJoin: () => void;
 };
 
-const { height } = Dimensions.get("window");
-
 /**
  * RoomDetailModal 컴포넌트
  *
@@ -36,12 +34,19 @@ export default function RoomDetailModal({
   onClose,
   onJoin,
 }: RoomDetailModalProps) {
+  // 화면 높이 가져오기
+  const { height } = Dimensions.get("window");
+
+  // 애니메이션을 위한 변수
   const slideAnim = useRef(new Animated.Value(height)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  // 사용자 입력값
   const [userInput, setUserInput] = useState("");
   const { userData, updateClothes } = useUserData();
 
   useEffect(() => {
+    // 보여줄 때 애니메이션
     if (visible) {
       Animated.parallel([
         Animated.timing(slideAnim, {
@@ -56,6 +61,7 @@ export default function RoomDetailModal({
         }),
       ]).start();
     } else {
+      // 숨길 때 애니메이션
       Animated.parallel([
         Animated.timing(slideAnim, {
           toValue: height,
@@ -69,7 +75,7 @@ export default function RoomDetailModal({
         }),
       ]).start();
     }
-  }, [fadeAnim, slideAnim, visible]);
+  }, [fadeAnim, height, slideAnim, visible]);
 
   const handleJoin = async () => {
     // 들어가는 방의 정보가 없거나 입력값이 없으면 함수를 종료합니다.
@@ -97,35 +103,35 @@ export default function RoomDetailModal({
       onRequestClose={onClose}
       animationType="none"
     >
-      <View style={modalStyles.container}>
+      <View style={styles.container}>
         <Animated.View
           style={[
-            modalStyles.backdrop,
+            styles.backdrop,
             {
               opacity: fadeAnim,
             },
           ]}
         >
           <TouchableWithoutFeedback onPress={onClose}>
-            <View style={modalStyles.backdropTouchable} />
+            <View style={styles.backdropTouchable} />
           </TouchableWithoutFeedback>
         </Animated.View>
 
         <Animated.View
           style={[
-            modalStyles.modalContent,
+            styles.modalContent,
             {
               transform: [{ translateY: slideAnim }],
             },
           ]}
         >
-          <View style={modalStyles.handleBar} />
-          <Text style={modalStyles.modalName}>🏠 {room.room_name}</Text>
+          <View style={styles.handleBar} />
+          <Text style={styles.modalName}>🏠 {room.room_name}</Text>
 
-          <View style={modalStyles.headerSection}>
-            <Text style={modalStyles.modalTime}>
-              <Text style={modalStyles.labelText}>출발 시각: </Text>
-              <Text style={modalStyles.timeText}>
+          <View style={styles.headerSection}>
+            <Text style={styles.modalTime}>
+              <Text style={styles.labelText}>출발 시각: </Text>
+              <Text style={styles.timeText}>
                 {new Date(room.departure_time)
                   .getHours()
                   .toString()
@@ -137,24 +143,24 @@ export default function RoomDetailModal({
                   .padStart(2, "0")}
               </Text>
             </Text>
-            <Text style={modalStyles.modalMembers}>
-              <Text style={modalStyles.labelText}>인원: </Text>
-              <Text style={modalStyles.timeText}>
+            <Text style={styles.modalMembers}>
+              <Text style={styles.labelText}>인원: </Text>
+              <Text style={styles.timeText}>
                 {room.users ? room.users.length : 0}/{room.limit_people}
               </Text>
             </Text>
           </View>
 
-          <View style={modalStyles.divider} />
+          <View style={styles.divider} />
 
-          <View style={modalStyles.messageContainer}>
-            <Text style={modalStyles.detailText}>만남의 장소</Text>
-            <Text style={modalStyles.messageText}>{room.details}</Text>
+          <View style={styles.messageContainer}>
+            <Text style={styles.detailText}>만남의 장소</Text>
+            <Text style={styles.messageText}>{room.details}</Text>
           </View>
-          <View style={modalStyles.messageContainer}>
-            <Text style={modalStyles.detailText}> 자신의 옷차림</Text>
+          <View style={styles.messageContainer}>
+            <Text style={styles.detailText}> 자신의 옷차림</Text>
             <TextInput
-              style={modalStyles.inputField}
+              style={styles.inputField}
               placeholder="서로를 알아볼 수 있도록 자세히 입력해주세요."
               value={userInput}
               onChangeText={setUserInput}
@@ -164,7 +170,7 @@ export default function RoomDetailModal({
 
           <TouchableOpacity
             style={[
-              modalStyles.joinButton,
+              styles.joinButton,
               {
                 backgroundColor: 버튼활성화 ? "#6049E2" : "#CCCCCC",
               },
@@ -175,7 +181,7 @@ export default function RoomDetailModal({
             // userInput의 텍스트가 있고, 이미 참여 중인 방이 없을 때만 버튼 활성화
             disabled={!버튼활성화}
           >
-            <Text style={modalStyles.joinButtonText}>
+            <Text style={styles.joinButtonText}>
               {userData?.current_party
                 ? "이미 참여 중인 방이 있습니다"
                 : "참가하기"}
@@ -187,7 +193,7 @@ export default function RoomDetailModal({
   );
 }
 
-const modalStyles = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "flex-end",
@@ -208,8 +214,6 @@ const modalStyles = StyleSheet.create({
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingHorizontal: 25,
-    height: height * 0.55,
-    width: "100%",
   },
   handleBar: {
     width: 40,
