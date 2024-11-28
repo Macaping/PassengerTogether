@@ -1,6 +1,5 @@
 import useClothes from "@/hooks/useClothes";
-import { useUser } from "@/hooks/useUser";
-import { supabase } from "@/lib/supabase"; // supabase 추가
+import { useUserData } from "@/hooks/useUserData";
 import { Database } from "@/lib/supabase_type";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -36,27 +35,7 @@ export default function RoomDetailModal({
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [userInput, setUserInput] = useState("");
   const { updateClothes, loading, error } = useClothes();
-  const { user } = useUser();
-  const [currentParty, setCurrentParty] = useState<string | null>(null); // 추가
-
-  // current_party를 확인하는 useEffect 추가
-  useEffect(() => {
-    const fetchUserParty = async () => {
-      if (user?.id) {
-        const { data, error } = await supabase
-          .from("users")
-          .select("current_party")
-          .eq("user_id", user.id)
-          .single();
-
-        if (data) {
-          setCurrentParty(data.current_party);
-        }
-      }
-    };
-
-    fetchUserParty();
-  }, [user]);
+  const { userData } = useUserData();
 
   useEffect(() => {
     if (visible) {
@@ -92,7 +71,10 @@ export default function RoomDetailModal({
     if (!room || !userInput.trim()) return;
 
     try {
-      const result = await updateClothes(user?.id, userInput.trim());
+      if (!userData?.user_id) {
+        throw new Error("User ID not found");
+      }
+      const result = await updateClothes(userData?.user_id, userInput.trim());
       if (result) {
         onJoin();
       } else {
@@ -173,7 +155,7 @@ export default function RoomDetailModal({
               placeholder="서로를 알아볼 수 있도록 자세히 입력해주세요."
               value={userInput}
               onChangeText={setUserInput}
-              editable={!currentParty} // 추가
+              editable={!userData?.current_party} // party에 참가 중이면 수정 불가
             />
           </View>
 
@@ -187,7 +169,7 @@ export default function RoomDetailModal({
             disabled={!userInput.trim() || loading}
           >
             <Text style={modalStyles.joinButtonText}>
-              {currentParty
+              {userData?.current_party
                 ? "이미 참여 중인 방이 있습니다"
                 : loading
                   ? "처리 중..."

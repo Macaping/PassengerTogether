@@ -1,7 +1,5 @@
+import { useUserData } from "@/hooks/useUserData";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
-import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
-import { useUser } from "@/hooks/useUser";
 
 interface CreateRoomButtonProps {
   onPress: () => void; // 버튼 클릭 시 호출할 함수
@@ -14,37 +12,19 @@ export default function CreateRoomButton({
   disabled = false,
   text,
 }: CreateRoomButtonProps) {
-  const { user } = useUser();
-  const [currentParty, setCurrentParty] = useState<string | null>(null);
+  const { userData } = useUserData();
 
-  useEffect(() => {
-    const fetchUserParty = async () => {
-      if (user?.id) {
-        const { data, error } = await supabase
-          .from("users")
-          .select("current_party")
-          .eq("user_id", user.id)
-          .single();
-
-        if (data) {
-          setCurrentParty(data.current_party);
-        }
-      }
-    };
-
-    fetchUserParty();
-  }, [user]);
   return (
     <TouchableOpacity
       style={[
         styles.button,
-        (disabled || currentParty) && styles.disabledButton,
+        (disabled || userData?.current_party) && styles.disabledButton,
       ]}
       onPress={onPress}
-      disabled={disabled || !!currentParty}
+      disabled={disabled || !!userData?.current_party}
     >
       <Text style={styles.buttonText}>
-        {currentParty ? "이미 참여 중인 방이 있습니다" : text}
+        {userData?.current_party ? "이미 참여 중인 방이 있습니다" : text}
       </Text>
     </TouchableOpacity>
   );
