@@ -49,21 +49,19 @@ export default async function JoinRoom(roomId: string) {
 
             if (usersToNotify.length > 0) {
               // 방에 참가한 후 알림을 보내기 위해 서버로 POST 요청
+              const BACKEND_API = process.env.EXPO_PUBLIC_BACKEND_API || "";
               try {
-                const response = await fetch(
-                  "http://owonet.store/exposerver/send-notification/",
-                  {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                      roomId: roomId,
-                      newUserId: userId,
-                      newUserEmail: userEmail,
-                    }),
+                const response = await fetch(BACKEND_API, {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
                   },
-                );
+                  body: JSON.stringify({
+                    roomId: roomId,
+                    newUserId: userId,
+                    newUserEmail: userEmail,
+                  }),
+                });
 
                 if (response.ok) {
                   const text = await response.text(); // 응답을 텍스트로 처리
