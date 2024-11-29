@@ -42,7 +42,7 @@ const headerStyles = StyleSheet.create({
   headerContainer: {
     alignItems: "center",
     backgroundColor: "#6049E2",
-    height: height * 0.2,
+    paddingBottom: "10%",
   },
   date: {
     width: "80%",
