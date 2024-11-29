@@ -78,6 +78,7 @@ export default function RoomMakeView() {
       <방만들기
         onPress={handleCreateRoom}
         disabled={isButtonDisabled}
+        selectedDate={selectedDate}
         text="방만들기"
       />
     </View>
