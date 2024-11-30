@@ -24,6 +24,12 @@ type RoomDetailModalProps = {
 
 const { height } = Dimensions.get("window");
 
+/**
+ * RoomDetailModal 컴포넌트
+ *
+ * - 방 상세 정보를 표시하고, 방에 참가할 수 있는 모달창을 표시합니다.
+ * - '참가하기' 버튼을 누르면 방에 참가합니다.
+ */
 export default function RoomDetailModal({
   visible,
   room,
@@ -172,7 +178,7 @@ export default function RoomDetailModal({
             <Text style={modalStyles.joinButtonText}>
               {userData?.current_party
                 ? "이미 참여 중인 방이 있습니다"
-                : "참가 하기"}
+                : "참가하기"}
             </Text>
           </TouchableOpacity>
         </Animated.View>

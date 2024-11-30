@@ -5,6 +5,9 @@ import Item from "./items";
 
 type Room = Database["public"]["Tables"]["rooms"]["Row"];
 
+/**
+ * RoomList 컴포넌트
+ */
 export default function List({
   roomList,
   handleRoomPress,
