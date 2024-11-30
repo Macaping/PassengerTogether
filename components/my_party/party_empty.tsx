@@ -1,6 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
 import { StyleSheet, Text, View } from "react-native";
 
+/**
+ * 현재 참여한 파티가 없을 때 표시되는 컴포넌트
+ */
 export default function PartyEmpty() {
   return (
     <View style={styles.background}>

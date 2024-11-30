@@ -1,5 +1,8 @@
 import { StyleSheet, Text, View } from "react-native";
 
+/**
+ * 파티 ID를 표시하는 컴포넌트
+ */
 export function PartyHeader({ id }: { id: string }) {
   return (
     <View style={styles.container}>
