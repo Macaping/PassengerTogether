@@ -8,6 +8,12 @@ import {
   View,
 } from "react-native";
 
+/**
+ * 장소 선택 컴포넌트
+ *
+ * - 사용자가 출발지와 도착지를 선택할 수 있는 컴포넌트입니다.
+ * - 출발지와 도착지를 선택하면 부모 컴포넌트에 변경된 값을 전달합니다.
+ */
 export default function 장소선택({
   departure,
   setDeparture,

@@ -26,6 +26,12 @@ interface InformationBoxProps {
   duration: number | null;
 }
 
+/**
+ * InformationBox 컴포넌트
+ *
+ * 사용자가 출발지, 도착지, 출발 날짜 및 시간을 선택할 수 있도록 하는 UI를 제공합니다.
+ * 또한 선택된 경로의 거리와 소요 시간을 표시합니다.
+ */
 export function InformationBox({
   selectedDeparture,
   setSelectedDeparture,
@@ -36,12 +42,18 @@ export function InformationBox({
   locations,
   distance,
   duration,
-}: InformationBoxProps) {
+}: InformationBoxProps): React.JSX.Element {
+  // 모달에서 변경하려는 위치의 타입
   const [changingLocationType, setChangingLocationType] = useState("departure");
+
+  // 모달의 표시 여부
   const [modalVisible, setModalVisible] = useState(false);
+
+  // 날짜 및 시간 선택 모달의 표시 여부
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
 
+  // 위치 선택
   const handleLocationSelect = (location: string) => {
     if (changingLocationType === "departure") {
       setSelectedDeparture(location);
@@ -51,6 +63,7 @@ export function InformationBox({
     setModalVisible(false);
   };
 
+  // 날짜를 변경할 때
   const handleDateChange = (
     _event: DateTimePickerEvent,
     selectedDate?: Date | undefined,
@@ -67,6 +80,7 @@ export function InformationBox({
     }
   };
 
+  // 시간을 변경할 때
   const handleTimeChange = (
     _event: DateTimePickerEvent,
     selectedTime?: Date,
@@ -91,6 +105,7 @@ export function InformationBox({
   // 현재 시간을 기준으로 제한 설정
   const currentDate = new Date();
 
+  // 위치 선택 모달 열기
   const openLocationModal = (type: "departure" | "destination") => {
     setChangingLocationType(type);
     setModalVisible(true);
@@ -188,6 +203,7 @@ export function InformationBox({
         </View>
       </View>
 
+      {/* 날짜 모달이 활성화 되었을 때 */}
       {showDatePicker && (
         <DateTimePicker
           value={date}
@@ -198,6 +214,7 @@ export function InformationBox({
         />
       )}
 
+      {/* 시간 모달이 활성화 되었을 때 */}
       {showTimePicker && (
         <DateTimePicker
           value={date}

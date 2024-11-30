@@ -1,14 +1,27 @@
 import { supabase } from "@/lib/supabase";
 
+/**
+ * 사용자를 주어진 방에 추가하고, 방에 참가한 사용자에게 푸시 알림을 전송합니다.
+ *
+ * @param {string} roomId - 사용자가 참가할 방의 ID
+ *
+ * 주요 동작:
+ * 1. 현재 로그인된 사용자 정보를 가져옵니다.
+ * 2. 주어진 방의 사용자 목록에 현재 사용자를 추가합니다.
+ * 3. 사용자 정보(`current_party`)를 업데이트하여 현재 참가한 방을 설정합니다.
+ * 4. 방에 참가한 새로운 사용자 정보를 기존 사용자들에게 알립니다.
+ *
+ * @returns {Promise<void>} 반환값 없음
+ */
 export default async function JoinRoom(roomId: string) {
-  // 현재 사용자 가져오기
+  // Step 1: 현재 사용자 가져오기
   const user = await supabase.auth.getUser();
-  const userId = user.data?.user?.id;
-  const userEmail = user.data?.user?.email; // 사용자 이메일 가져오기
+  const userId = user.data?.user?.id; // 현재 사용자 ID
+  const userEmail = user.data?.user?.email; // 현재 사용자 이메일
   console.log("userId:", userId);
 
   if (userId) {
-    // 방 데이터 배열 가져오기
+    // Step 2: 주어진 방의 사용자 목록 가져오기
     const { data: roomData, error: fetchError } = await supabase
       .from("rooms")
       .select("users")
@@ -17,14 +30,15 @@ export default async function JoinRoom(roomId: string) {
 
     console.log("roomData:", roomData);
     if (fetchError) {
-      console.error(fetchError);
+      console.error("방 데이터 가져오기 실패:", fetchError);
     } else {
-      // 방에 사용자가 포함되어 있지 않으면 추가
-      const users = roomData.users || [];
-      if (!users.includes(userId)) {
-        users.push(userId);
+      const users = roomData.users || []; // 방에 등록된 사용자 ID 배열
 
-        // 방 데이터 업데이트
+      // Step 3: 방에 현재 사용자가 없으면 추가
+      if (!users.includes(userId)) {
+        users.push(userId); // 사용자 ID 추가
+
+        // Step 4: 방 데이터 업데이트
         const { error: updateError } = await supabase
           .from("rooms")
           .update({ users })
@@ -32,24 +46,23 @@ export default async function JoinRoom(roomId: string) {
         console.log("users:", users);
 
         if (updateError) {
-          console.error(updateError);
+          console.error("방 업데이트 실패:", updateError);
         } else {
-          // 사용자 테이블에 방 추가
+          // Step 5: 사용자 정보 업데이트 (current_party 설정)
           const { error: insertError } = await supabase
             .from("users")
-            .update({ current_party: roomId })
+            .update({ current_party: roomId }) // 현재 참가 중인 방 ID 업데이트
             .eq("user_id", userId)
             .single();
 
           if (insertError) {
-            console.error(insertError);
+            console.error("사용자 정보 업데이트 실패:", insertError);
           } else {
-            // 사용자 자신을 제외한 방의 모든 사용자에게 알림 전송
+            // Step 6: 사용자 자신을 제외한 방의 다른 사용자들에게 알림 전송
             const usersToNotify = users.filter((id) => id !== userId);
 
             if (usersToNotify.length > 0) {
-              // 방에 참가한 후 알림을 보내기 위해 서버로 POST 요청
-              const BACKEND_API = process.env.EXPO_PUBLIC_BACKEND_API || "";
+              const BACKEND_API = process.env.EXPO_PUBLIC_BACKEND_API || ""; // 백엔드 API URL
               try {
                 const response = await fetch(BACKEND_API, {
                   method: "POST",
@@ -64,7 +77,7 @@ export default async function JoinRoom(roomId: string) {
                 });
 
                 if (response.ok) {
-                  const text = await response.text(); // 응답을 텍스트로 처리
+                  const text = await response.text(); // 응답 메시지 처리
                   console.log("푸시 알림 전송 요청 성공:", text);
                 } else {
                   console.error(
@@ -82,6 +95,6 @@ export default async function JoinRoom(roomId: string) {
       }
     }
   } else {
-    console.error("User not authenticated");
+    console.error("사용자가 인증되지 않았습니다."); // 인증되지 않은 경우
   }
 }

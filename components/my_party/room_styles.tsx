@@ -1,5 +1,8 @@
 import { StyleSheet } from "react-native";
 
+/**
+ * 방 정보 화면의 스타일
+ */
 export const roomstyles = StyleSheet.create({
   background: {
     flex: 1,

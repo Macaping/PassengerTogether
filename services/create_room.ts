@@ -1,11 +1,13 @@
 import { supabase } from "@/lib/supabase";
 import { User } from "./user";
 
+/**
+ * 새로운 방을 생성합니다.
+ */
 export async function CreateRoom({
   departure_time,
   origin,
   destination,
-  users = [],
   details,
   room_name,
   meetingPlace,
@@ -13,16 +15,14 @@ export async function CreateRoom({
   departure_time: string;
   origin: string;
   destination: string;
-  users: string[];
   details: string;
   room_name: string;
   meetingPlace: string;
 }) {
-  var room = {
+  let room = {
     departure_time: departure_time,
     origin: origin,
     destination: destination,
-    users: users,
     details: meetingPlace,
     room_name: room_name,
   };
