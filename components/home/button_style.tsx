@@ -1,5 +1,8 @@
 import { StyleSheet } from "react-native";
 
+/**
+ * 버튼 컴포넌트의 스타일
+ */
 export const styles = StyleSheet.create({
   button: {
     flex: 1,

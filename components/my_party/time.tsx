@@ -1,7 +1,9 @@
 import { StyleSheet, Text, View } from "react-native";
 
+/**
+ * 시간 정보를 표시하는 컴포넌트
+ */
 export default function Time({ date }: { date: Date }) {
-  // 시간 정보
   return (
     <View style={styles.container}>
       <Text style={styles.label}>출발 시각</Text>

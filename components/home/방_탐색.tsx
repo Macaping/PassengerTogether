@@ -8,7 +8,17 @@ interface 방_탐색Props {
   date: Date;
 }
 
-export function 방_탐색({ departure, destination, date }: 방_탐색Props) {
+/**
+ * 방 탐색 버튼
+ *
+ * - 사용자가 출발지, 도착지, 날짜를 선택하고 방 탐색 버튼을 누를 수 있습니다.
+ * - 버튼을 누르면 방 목록 페이지로 이동합니다.
+ */
+export function 방_탐색({
+  departure,
+  destination,
+  date,
+}: 방_탐색Props): React.JSX.Element {
   // 방 탐색 버튼
   return (
     <Link

@@ -1,5 +1,8 @@
 import { StyleSheet, View } from "react-native";
 
+/**
+ * 구분선 컴포넌트
+ */
 export function Separator() {
   return (
     <View style={styles.container}>
