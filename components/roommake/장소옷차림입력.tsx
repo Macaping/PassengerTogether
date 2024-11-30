@@ -8,6 +8,12 @@ interface MeetingDetailsInputProps {
   onDetailsChange: (text: string) => void; // 세부사항 변경 핸들러
 }
 
+/**
+ * 장소 및 옷차림 정보 입력 컴포넌트
+ *
+ * - 만남의 장소와 세부사항(옷차림 정보)을 입력할 수 있는 컴포넌트입니다.
+ * - 만남의 장소와 세부사항을 입력하면 부모 컴포넌트에 변경된 값을 전달합니다.
+ */
 export default function 장소옷차림입력({
   meetingPlace,
   details,

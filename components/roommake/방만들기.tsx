@@ -9,6 +9,9 @@ interface CreateRoomButtonProps {
   selectedDate: Date; // 선택된 출발 시간
 }
 
+/**
+ * 방 만들기 버튼 컴포넌트
+ */
 export default function CreateRoomButton({
   onPress,
   disabled = false,

@@ -9,6 +9,9 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 //   limit_people: Room["limit_people"];
 // };
 
+/**
+ * RoomList 아이템 컴포넌트
+ */
 export default function Item({
   created_at,
   departure_time,

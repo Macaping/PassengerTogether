@@ -3,6 +3,9 @@ import { router } from "expo-router";
 import { Text, TouchableOpacity } from "react-native";
 import { styles } from "./icon_styles";
 
+/**
+ * 동승자 버튼 컴포넌트
+ */
 export default function 동승자() {
   return (
     <TouchableOpacity

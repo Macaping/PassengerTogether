@@ -4,6 +4,9 @@ import { Text, TouchableOpacity, View } from "react-native";
 import { styles } from "./icon_styles";
 import 나가기Modal from "./나가기_modal";
 
+/**
+ * 나가기 버튼 컴포넌트
+ */
 export default function 나가기() {
   const [isLeaveModalVisible, setIsLeaveModalVisible] = useState(false);
 
