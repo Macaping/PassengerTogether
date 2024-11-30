@@ -1,4 +1,5 @@
 import { Link } from "expo-router";
+import { useEffect, useState } from "react";
 import { Alert, Text } from "react-native";
 import { styles } from "./button_style";
 
@@ -20,8 +21,20 @@ export function 방_탐색({
   date,
 }: 방_탐색Props): React.JSX.Element {
   // 시간이 지난 날짜인지 확인
-  const currentDate = new Date();
-  const isDisabled = date < currentDate;
+  const [isDisabled, setIsDisabled] = useState(false);
+
+  // 매 초마다 현재 시간과 선택된 시간 비교
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (date < new Date()) {
+        setIsDisabled(true);
+      } else {
+        setIsDisabled(false);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [date]);
 
   return (
     <Link
