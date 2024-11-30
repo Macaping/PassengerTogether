@@ -47,7 +47,6 @@ export default function RoomMakeView() {
         departure_time: selectedDate.toISOString(),
         origin: departure as string,
         destination: destination as string,
-        users: [],
         meetingPlace,
         details,
         room_name: roomName,
