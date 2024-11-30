@@ -6,10 +6,10 @@ import { CreateRoom } from "@/services/create_room";
 import JoinRoom from "@/services/join_room";
 import { router } from "expo-router";
 import React, { useState } from "react";
-import { Alert, StyleSheet, TextInput, View, Text } from "react-native";
+import { Alert, StyleSheet, Text, TextInput, View } from "react-native";
 
 /**
- * RoomMakeView 컴포넌트
+ * RoomMakeView 페이지
  *
  * - 사용자가 새로운 방을 생성할 수 있는 화면입니다.
  * - 출발지, 도착지, 시간, 방 제목, 만남의 장소, 세부사항을 입력받아 방을 생성합니다.

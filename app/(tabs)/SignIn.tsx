@@ -10,7 +10,7 @@ import {
 } from "react-native";
 
 /**
- * SignInView 컴포넌트
+ * SignInView 페이지
  *
  * - 사용자 로그인 화면을 제공합니다.
  * - 사용자가 이메일과 비밀번호를 입력하고 로그인을 시도할 수 있습니다.

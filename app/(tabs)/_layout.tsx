@@ -1,12 +1,12 @@
+import * as Notifications from "expo-notifications";
 import { Tabs } from "expo-router";
 import React, { useEffect } from "react";
-import * as Notifications from "expo-notifications";
 
 import { TabBarIcon } from "@/components/navigation/TabBarIcon";
 import { useUser } from "@/hooks/useUser";
 
 /**
- * TabLayout 컴포넌트
+ * TabLayout 페이지
  *
  * - 앱의 하단 탭 내비게이션을 구성합니다.
  * - 알림 수신 및 응답 처리를 설정합니다.

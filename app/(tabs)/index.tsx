@@ -19,7 +19,7 @@ const coordinates: { [key: string]: LatLng } = {
 const locations = ["천안역", "천안아산역", "선문대", "탕정역", "두정동 롯데"];
 
 /**
- * HomeView 컴포넌트
+ * HomeView 페이지
  *
  * - 지도와 경로 정보를 보여주는 메인 화면입니다.
  * - 출발지와 도착지를 선택하여 방을 탐색하거나 방을 생성할 수 있습니다.

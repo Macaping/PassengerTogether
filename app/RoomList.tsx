@@ -9,7 +9,7 @@ import React, { useState } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 
 /**
- * RoomListView 컴포넌트
+ * RoomListView 페이지
  *
  * - 방 목록을 조회하고 표시하는 화면입니다.
  * - 사용자가 방을 선택하면 상세 정보 모달이 열리며, 방에 참가할 수 있습니다.

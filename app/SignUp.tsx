@@ -10,7 +10,7 @@ import {
 } from "react-native";
 
 /**
- * SignUpView 컴포넌트
+ * SignUpView 페이지
  *
  * - 새로운 사용자가 회원가입을 할 수 있는 화면입니다.
  * - 사용자는 이메일, 비밀번호, 닉네임을 입력하여 계정을 생성할 수 있습니다.

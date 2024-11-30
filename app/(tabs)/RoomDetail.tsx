@@ -1,7 +1,7 @@
+import Clothes from "@/components/my_party/clothes";
 import Departure from "@/components/my_party/departure";
 import Destination from "@/components/my_party/destination";
 import Details from "@/components/my_party/details";
-import Clothes from "@/components/my_party/clothes";
 import NumPeople from "@/components/my_party/num_people";
 import PartyEmpty from "@/components/my_party/party_empty";
 import { PartyHeader } from "@/components/my_party/party_header";
@@ -11,12 +11,12 @@ import Time from "@/components/my_party/time";
 import 나가기 from "@/components/my_party/나가기";
 import 동승자 from "@/components/my_party/동승자";
 import 채팅 from "@/components/my_party/채팅";
+import { useHostClothes } from "@/hooks/useHostClothes";
 import { useParty } from "@/hooks/useParty";
 import { StyleSheet, View } from "react-native";
-import { useHostClothes } from "@/hooks/useHostClothes";
 
 /**
- * RoomDetailView 컴포넌트
+ * RoomDetailView 페이지
  *
  * - 사용자가 속한 방의 세부 정보를 표시하는 화면입니다.
  * - 방의 시간, 경로, 인원, 세부 정보 등을 시각화하며, 채팅 및 동승자 관련 액션 버튼을 제공합니다.

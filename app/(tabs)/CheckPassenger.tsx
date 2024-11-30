@@ -1,14 +1,14 @@
-import React from "react";
-import { FlatList, StyleSheet, Text, View } from "react-native";
-import { usePassengers } from "@/hooks/usePassengers";
 import { PartyHeader } from "@/components/my_party/party_header";
 import { roomstyles } from "@/components/my_party/room_styles";
 import { Separator } from "@/components/my_party/separator";
 import 이전 from "@/components/my_party/이전";
+import { usePassengers } from "@/hooks/usePassengers";
 import { useUserData } from "@/hooks/useUserData";
+import React from "react";
+import { FlatList, StyleSheet, Text, View } from "react-native";
 
 /**
- * 동승자 확인 화면 컴포넌트
+ * 동승자 확인 화면 페이지
  *
  * - 현재 사용자가 속한 파티의 동승자 목록을 표시합니다.
  * - 닉네임과 옷차림 정보를 나열하며, "이전" 버튼을 통해 이전 화면으로 이동할 수 있습니다.

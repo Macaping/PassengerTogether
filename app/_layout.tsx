@@ -10,7 +10,7 @@ import { StatusBar } from "expo-status-bar";
 SplashScreen.preventAutoHideAsync();
 
 /**
- * RootLayout 컴포넌트
+ * RootLayout 페이지
  *
  * - 애플리케이션의 루트 레이아웃 및 내비게이션 설정을 담당합니다.
  * - 커스텀 폰트를 로드하며, 로드 완료 전에 Splash Screen을 유지합니다.

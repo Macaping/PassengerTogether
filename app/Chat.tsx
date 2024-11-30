@@ -12,7 +12,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 /**
- * ChatView 컴포넌트
+ * ChatView 페이지
  *
  * - 채팅 기능을 제공하는 화면입니다.
  * - 사용자는 메시지를 전송하거나 다른 사용자의 메시지를 확인할 수 있습니다.
