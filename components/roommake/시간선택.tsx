@@ -1,12 +1,18 @@
+import DateTimePicker from "@react-native-community/datetimepicker";
 import React, { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
 
 interface DateTimeSelectorProps {
   selectedDate: Date; // 현재 선택된 날짜
   onDateChange: (date: Date) => void; // 변경된 날짜를 부모에 전달
 }
 
+/**
+ * 시간 선택 컴포넌트
+ *
+ * - 사용자가 날짜와 시간을 선택할 수 있는 컴포넌트입니다.
+ * - 날짜와 시간을 선택하면 부모 컴포넌트에 변경된 값을 전달합니다.
+ */
 export default function 시간선택({
   selectedDate,
   onDateChange,

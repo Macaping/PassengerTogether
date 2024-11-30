@@ -7,6 +7,9 @@ interface CreateRoomButtonProps {
   text: string; // 버튼 텍스트
 }
 
+/**
+ * 방 만들기 버튼 컴포넌트
+ */
 export default function CreateRoomButton({
   onPress,
   disabled = false,
