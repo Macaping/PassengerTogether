@@ -36,7 +36,6 @@ export default function 시간선택({
 
   // 시간 선택 핸들러
   const handleTimeChange = (event: any, time?: Date) => {
-    setShowTimePicker(false);
     if (time) {
       const now = new Date(); // 현재 시간 동적으로 가져오기
       const updatedDate = new Date(selectedDate);
@@ -51,6 +50,7 @@ export default function 시간선택({
       }
       onDateChange(updatedDate);
     }
+    setShowTimePicker(false);
   };
 
   return (
