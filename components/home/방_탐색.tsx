@@ -1,5 +1,6 @@
 import { Link } from "expo-router";
-import { Text } from "react-native";
+import { useEffect, useState } from "react";
+import { Alert, Text } from "react-native";
 import { styles } from "./button_style";
 
 interface 방_탐색Props {
@@ -19,7 +20,22 @@ export function 방_탐색({
   destination,
   date,
 }: 방_탐색Props): React.JSX.Element {
-  // 방 탐색 버튼
+  // 시간이 지난 날짜인지 확인
+  const [isDisabled, setIsDisabled] = useState(false);
+
+  // 매 초마다 현재 시간과 선택된 시간 비교
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (date < new Date()) {
+        setIsDisabled(true);
+      } else {
+        setIsDisabled(false);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [date]);
+
   return (
     <Link
       href={{
@@ -30,7 +46,13 @@ export function 방_탐색({
           date: date,
         },
       }}
-      style={styles.button}
+      style={[styles.button, isDisabled && { backgroundColor: "#A0A0A0" }]} // 비활성화 스타일 적용
+      onPress={(e) => {
+        if (isDisabled) {
+          e.preventDefault(); // 링크 동작 막기
+          Alert.alert("시간을 다시 선택해주세요."); // 경고 메시지 표시
+        }
+      }}
     >
       <Text style={styles.text}>방 탐색</Text>
     </Link>

@@ -27,6 +27,7 @@ export default function 장소옷차림입력({
       <TextInput
         style={styles.input}
         placeholder="어디서 모일건가요?"
+        maxLength={5}
         value={meetingPlace}
         onChangeText={onMeetingPlaceChange}
       />
@@ -38,6 +39,7 @@ export default function 장소옷차림입력({
         placeholder="오늘의 OOTD 입력!"
         value={details}
         onChangeText={onDetailsChange}
+        maxLength={20}
       />
     </View>
   );

@@ -89,6 +89,7 @@ export default function RoomMakeView() {
         placeholder="방제목"
         value={roomName}
         onChangeText={setRoomName}
+        maxLength={10}
       />
 
       {/* 만남의 장소 및 세부사항 입력 */}
@@ -103,6 +104,7 @@ export default function RoomMakeView() {
       <방만들기
         onPress={handleCreateRoom}
         disabled={isButtonDisabled}
+        selectedDate={selectedDate}
         text="방만들기"
       />
     </View>

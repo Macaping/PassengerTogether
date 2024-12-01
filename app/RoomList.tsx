@@ -108,9 +108,7 @@ export default function RoomListView() {
       />
 
       {/* 방 목록 */}
-
       <View style={listStyles.Container}>
-        <View style={listStyles.columnCrossline} />
         <List roomList={roomList} handleRoomPress={handleRoomPress} />
       </View>
     </View>
@@ -142,14 +140,5 @@ const listStyles = StyleSheet.create({
   },
   indexText: {
     color: "#747474", // 헤더 텍스트 색상
-  },
-  // 방 목록을 구분하는 세로선
-  columnCrossline: {
-    position: "absolute",
-    borderLeftWidth: 2,
-    borderLeftColor: "#6049E2",
-    top: "1%",
-    left: "17%",
-    height: "100%",
   },
 });
