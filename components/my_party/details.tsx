@@ -1,5 +1,8 @@
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
+/**
+ * 만남의 장소 정보를 표시하는 컴포넌트
+ */
 export default function Details({ text }: { text: string | null }) {
   return (
     <View style={styles.container}>

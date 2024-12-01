@@ -2,6 +2,9 @@ import { supabase } from "@/lib/supabase";
 import { Room } from "./room";
 import { User } from "./user";
 
+/**
+ * 사용자가 현재 속한 방에서 나가게 합니다.
+ */
 export async function LeaveRoom() {
   // 사용자 데이터
   const user = await User();

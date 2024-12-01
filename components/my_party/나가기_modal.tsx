@@ -8,6 +8,12 @@ interface 나가기ModalProps {
   setVisible: (visible: boolean) => void;
 }
 
+/**
+ * 나가기Modal 컴포넌트
+ *
+ * - 방을 나가기 위한 모달창을 표시합니다.
+ * - '예' 버튼을 누르면 방을 나가고, '아니오' 버튼을 누르면 모달창을 닫습니다.
+ */
 export default function 나가기Modal({
   isVisible,
   setVisible,

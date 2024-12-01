@@ -1,5 +1,8 @@
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 
+/**
+ * 로딩 중을 표시하는 컴포넌트
+ */
 export default function Loading() {
   return (
     <View style={styles.container}>

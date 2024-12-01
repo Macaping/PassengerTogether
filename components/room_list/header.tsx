@@ -4,6 +4,9 @@ import { Dimensions, StyleSheet, Text, View } from "react-native";
 
 const { height } = Dimensions.get("window");
 
+/**
+ * 헤더 컴포넌트
+ */
 export default function Header({
   origin,
   destination,

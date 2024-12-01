@@ -1,5 +1,8 @@
 import { StyleSheet, Text, View } from "react-native";
 
+/**
+ * 출발지 정보를 표시하는 컴포넌트
+ */
 export default function Departure({ location }: { location: string | null }) {
   return (
     <View style={styles.container}>

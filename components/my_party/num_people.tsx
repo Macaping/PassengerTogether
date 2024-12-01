@@ -1,5 +1,8 @@
 import { StyleSheet, Text, View } from "react-native";
 
+/**
+ * 인원수 정보를 표시하는 컴포넌트
+ */
 export default function NumPeople({
   current,
   max,

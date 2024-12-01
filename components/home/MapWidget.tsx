@@ -8,6 +8,9 @@ interface MapWidgetProps {
   destination: LatLng | null;
 }
 
+/**
+ * 지도 위젯 컴포넌트
+ */
 export function MapWidget({
   departure,
   destination,
@@ -16,7 +19,7 @@ export function MapWidget({
 }: MapWidgetProps & {
   setDistance: React.Dispatch<React.SetStateAction<number | null>>;
   setDuration: React.Dispatch<React.SetStateAction<number | null>>;
-}) {
+}): React.JSX.Element {
   // 위치 정보
   const [location, setLocation] =
     useState<Location.LocationObjectCoords | null>(null);

@@ -1,5 +1,8 @@
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
+/**
+ * 방장의 옷차림 정보를 표시하는 컴포넌트
+ */
 export default function clothes({ text }: { text: string | null }) {
   return (
     <View style={styles.container}>
