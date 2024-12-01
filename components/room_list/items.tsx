@@ -41,15 +41,12 @@ export default function Item({
         {new Date(departure_time).getHours().toString().padStart(2, "0")}:
         {new Date(departure_time).getMinutes().toString().padStart(2, "0")}
       </Text>
-      {/* 방 번호 */}
-      <Text style={itemStyles.방_번호}>
-        {room_name || created_at.slice(-10, -6)}
-      </Text>
+      {/* 방 이름 */}
+      <Text style={itemStyles.roomName}>{room_name}</Text>
       {/* 현재인원/최대인원 */}
       <Text style={itemStyles.현재인원_최대인원}>
         {users ? users.length : "0"}/{limit_people}
       </Text>
-      {/* <Text style={itemStyles.현재인원_최대인원}>방 상태: {status}</Text> */}
     </TouchableOpacity>
   );
 }
@@ -82,7 +79,7 @@ const itemStyles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
   },
-  방_번호: {
+  roomName: {
     width: "50%",
     textAlign: "left",
     color: "#000000",
