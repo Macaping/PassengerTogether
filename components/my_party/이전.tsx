@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { Text, TouchableOpacity } from "react-native";
+import { Text, TouchableOpacity, StyleSheet } from "react-native";
 import { styles } from "./icon_styles";
 
 /**
@@ -9,7 +9,7 @@ import { styles } from "./icon_styles";
 export default function 이전() {
   return (
     <TouchableOpacity
-      style={styles.button}
+      style={[styles.button, buttonStyles.button]}
       onPress={() => router.replace("/RoomDetail")}
     >
       <Ionicons name="arrow-back-outline" size={32} color="#666666" />
@@ -17,3 +17,8 @@ export default function 이전() {
     </TouchableOpacity>
   );
 }
+const buttonStyles = StyleSheet.create({
+  button: {
+    right: "5%",
+  },
+});

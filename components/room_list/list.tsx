@@ -27,7 +27,7 @@ export default function List({
       renderItem={({ item }) => (
         // Item 컴포넌트에 전달할 props를 정의합니다.
         <Item
-          created_at={item.created_at}
+          room_name={item.room_name} // room_name 추가
           departure_time={
             item.departure_time ? new Date(item.departure_time) : new Date()
           }

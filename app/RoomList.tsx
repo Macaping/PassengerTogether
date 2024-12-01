@@ -108,8 +108,9 @@ export default function RoomListView() {
       />
 
       {/* 방 목록 */}
-      <View style={listStyles.columnCrossline} />
+
       <View style={listStyles.Container}>
+        <View style={listStyles.columnCrossline} />
         <List roomList={roomList} handleRoomPress={handleRoomPress} />
       </View>
     </View>
