@@ -37,6 +37,11 @@ export default function List({
             users={item.users ?? []}
             status={item.status}
             onPress={() => handleRoomPress(item)}
+            // 방 이름이 없을 경우, 방 생성 시간을 사용합니다.
+            room_name={
+              item.room_name ??
+              (item.room_name || item.created_at.slice(-10, -6))
+            }
           />
         )}
         keyExtractor={(item) => item.id}
