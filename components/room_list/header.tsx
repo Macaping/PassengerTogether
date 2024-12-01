@@ -1,8 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { Dimensions, StyleSheet, Text, View } from "react-native";
-
-const { height } = Dimensions.get("window");
+import { StyleSheet, Text, View } from "react-native";
 
 /**
  * 헤더 컴포넌트
@@ -25,13 +23,13 @@ export default function Header({
   });
 
   return (
-    <View style={headerStyles.headerContainer}>
+    <View style={headerStyles.container}>
       <Text style={headerStyles.date}>{formattedDate}</Text>
       <View style={headerStyles.routeContainer}>
         <Text style={headerStyles.locationName}>{origin}</Text>
         <Ionicons
           name="arrow-forward"
-          size={24}
+          size={30}
           color="#ffffff"
           style={headerStyles.arrowIcon}
         />
@@ -42,44 +40,28 @@ export default function Header({
 }
 
 const headerStyles = StyleSheet.create({
-  headerContainer: {
+  container: {
     alignItems: "center",
     backgroundColor: "#6049E2",
-    height: height * 0.2,
+    padding: 25,
   },
   date: {
-    width: "80%",
-    color: "#ffffff",
+    color: "#FFFFFF",
     fontSize: 20,
-    paddingTop: height * 0.03,
   },
-
   routeContainer: {
     flexDirection: "row",
-    alignItems: "stretch",
-    justifyContent: "center",
-    // paddingTop: '2%',
-    width: "90%",
-    // paddingBottom: '5%'
   },
   locationName: {
+    flex: 1,
     fontSize: 30,
-    color: "#ffffff",
+    color: "#FFFFFF",
     fontWeight: "600",
-    alignItems: "center",
-
-    width: "40%",
     textAlign: "center",
+    padding: 10,
   },
   arrowIcon: {
-    marginHorizontal: 10, // 화살표와 텍스트 사이 간격
     alignSelf: "center",
-    top: "1.5%",
-  },
-  headerContainerWithModal: {
-    alignItems: "center",
-    backgroundColor: "#6049E2",
-    height: "22%",
-    zIndex: 1, // 모달 오버레이 아래에 위치하도록 설정
+    padding: 10,
   },
 });

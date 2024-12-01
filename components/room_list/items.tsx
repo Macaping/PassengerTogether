@@ -60,12 +60,11 @@ const itemStyles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     backgroundColor: "#ffffff",
-    alignItems: "center",
+    alignItems: "flex-end",
     borderWidth: 0.5,
     borderColor: "#A594F9",
     borderRadius: 8,
     padding: 20,
-    top: "-4%",
   },
   header: {
     backgroundColor: "#A594F9",
@@ -89,12 +88,12 @@ const itemStyles = StyleSheet.create({
     color: "#000000",
     fontSize: 20,
     fontWeight: "500",
+    top: "-5%",
   },
   현재인원_최대인원: {
     color: "#000000",
     fontSize: 18,
     fontWeight: "600",
-    right: "20%",
-    top: "3%",
+    right: "2%",
   },
 });
