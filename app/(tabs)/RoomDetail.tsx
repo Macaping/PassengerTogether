@@ -1,3 +1,4 @@
+import { partyState } from "@/atoms/partyState";
 import Clothes from "@/components/my_party/clothes";
 import Departure from "@/components/my_party/departure";
 import Destination from "@/components/my_party/destination";
@@ -12,8 +13,8 @@ import 나가기 from "@/components/my_party/나가기";
 import 동승자 from "@/components/my_party/동승자";
 import 채팅 from "@/components/my_party/채팅";
 import { useHostClothes } from "@/hooks/useHostClothes";
-import { useParty } from "@/hooks/useParty";
 import { StyleSheet, View } from "react-native";
+import { useRecoilValue } from "recoil";
 
 /**
  * RoomDetailView 페이지
@@ -31,13 +32,13 @@ import { StyleSheet, View } from "react-native";
  */
 export default function RoomDetailView() {
   // 방 데이터 및 로딩 상태 가져오기
-  const { roomData: room, loading: roomLoading } = useParty();
+  const room = useRecoilValue(partyState);
   const { hostClothes, loading: clothesLoading } = useHostClothes(
     room?.users || [],
   );
 
   // 로딩 상태 처리
-  if (roomLoading || clothesLoading) {
+  if (clothesLoading) {
     return <PartyEmpty />;
   }
 

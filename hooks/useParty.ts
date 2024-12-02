@@ -1,8 +1,9 @@
+import { partyState } from "@/atoms/partyState";
 import { userDataState } from "@/atoms/userDataState";
 import { supabase } from "@/lib/supabase";
 import { Database } from "@/lib/supabase_type";
-import { useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
+import { useEffect } from "react";
+import { useRecoilState, useRecoilValue } from "recoil";
 
 type Room = Database["public"]["Tables"]["rooms"]["Row"];
 
@@ -27,7 +28,7 @@ type Room = Database["public"]["Tables"]["rooms"]["Row"];
  */
 export function useParty() {
   const userData = useRecoilValue(userDataState);
-  const [roomData, setRoomData] = useState<Room | null>(null);
+  const [roomData, setRoomData] = useRecoilState(partyState);
 
   // 참가하는 방의 ID가 다른 경우에 실행
   useEffect(() => {
@@ -71,7 +72,7 @@ export function useParty() {
         }
       });
     };
-  }, [userData]);
+  }, [setRoomData, userData?.current_party]);
 
   return { roomData };
 }
