@@ -1,14 +1,11 @@
-import { partyState } from "@/atoms/partyState";
 import { PartyHeader } from "@/components/my_party/party_header";
 import { roomstyles } from "@/components/my_party/room_styles";
 import { Separator } from "@/components/my_party/separator";
 import 이전 from "@/components/my_party/이전";
-import { supabase } from "@/lib/supabase";
+import { usePassengers } from "@/hooks/usePassengers";
 import { Database } from "@/lib/supabase_type";
-import { fetchUserById } from "@/services/fetchUser";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
-import { useRecoilValue } from "recoil";
 
 type UserData = Database["public"]["Tables"]["users"]["Row"];
 
@@ -26,50 +23,7 @@ type UserData = Database["public"]["Tables"]["users"]["Row"];
  * @returns {React.ReactElement} 동승자 확인 화면 UI.
  */
 export default function CheckPassenger() {
-  const partyData = useRecoilValue(partyState); // 현재 사용자의 파티 데이터 가져오기
-  const [passengers, setPassengers] = useState<UserData[]>([]); // 동승자의 데이터 상태
-
-  useEffect(() => {
-    // 초기화
-    const refresh = async () => {
-      if (!partyData?.users) {
-        return;
-      }
-      // 동승자 목록 데이터 가져오기
-      const temp: UserData[] = (
-        await Promise.all(partyData.users.map((user) => fetchUserById(user)))
-      ).filter((user): user is UserData => user !== null);
-      // 동승자 목록 업데이트
-      setPassengers(temp);
-    };
-    refresh();
-
-    // 실시간 구독
-    supabase
-      .channel("passenger")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "users",
-          filter: `current_party=eq.${partyData?.id}`,
-        },
-        () => {
-          refresh();
-        },
-      )
-      .subscribe();
-
-    return () => {
-      // 이전 구독 해제
-      supabase.getChannels().forEach((channel) => {
-        if (channel.subTopic === "passenger") {
-          channel.unsubscribe();
-        }
-      });
-    };
-  }, [partyData]);
+  const { passengers } = usePassengers(); // 동승자 목록 데이터 가져오기
 
   // 동승자 목록이 없는 경우
   if (!passengers) {
