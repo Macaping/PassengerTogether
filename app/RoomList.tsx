@@ -6,7 +6,7 @@ import { Database } from "@/lib/supabase_type";
 import JoinRoom from "@/services/join_room";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Alert, StyleSheet, Text, View } from "react-native";
 
 /**
  * RoomListView 페이지
@@ -81,6 +81,20 @@ export default function RoomListView() {
    */
   const handleJoinRoom = (room: Room) => {
     if (!room) return;
+
+    // 최대 인원 확인
+    const currentUsers = room.users ? room.users.length : 0; // 현재 인원
+    const maxUsers = room.limit_people || 4; // 최대 인원 (기본값: 4)
+
+    if (currentUsers >= maxUsers) {
+      // 방 정원이 가득 찬 경우 경고 메시지 표시
+      Alert.alert(
+        "참가 불가",
+        "이 방은 이미 정원이 가득 찼습니다. 다른 방을 선택해주세요.",
+      );
+      return;
+    }
+
     JoinRoom(room.id)
       .then(() => router.replace("/(tabs)/RoomDetail")) // 방 참가 후 상세 화면으로 이동
       .catch((error) => console.error(error))
