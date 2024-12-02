@@ -1,7 +1,8 @@
+import { userDataState } from "@/atoms/userDataState";
 import { supabase } from "@/lib/supabase";
 import { Database } from "@/lib/supabase_type";
 import { useEffect, useState } from "react";
-import { useUserData } from "./useUserData";
+import { useRecoilValue } from "recoil";
 
 type Room = Database["public"]["Tables"]["rooms"]["Row"];
 
@@ -25,7 +26,7 @@ type Room = Database["public"]["Tables"]["rooms"]["Row"];
  * - 컴포넌트가 언마운트되면 자동으로 구독이 해제됩니다.
  */
 export function useParty() {
-  const { userData } = useUserData();
+  const userData = useRecoilValue(userDataState);
   const [roomData, setRoomData] = useState<Room | null>(null);
 
   // 참가하는 방의 ID가 다른 경우에 실행

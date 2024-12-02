@@ -1,11 +1,12 @@
+import { userDataState } from "@/atoms/userDataState";
 import { PartyHeader } from "@/components/my_party/party_header";
 import { roomstyles } from "@/components/my_party/room_styles";
 import { Separator } from "@/components/my_party/separator";
 import 이전 from "@/components/my_party/이전";
 import { usePassengers } from "@/hooks/usePassengers";
-import { useUserData } from "@/hooks/useUserData";
 import React from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
+import { useRecoilValue } from "recoil";
 
 /**
  * 동승자 확인 화면 페이지
@@ -21,7 +22,7 @@ import { FlatList, StyleSheet, Text, View } from "react-native";
  * @returns {React.ReactElement} 동승자 확인 화면 UI.
  */
 export default function CheckPassenger() {
-  const { userData } = useUserData(); // 현재 사용자 데이터 가져오기
+  const userData = useRecoilValue(userDataState); // 현재 사용자 데이터 가져오기
   const { passengers, loading } = usePassengers(userData?.current_party); // 사용자의 현재 파티 ID로 동승자 목록 가져오기
 
   // 로딩 상태 처리

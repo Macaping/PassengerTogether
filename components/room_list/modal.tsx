@@ -1,3 +1,4 @@
+import { userDataState } from "@/atoms/userDataState";
 import { useUserData } from "@/hooks/useUserData";
 import { Database } from "@/lib/supabase_type";
 import React, { useEffect, useRef, useState } from "react";
@@ -12,6 +13,7 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
+import { useRecoilValue } from "recoil";
 
 type Room = Database["public"]["Tables"]["rooms"]["Row"];
 
@@ -43,7 +45,8 @@ export default function RoomDetailModal({
 
   // 사용자 입력값
   const [userInput, setUserInput] = useState("");
-  const { userData, updateClothes } = useUserData();
+  const userData = useRecoilValue(userDataState);
+  const { updateClothes } = useUserData();
 
   useEffect(() => {
     // 보여줄 때 애니메이션

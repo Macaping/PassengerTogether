@@ -1,5 +1,5 @@
+import { userState } from "@/atoms/userState";
 import useChat from "@/hooks/useChat";
-import { useUser } from "@/hooks/useUser";
 import React from "react";
 import {
   Button,
@@ -10,6 +10,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useRecoilValue } from "recoil";
 
 /**
  * ChatView 페이지
@@ -35,7 +36,7 @@ export default function ChatView() {
     handleSendMessage, // 메시지 전송 함수
   } = useChat();
 
-  const { user } = useUser(); // 현재 사용자 정보 가져오기
+  const user = useRecoilValue(userState); // 현재 사용자 정보 가져오기
 
   if (!user) {
     // user가 없으면 로딩 화면 표시

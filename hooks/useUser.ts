@@ -1,6 +1,7 @@
-import { User } from "@supabase/supabase-js";
-import { useEffect, useState } from "react";
-import { useSession } from "./useSession";
+import { sessionState } from "@/atoms/sessionState";
+import { userState } from "@/atoms/userState";
+import { useEffect } from "react";
+import { useRecoilState, useRecoilValue } from "recoil";
 
 /**
  * 현재 사용자 정보를 가져오는 커스텀 훅입니다.
@@ -14,12 +15,12 @@ import { useSession } from "./useSession";
  * ```
  */
 export function useUser() {
-  const { session } = useSession();
-  const [user, setUser] = useState<User | undefined>(session?.user);
+  const session = useRecoilValue(sessionState);
+  const [user, setUser] = useRecoilState(userState);
 
   useEffect(() => {
     setUser(session?.user);
-  }, [session]);
+  }, [session?.user, setUser]);
 
   return { user };
 }
