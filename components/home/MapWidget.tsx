@@ -6,7 +6,7 @@ import {
 } from "@/atoms/routeState";
 import * as Location from "expo-location";
 import { useEffect, useRef, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import MapView, { LatLng, Marker, Polyline, Region } from "react-native-maps";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 
@@ -121,6 +121,10 @@ export function MapWidget(): React.JSX.Element {
         <Text>{errorMsg}</Text>
       </View>
     );
+  }
+
+  if (!location || departureLocation == null || destinationLocation == null) {
+    return <ActivityIndicator />;
   }
 
   return (
