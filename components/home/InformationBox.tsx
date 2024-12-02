@@ -1,3 +1,11 @@
+import {
+  departureState,
+  destinationState,
+  distanceState,
+  durationState,
+  fromDateState,
+  locationsState,
+} from "@/atoms/routeState";
 import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
@@ -11,20 +19,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useRecoilState, useRecoilValue } from "recoil";
 
 const { width } = Dimensions.get("window"); //Dimensions 이용
-
-interface InformationBoxProps {
-  selectedDeparture: string;
-  setSelectedDeparture: (location: string) => void;
-  selectedDestination: string;
-  setSelectedDestination: (location: string) => void;
-  date: Date;
-  setDate: (date: Date) => void;
-  locations: string[];
-  distance: number | null;
-  duration: number | null;
-}
 
 /**
  * InformationBox 컴포넌트
@@ -32,37 +29,35 @@ interface InformationBoxProps {
  * 사용자가 출발지, 도착지, 출발 날짜 및 시간을 선택할 수 있도록 하는 UI를 제공합니다.
  * 또한 선택된 경로의 거리와 소요 시간을 표시합니다.
  */
-export function InformationBox({
-  selectedDeparture,
-  setSelectedDeparture,
-  selectedDestination,
-  setSelectedDestination,
-  date,
-  setDate,
-  locations,
-  distance,
-  duration,
-}: InformationBoxProps): React.JSX.Element {
+export function InformationBox(): React.JSX.Element {
+  // 위치 선택
+  const locations = useRecoilValue(locationsState);
+  const [departure, setDeparture] = useRecoilState(departureState);
+  const [destination, setDestination] = useRecoilState(destinationState);
+
   // 모달에서 변경하려는 위치의 타입
   const [changingLocationType, setChangingLocationType] = useState("departure");
-
+  const handleLocationSelect = (location: string) => {
+    if (changingLocationType === "departure") {
+      setDeparture(location);
+    } else {
+      setDestination(location);
+    }
+    setModalVisible(false);
+  };
   // 모달의 표시 여부
   const [modalVisible, setModalVisible] = useState(false);
+  // 위치 선택 모달 열기
+  const openLocationModal = (type: "departure" | "destination") => {
+    setChangingLocationType(type);
+    setModalVisible(true);
+  };
 
   // 날짜 및 시간 선택 모달의 표시 여부
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
 
-  // 위치 선택
-  const handleLocationSelect = (location: string) => {
-    if (changingLocationType === "departure") {
-      setSelectedDeparture(location);
-    } else {
-      setSelectedDestination(location);
-    }
-    setModalVisible(false);
-  };
-
+  const [fromDate, setFromDate] = useRecoilState(fromDateState);
   // 날짜를 변경할 때
   const handleDateChange = (
     _event: DateTimePickerEvent,
@@ -70,13 +65,13 @@ export function InformationBox({
   ): void => {
     setShowDatePicker(false);
     if (selectedDate) {
-      const newDate = new Date(date);
+      const newDate = new Date(fromDate);
       newDate.setFullYear(
         selectedDate.getFullYear(),
         selectedDate.getMonth(),
         selectedDate.getDate(),
       );
-      setDate(newDate);
+      setFromDate(newDate);
     }
   };
 
@@ -87,8 +82,8 @@ export function InformationBox({
   ) => {
     setShowTimePicker(false);
     if (selectedTime) {
-      const currentDate = new Date();
-      const newDate = new Date(date);
+      const currentDate = new Date(); // 현재 시간
+      const newDate = new Date(fromDate);
       newDate.setHours(selectedTime.getHours());
       newDate.setMinutes(selectedTime.getMinutes());
 
@@ -97,19 +92,16 @@ export function InformationBox({
         alert("현재 시간보다 이전의 시간은 선택할 수 없습니다.");
         return;
       }
-
-      setDate(newDate);
+      setFromDate(newDate);
     }
   };
 
   // 현재 시간을 기준으로 제한 설정
   const currentDate = new Date();
 
-  // 위치 선택 모달 열기
-  const openLocationModal = (type: "departure" | "destination") => {
-    setChangingLocationType(type);
-    setModalVisible(true);
-  };
+  // 거리 및 소요 시간
+  const distance = useRecoilValue(distanceState);
+  const duration = useRecoilValue(durationState);
 
   // 상호작용 UI
   return (
@@ -124,7 +116,7 @@ export function InformationBox({
         <View style={{ flex: 3 }}>
           <Text style={main_styles.locationLabel}>출발</Text>
           <TouchableOpacity onPress={() => openLocationModal("departure")}>
-            <Text style={main_styles.routeText}>{selectedDeparture}</Text>
+            <Text style={main_styles.routeText}>{departure}</Text>
           </TouchableOpacity>
         </View>
 
@@ -139,7 +131,7 @@ export function InformationBox({
         <View style={{ flex: 3 }}>
           <Text style={main_styles.locationLabel}>도착</Text>
           <TouchableOpacity onPress={() => openLocationModal("destination")}>
-            <Text style={main_styles.routeText}>{selectedDestination}</Text>
+            <Text style={main_styles.routeText}>{destination}</Text>
           </TouchableOpacity>
         </View>
 
@@ -155,9 +147,9 @@ export function InformationBox({
               data={locations.filter(
                 (item) =>
                   (changingLocationType === "departure" &&
-                    item !== selectedDestination) ||
+                    item !== destination) ||
                   (changingLocationType === "destination" &&
-                    item !== selectedDeparture),
+                    item !== departure),
               )}
               keyExtractor={(item) => item}
               renderItem={({ item }) => (
@@ -186,7 +178,7 @@ export function InformationBox({
             style={date_styles.dateTimeButton}
           >
             <Text style={date_styles.dateText}>
-              {date.toLocaleDateString()}
+              {fromDate.toLocaleDateString()}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -194,7 +186,7 @@ export function InformationBox({
             style={date_styles.dateTimeButton}
           >
             <Text style={date_styles.dateText}>
-              {date.toLocaleTimeString([], {
+              {fromDate.toLocaleTimeString([], {
                 hour: "2-digit",
                 minute: "2-digit",
               })}
@@ -206,7 +198,7 @@ export function InformationBox({
       {/* 날짜 모달이 활성화 되었을 때 */}
       {showDatePicker && (
         <DateTimePicker
-          value={date}
+          value={fromDate}
           mode="date"
           display="default"
           onChange={handleDateChange}
@@ -217,7 +209,7 @@ export function InformationBox({
       {/* 시간 모달이 활성화 되었을 때 */}
       {showTimePicker && (
         <DateTimePicker
-          value={date}
+          value={fromDate}
           mode="time"
           display="default"
           minuteInterval={5}
