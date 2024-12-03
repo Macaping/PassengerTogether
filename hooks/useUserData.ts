@@ -1,7 +1,9 @@
+import { userDataState } from "@/atoms/userDataState";
+import { userState } from "@/atoms/userState";
 import { supabase } from "@/lib/supabase";
 import { Database } from "@/lib/supabase_type";
-import { useEffect, useState } from "react";
-import { useUser } from "./useUser";
+import { useEffect } from "react";
+import { useRecoilState, useRecoilValue } from "recoil";
 
 type UserData = Database["public"]["Tables"]["users"]["Row"];
 
@@ -17,8 +19,8 @@ type UserData = Database["public"]["Tables"]["users"]["Row"];
  * ```
  */
 export function useUserData() {
-  const { user } = useUser();
-  const [userData, setUserData] = useState<UserData | null>(null);
+  const user = useRecoilValue(userState);
+  const [userData, setUserData] = useRecoilState(userDataState);
 
   useEffect(() => {
     // 초기화
@@ -62,7 +64,7 @@ export function useUserData() {
         }
       });
     };
-  }, [user]);
+  }, [setUserData, user?.id]);
 
   /**
    * Updates the clothes column for a user in the users table.

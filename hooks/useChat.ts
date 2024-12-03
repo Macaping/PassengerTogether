@@ -1,7 +1,8 @@
+import { userState } from "@/atoms/userState";
 import { supabase } from "@/lib/supabase";
 import type { Database } from "@/lib/supabase_type";
 import { useEffect, useState } from "react";
-import { useUser } from "./useUser";
+import { useRecoilValue } from "recoil";
 
 /**
  * 타입 정의
@@ -25,7 +26,7 @@ type User = Database["public"]["Tables"]["users"]["Row"]; // "users" 테이블�
  * - `handleSendMessage`: 작성한 메시지를 전송하는 함수
  */
 export default function useChat() {
-  const { user } = useUser(); // 현재 로그인한 사용자 정보
+  const user = useRecoilValue(userState); // 현재 로그인한 사용자 정보
   const [roomId, setRoomId] = useState<User["current_party"] | null>(null); // 현재 사용자가 속한 채팅방 ID
   const [messages, setMessages] = useState<(Message & { nickname?: string })[]>(
     [],

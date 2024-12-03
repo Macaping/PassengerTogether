@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabase";
-import { User } from "./user";
+import { fetchUser } from "./fetchUser";
 
 /**
  * 새로운 방을 생성합니다.
@@ -27,7 +27,7 @@ export async function CreateRoom({
     room_name: room_name,
   };
 
-  const user = await User();
+  const user = await fetchUser();
   if (!user?.id) throw Error("사용자 정보가 없습니다.");
 
   try {

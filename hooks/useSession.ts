@@ -1,6 +1,7 @@
+import { sessionState } from "@/atoms/sessionState";
 import { supabase } from "@/lib/supabase";
-import { Session } from "@supabase/supabase-js";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useRecoilState } from "recoil";
 
 /**
  * supabase의 세션 정보를 가져오고 실시간으로 구독하는 커스텀 훅
@@ -16,7 +17,7 @@ import { useEffect, useState } from "react";
  * 컴포넌트가 언마운트될 때 구독을 해제합니다.
  */
 export function useSession() {
-  const [session, setSession] = useState<Session | null>(null); // 세션 정보
+  const [session, setSession] = useRecoilState(sessionState);
 
   useEffect(() => {
     // 초기화
@@ -33,7 +34,7 @@ export function useSession() {
       // 구독 해제
       authListener?.subscription.unsubscribe();
     };
-  }, []);
+  }, [setSession]);
 
   return { session };
 }

@@ -1,12 +1,18 @@
+import {
+  departureState,
+  destinationState,
+  fromDateState,
+} from "@/atoms/routeState";
+import Details from "@/components/roommake/Details";
 import 방만들기 from "@/components/roommake/방만들기";
 import 시간선택 from "@/components/roommake/시간선택";
 import 장소선택 from "@/components/roommake/장소선택";
-import 장소옷차림입력 from "@/components/roommake/장소옷차림입력";
 import { CreateRoom } from "@/services/create_room";
 import JoinRoom from "@/services/join_room";
 import { router } from "expo-router";
 import React, { useState } from "react";
-import { Alert, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, StyleSheet, View } from "react-native";
+import { useRecoilValue } from "recoil";
 
 /**
  * RoomMakeView 페이지
@@ -26,15 +32,15 @@ import { Alert, StyleSheet, Text, TextInput, View } from "react-native";
  */
 export default function RoomMakeView() {
   // 상태 관리
-  const [departure, setDeparture] = useState("천안역"); // 출발지
-  const [destination, setDestination] = useState("천안아산역"); // 도착지
-  const [selectedDate, setSelectedDate] = useState(new Date()); // 선택된 시간
-  const [details, setDetails] = useState(""); // 세부사항
+  const departure = useRecoilValue(departureState); // 출발지
+  const destination = useRecoilValue(destinationState); // 도착지
+  const fromDate = useRecoilValue(fromDateState); // 선택된 시간
+
   const [roomName, setRoomName] = useState(""); // 방 제목
   const [meetingPlace, setMeetingPlace] = useState(""); // 만남의 장소
+  const [ootd, setOotd] = useState(""); // 오늘의 옷차림
 
-  const locations = ["천안역", "천안아산역", "선문대", "탕정역", "두정동 롯데"]; // 장소 옵션
-  const isButtonDisabled = !meetingPlace || !details; // 방 만들기 버튼 활성화 조건
+  const isButtonDisabled = !meetingPlace || !ootd; // 방 만들기 버튼 활성화 조건
 
   /**
    * 방 생성 함수
@@ -44,11 +50,11 @@ export default function RoomMakeView() {
     try {
       // 방 생성 API 호출
       const room = await CreateRoom({
-        departure_time: selectedDate.toISOString(),
-        origin: departure as string,
-        destination: destination as string,
+        departure_time: fromDate.toISOString(),
+        origin: departure,
+        destination: destination,
         meetingPlace,
-        details,
+        details: ootd,
         room_name: roomName,
       });
 
@@ -68,43 +74,26 @@ export default function RoomMakeView() {
   return (
     <View style={styles.container}>
       {/* 출발지 및 도착지 선택 */}
-      <장소선택
-        departure={departure}
-        setDeparture={setDeparture}
-        destination={destination}
-        setDestination={setDestination}
-        locations={locations}
-      />
+      <장소선택 />
 
       {/* 시간 선택 */}
-      <시간선택
-        selectedDate={selectedDate}
-        onDateChange={(date) => setSelectedDate(date)}
-      />
+      <시간선택 />
 
-      {/* 방 제목 입력 */}
-      <Text style={styles.sectionTitle}>방제목</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="방제목"
-        value={roomName}
-        onChangeText={setRoomName}
-        maxLength={10}
-      />
-
-      {/* 만남의 장소 및 세부사항 입력 */}
-      <장소옷차림입력
+      {/* 방제목, 만남의 장소, 나의 옷차림 입력 */}
+      <Details
+        roomName={roomName}
+        setRoomName={setRoomName}
         meetingPlace={meetingPlace}
-        details={details}
-        onMeetingPlaceChange={setMeetingPlace}
-        onDetailsChange={setDetails}
+        setMeetingPlace={setMeetingPlace}
+        ootd={ootd}
+        setOotd={setOotd}
       />
 
       {/* 방 만들기 버튼 */}
       <방만들기
         onPress={handleCreateRoom}
         disabled={isButtonDisabled}
-        selectedDate={selectedDate}
+        selectedDate={fromDate}
         text="방만들기"
       />
     </View>

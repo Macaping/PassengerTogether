@@ -2,21 +2,8 @@ import { InformationBox } from "@/components/home/InformationBox";
 import { MapWidget } from "@/components/home/MapWidget";
 import { 방_탐색 } from "@/components/home/방_탐색";
 import { 방장_하기 } from "@/components/home/방장_하기";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { StyleSheet, View } from "react-native";
-import { LatLng } from "react-native-maps";
-
-// 주요 장소의 좌표 데이터
-const coordinates: { [key: string]: LatLng } = {
-  천안역: { latitude: 36.8089885, longitude: 127.148933 },
-  천안아산역: { latitude: 36.7946071, longitude: 127.1045608 },
-  선문대: { latitude: 36.7989764, longitude: 127.0750025 },
-  탕정역: { latitude: 36.78827, longitude: 127.084638 },
-  "두정동 롯데": { latitude: 36.8261834, longitude: 127.1399744 },
-};
-
-// 장소 목록
-const locations = ["천안역", "천안아산역", "선문대", "탕정역", "두정동 롯데"];
 
 /**
  * HomeView 페이지
@@ -33,70 +20,21 @@ const locations = ["천안역", "천안아산역", "선문대", "탕정역", "�
  * @returns {React.ReactElement} 지도와 UI가 포함된 메인 화면 구성 요소.
  */
 export default function HomeView() {
-  // 출발지와 도착지 상태
-  const [departure, setDeparture] = useState<LatLng>(coordinates["천안역"]); // 기본값: 천안역
-  const [destination, setDestination] = useState<LatLng>(
-    coordinates["천안아산역"], // 기본값: 천안아산역
-  );
-  const [selectedDeparture, setSelectedDeparture] = useState<string>("천안역");
-  const [selectedDestination, setSelectedDestination] =
-    useState<string>("천안아산역");
-
-  // 사용자가 출발지/도착지를 변경하면 상태를 업데이트
-  useEffect(() => {
-    if (selectedDeparture) {
-      setDeparture(coordinates[selectedDeparture]);
-    }
-    if (selectedDestination) {
-      setDestination(coordinates[selectedDestination]);
-    }
-  }, [selectedDeparture, selectedDestination]);
-
-  // 날짜 상태
-  const [date, setDate] = useState<Date>(new Date()); // 기본값: 현재 날짜
-
-  // 경로 정보 (거리 및 예상 소요 시간)
-  const [distance, setDistance] = useState<number | null>(null);
-  const [duration, setDuration] = useState<number | null>(null);
-
   return (
     <View style={styles.container}>
       {/* 지도 위젯 */}
       <View style={styles.map}>
-        <MapWidget
-          departure={departure}
-          destination={destination}
-          setDistance={setDistance}
-          setDuration={setDuration}
-        />
+        <MapWidget />
       </View>
 
       {/* 사용자 인터페이스 */}
       <View style={styles.interface}>
-        <InformationBox
-          selectedDeparture={selectedDeparture}
-          setSelectedDeparture={setSelectedDeparture}
-          selectedDestination={selectedDestination}
-          setSelectedDestination={setSelectedDestination}
-          date={date}
-          setDate={setDate}
-          locations={locations}
-          distance={distance}
-          duration={duration}
-        />
+        <InformationBox />
 
         {/* 버튼 그룹 */}
         <View style={styles.buttonContainer}>
-          <방_탐색
-            departure={selectedDeparture}
-            destination={selectedDestination}
-            date={date}
-          />
-          <방장_하기
-            departure={selectedDeparture}
-            destination={selectedDestination}
-            date={date}
-          />
+          <방_탐색 />
+          <방장_하기 />
         </View>
       </View>
     </View>

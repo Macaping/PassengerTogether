@@ -1,22 +1,23 @@
+import {
+  departureState,
+  destinationState,
+  fromDateState,
+} from "@/atoms/routeState";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
+import { useRecoilValue } from "recoil";
 
 /**
  * 헤더 컴포넌트
  */
-export default function Header({
-  origin,
-  destination,
-  date: date,
-}: {
-  origin: string;
-  destination: string;
-  date: Date;
-}) {
+export default function Header() {
+  const departure = useRecoilValue(departureState); // 출발지
+  const destination = useRecoilValue(destinationState); // 도착지
+  const fromDate = useRecoilValue(fromDateState); // 출발 시간
+
   // 날짜 포맷을 변경합니다.
-  date = new Date(date);
-  const formattedDate = date.toLocaleTimeString("ko-KR", {
+  const formattedDate = fromDate.toLocaleTimeString("ko-KR", {
     month: "long",
     day: "numeric",
     weekday: "short",
@@ -26,7 +27,7 @@ export default function Header({
     <View style={headerStyles.container}>
       <Text style={headerStyles.date}>{formattedDate}</Text>
       <View style={headerStyles.routeContainer}>
-        <Text style={headerStyles.locationName}>{origin}</Text>
+        <Text style={headerStyles.locationName}>{departure}</Text>
         <Ionicons
           name="arrow-forward"
           size={30}

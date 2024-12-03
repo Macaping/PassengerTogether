@@ -1,3 +1,8 @@
+import {
+  departureState,
+  destinationState,
+  locationsState,
+} from "@/atoms/routeState";
 import React, { useState } from "react";
 import {
   FlatList,
@@ -7,6 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useRecoilState, useRecoilValue } from "recoil";
 
 /**
  * 장소 선택 컴포넌트
@@ -14,19 +20,10 @@ import {
  * - 사용자가 출발지와 도착지를 선택할 수 있는 컴포넌트입니다.
  * - 출발지와 도착지를 선택하면 부모 컴포넌트에 변경된 값을 전달합니다.
  */
-export default function 장소선택({
-  departure,
-  setDeparture,
-  destination,
-  setDestination,
-  locations,
-}: {
-  departure: string;
-  setDeparture: (value: string) => void;
-  destination: string;
-  setDestination: (value: string) => void;
-  locations: string[];
-}) {
+export default function 장소선택() {
+  const [departure, setDeparture] = useRecoilState(departureState);
+  const [destination, setDestination] = useRecoilState(destinationState);
+  const locations = useRecoilValue(locationsState);
   const [modalVisible, setModalVisible] = useState(false);
   const [changingType, setChangingType] = useState<"departure" | "destination">(
     "departure",
@@ -75,12 +72,15 @@ export default function 장소선택({
             keyExtractor={(item) => item}
             renderItem={({ item }) => (
               <TouchableOpacity
+                style={styles.modalItem}
                 onPress={() => {
-                  if (changingType === "departure") setDeparture(item);
-                  else setDestination(item);
+                  if (changingType === "departure") {
+                    setDeparture(item);
+                  } else {
+                    setDestination(item);
+                  }
                   setModalVisible(false);
                 }}
-                style={styles.modalItem}
               >
                 <Text>{item}</Text>
               </TouchableOpacity>

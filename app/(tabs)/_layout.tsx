@@ -3,7 +3,10 @@ import { Tabs } from "expo-router";
 import React, { useEffect } from "react";
 
 import { TabBarIcon } from "@/components/navigation/TabBarIcon";
+import { useParty } from "@/hooks/useParty";
+import { useSession } from "@/hooks/useSession";
 import { useUser } from "@/hooks/useUser";
+import { useUserData } from "@/hooks/useUserData";
 
 /**
  * TabLayout 페이지
@@ -19,7 +22,10 @@ import { useUser } from "@/hooks/useUser";
  * @returns {React.ReactElement} 구성된 Tabs 레이아웃을 반환.
  */
 export default function TabLayout() {
+  const { session } = useSession();
   const { user } = useUser();
+  const { userData } = useUserData();
+  const { roomData } = useParty();
 
   useEffect(() => {
     /**

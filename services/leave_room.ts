@@ -1,13 +1,13 @@
 import { supabase } from "@/lib/supabase";
+import { fetchUser } from "./fetchUser";
 import { Room } from "./room";
-import { User } from "./user";
 
 /**
  * 사용자가 현재 속한 방에서 나가게 합니다.
  */
 export async function LeaveRoom() {
   // 사용자 데이터
-  const user = await User();
+  const user = await fetchUser();
   if (!user?.id) throw Error("사용자 정보가 없습니다.");
 
   // 사용자가 속한 방 아이디

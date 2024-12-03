@@ -1,3 +1,5 @@
+import { partyState } from "@/atoms/partyState";
+import { passengersState } from "@/atoms/passengersState";
 import Clothes from "@/components/my_party/clothes";
 import Departure from "@/components/my_party/departure";
 import Destination from "@/components/my_party/destination";
@@ -11,9 +13,9 @@ import Time from "@/components/my_party/time";
 import 나가기 from "@/components/my_party/나가기";
 import 동승자 from "@/components/my_party/동승자";
 import 채팅 from "@/components/my_party/채팅";
-import { useHostClothes } from "@/hooks/useHostClothes";
-import { useParty } from "@/hooks/useParty";
+import { usePassengers } from "@/hooks/usePassengers";
 import { StyleSheet, View } from "react-native";
+import { useRecoilValue } from "recoil";
 
 /**
  * RoomDetailView 페이지
@@ -30,16 +32,12 @@ import { StyleSheet, View } from "react-native";
  * @returns {React.ReactElement} 방 세부 정보 화면 UI.
  */
 export default function RoomDetailView() {
-  // 방 데이터 및 로딩 상태 가져오기
-  const { roomData: room, loading: roomLoading } = useParty();
-  const { hostClothes, loading: clothesLoading } = useHostClothes(
-    room?.users || [],
-  );
-
-  // 로딩 상태 처리
-  if (roomLoading || clothesLoading) {
-    return <PartyEmpty />;
-  }
+  // 방 데이터
+  const room = useRecoilValue(partyState);
+  // 동승자 데이터
+  const passengers = useRecoilValue(passengersState);
+  // passengers hook 사용해서 동승자 정보를 구독한다.
+  usePassengers();
 
   // 방 데이터가 없는 경우 처리
   if (!room) {
@@ -83,7 +81,8 @@ export default function RoomDetailView() {
 
         {/* 방장의 옷차림 */}
         <View style={styles.details}>
-          <Clothes text={hostClothes || "정보 없음"} />
+          {/* 0번째 인덱스의 유저는 방장이므로 방장의 옷차림을 가져온다. */}
+          <Clothes text={passengers.at(0)?.clothes || "정보 없음"} />
         </View>
 
         {/* 구분선 */}

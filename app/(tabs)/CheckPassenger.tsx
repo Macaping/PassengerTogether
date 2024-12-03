@@ -1,11 +1,14 @@
+import { passengersState } from "@/atoms/passengersState";
 import { PartyHeader } from "@/components/my_party/party_header";
 import { roomstyles } from "@/components/my_party/room_styles";
 import { Separator } from "@/components/my_party/separator";
 import 이전 from "@/components/my_party/이전";
-import { usePassengers } from "@/hooks/usePassengers";
-import { useUserData } from "@/hooks/useUserData";
+import { Database } from "@/lib/supabase_type";
 import React from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
+import { useRecoilValue } from "recoil";
+
+type UserData = Database["public"]["Tables"]["users"]["Row"];
 
 /**
  * 동승자 확인 화면 페이지
@@ -21,14 +24,14 @@ import { FlatList, StyleSheet, Text, View } from "react-native";
  * @returns {React.ReactElement} 동승자 확인 화면 UI.
  */
 export default function CheckPassenger() {
-  const { userData } = useUserData(); // 현재 사용자 데이터 가져오기
-  const { passengers, loading } = usePassengers(userData?.current_party); // 사용자의 현재 파티 ID로 동승자 목록 가져오기
+  // 동승자 데이터
+  const passengers = useRecoilValue(passengersState);
 
-  // 로딩 상태 처리
-  if (loading) {
+  // 동승자 목록이 없는 경우
+  if (!passengers) {
     return (
       <View>
-        <Text>Loading...</Text>
+        <Text>동승자가 없습니다.</Text>
       </View>
     );
   }
@@ -39,7 +42,7 @@ export default function CheckPassenger() {
    * @param {Object} item - 동승자 데이터 객체 (닉네임, 옷차림 포함).
    * @returns {React.ReactElement} 렌더링된 동승자 항목.
    */
-  const renderPassengerItem = ({ item }: { item: (typeof passengers)[0] }) => (
+  const renderPassengerItem = (item: UserData) => (
     <View style={styles.passengerItem}>
       <Text style={styles.nickname}>{item.nickname}</Text>
       <Text style={styles.description}>{item.clothes}</Text>
@@ -61,10 +64,10 @@ export default function CheckPassenger() {
 
         {/* 동승자 목록 */}
         <FlatList
-          data={passengers}
-          keyExtractor={(item) => item.id} // 각 항목의 고유 ID를 키로 사용
-          renderItem={renderPassengerItem} // 각 항목 렌더링 함수
+          data={passengers} // 동승자 목록 데이터
           style={styles.passengerList}
+          keyExtractor={(item) => item.user_id} // 각 항목의 고유 ID를 키로 사용
+          renderItem={({ item }) => renderPassengerItem(item)} // 각 항목 렌더링 함수
         />
 
         {/* 구분선 및 버튼 */}

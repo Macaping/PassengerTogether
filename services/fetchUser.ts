@@ -10,7 +10,7 @@ import { supabase } from "@/lib/supabase";
  * @throws {AuthError} 인증 오류 발생 시 Supabase에서 반환된 에러를 throw합니다.
  * @throws {Error} 사용자 정보가 없을 경우 커스텀 에러를 throw합니다.
  */
-export async function User() {
+export async function fetchUser() {
   return supabase.auth
     .getUser()
     .then((value) => {
@@ -21,4 +21,16 @@ export async function User() {
     .catch((error) => {
       console.error("User fetch error:", error); // 에러 발생 시 로그 출력
     });
+}
+
+/**
+ * 사용자 ID로 사용자 정보를 가져옵니다.
+ */
+export async function fetchUserById(id: string) {
+  return await supabase
+    .from("users")
+    .select("*")
+    .eq("user_id", id)
+    .single()
+    .then((value) => value.data);
 }

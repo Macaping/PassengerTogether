@@ -1,25 +1,19 @@
+import {
+  departureLocationState,
+  destinationLocationState,
+  distanceState,
+  durationState,
+} from "@/atoms/routeState";
 import * as Location from "expo-location";
 import { useEffect, useRef, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import MapView, { LatLng, Marker, Polyline, Region } from "react-native-maps";
-
-interface MapWidgetProps {
-  departure: LatLng | null;
-  destination: LatLng | null;
-}
+import { useRecoilValue, useSetRecoilState } from "recoil";
 
 /**
  * 지도 위젯 컴포넌트
  */
-export function MapWidget({
-  departure,
-  destination,
-  setDistance,
-  setDuration,
-}: MapWidgetProps & {
-  setDistance: React.Dispatch<React.SetStateAction<number | null>>;
-  setDuration: React.Dispatch<React.SetStateAction<number | null>>;
-}): React.JSX.Element {
+export function MapWidget(): React.JSX.Element {
   // 위치 정보
   const [location, setLocation] =
     useState<Location.LocationObjectCoords | null>(null);
@@ -55,12 +49,18 @@ export function MapWidget({
 
   // 길찾기
   const MAP_KEY = process.env.EXPO_PUBLIC_MAP_KEY || ""; //길찾기 api 키 가져옴
+  const departureLocation = useRecoilValue(departureLocationState);
+  const destinationLocation = useRecoilValue(destinationLocationState);
   const [route, setRoute] = useState<LatLng[]>([]);
+
+  // 거리와 소요 시간
+  const setDistance = useSetRecoilState(distanceState);
+  const setDuration = useSetRecoilState(durationState);
 
   // 출발지와 도착지가 변경될 때마다 길찾기를 수행합니다.
   useEffect(() => {
-    if (departure && destination) {
-      const url = `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${MAP_KEY}&start=${departure?.longitude},${departure.latitude}&end=${destination.longitude},${destination.latitude}`;
+    if (departureLocation && destinationLocation) {
+      const url = `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${MAP_KEY}&start=${departureLocation?.longitude},${departureLocation.latitude}&end=${destinationLocation.longitude},${destinationLocation.latitude}`;
       fetch(url)
         // json으로 변환
         .then((value) => value.json())
@@ -80,33 +80,39 @@ export function MapWidget({
         })
         .catch((error) => console.error("Error fetching route data:", error));
     }
-  }, [MAP_KEY, departure, destination, setDistance, setDuration]);
+  }, [
+    MAP_KEY,
+    departureLocation,
+    destinationLocation,
+    setDistance,
+    setDuration,
+  ]);
 
   const mapRef = useRef<MapView | null>(null);
 
   // 출발지가 변경될 때마다 지도를 이동합니다.
   useEffect(() => {
-    if (departure) {
+    if (departureLocation) {
       mapRef.current?.animateToRegion({
-        latitude: departure.latitude,
-        longitude: departure.longitude,
+        latitude: departureLocation.latitude,
+        longitude: departureLocation.longitude,
         latitudeDelta: 0.025,
         longitudeDelta: 0.025,
       });
     }
-  }, [departure]);
+  }, [departureLocation]);
 
   // 도착지가 변경될 때마다 지도를 이동합니다.
   useEffect(() => {
-    if (destination) {
+    if (destinationLocation) {
       mapRef.current?.animateToRegion({
-        latitude: destination.latitude,
-        longitude: destination.longitude,
+        latitude: destinationLocation.latitude,
+        longitude: destinationLocation.longitude,
         latitudeDelta: 0.025,
         longitudeDelta: 0.025,
       });
     }
-  }, [destination]);
+  }, [destinationLocation]);
 
   if (errorMsg) {
     return (
@@ -117,6 +123,10 @@ export function MapWidget({
     );
   }
 
+  if (!location || departureLocation == null || destinationLocation == null) {
+    return <ActivityIndicator />;
+  }
+
   return (
     <MapView
       ref={mapRef}
@@ -124,8 +134,12 @@ export function MapWidget({
       initialRegion={initialRegion}
       showsUserLocation={true}
     >
-      {departure && <Marker coordinate={departure} title="출발지" />}
-      {destination && <Marker coordinate={destination} title="도착지" />}
+      {departureLocation && (
+        <Marker coordinate={departureLocation} title="출발지" />
+      )}
+      {destinationLocation && (
+        <Marker coordinate={destinationLocation} title="도착지" />
+      )}
       {route && (
         <Polyline coordinates={route} strokeColor="#6B59CC" strokeWidth={4} />
       )}

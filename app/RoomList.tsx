@@ -1,12 +1,18 @@
+import {
+  departureState,
+  destinationState,
+  fromDateState,
+} from "@/atoms/routeState";
 import Header from "@/components/room_list/header";
 import List from "@/components/room_list/list";
 import RoomDetailModal from "@/components/room_list/modal";
 import { useRoomList } from "@/hooks/useRoomList";
 import { Database } from "@/lib/supabase_type";
 import JoinRoom from "@/services/join_room";
-import { router, useLocalSearchParams } from "expo-router";
+import { router } from "expo-router";
 import React, { useState } from "react";
 import { ActivityIndicator, Alert, StyleSheet, Text, View } from "react-native";
+import { useRecoilValue } from "recoil";
 
 /**
  * RoomListView 페이지
@@ -23,22 +29,19 @@ import { ActivityIndicator, Alert, StyleSheet, Text, View } from "react-native";
  * @returns {React.ReactElement} 방 목록 화면 UI.
  */
 export default function RoomListView() {
+  const departure = useRecoilValue(departureState);
+  const destination = useRecoilValue(destinationState);
+  const fromDate = useRecoilValue(fromDateState);
+
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null); // 선택된 방 정보 상태
   const [modalVisible, setModalVisible] = useState(false); // 모달 표시 상태
 
-  // URL 파라미터에서 출발지, 도착지, 날짜를 가져옵니다.
-  const {
-    departure = "출발지",
-    destination = "도착지",
-    date = new Date(),
-  } = useLocalSearchParams() as unknown as {
-    departure: string;
-    destination: string;
-    date: Date;
-  };
-
   // 출발지, 도착지, 날짜를 기준으로 실시간 방 목록 조회
-  const { loading, roomList } = useRoomList({ departure, destination, date });
+  const { loading, roomList } = useRoomList({
+    departure: departure,
+    destination: destination,
+    date: fromDate,
+  });
 
   if (loading) {
     // 로딩 중일 때 로딩 인디케이터 표시
@@ -104,7 +107,7 @@ export default function RoomListView() {
   return (
     <View style={styles.container}>
       {/* 화면 상단 헤더 */}
-      <Header origin={departure} destination={destination} date={date} />
+      <Header />
 
       {/* 방 목록 헤더 */}
       <View style={listStyles.indexContainer}>

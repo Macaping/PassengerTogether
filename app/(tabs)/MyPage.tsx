@@ -1,4 +1,4 @@
-import { useUserData } from "@/hooks/useUserData";
+import { userDataState } from "@/atoms/userDataState";
 import { signOutUser } from "@/utils/auth.utils";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router } from "expo-router";
@@ -10,6 +10,7 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
+import { useRecoilValue } from "recoil";
 
 /**
  * MyPage 페이지
@@ -29,7 +30,7 @@ export default function MyPage() {
   const { height } = useWindowDimensions(); // 화면 높이에 따른 아이콘 크기 동적 계산
   const iconSize = height * 0.25;
 
-  const { userData } = useUserData(); // 사용자 데이터 가져오기
+  const userData = useRecoilValue(userDataState); // 사용자 데이터 가져오기
 
   /**
    * 로그아웃 처리

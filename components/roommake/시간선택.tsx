@@ -1,11 +1,8 @@
+import { fromDateState } from "@/atoms/routeState";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import React, { useState } from "react";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-
-interface DateTimeSelectorProps {
-  selectedDate: Date; // 현재 선택된 날짜
-  onDateChange: (date: Date) => void; // 변경된 날짜를 부모에 전달
-}
+import { useRecoilState } from "recoil";
 
 /**
  * 시간 선택 컴포넌트
@@ -13,23 +10,21 @@ interface DateTimeSelectorProps {
  * - 사용자가 날짜와 시간을 선택할 수 있는 컴포넌트입니다.
  * - 날짜와 시간을 선택하면 부모 컴포넌트에 변경된 값을 전달합니다.
  */
-export default function 시간선택({
-  selectedDate,
-  onDateChange,
-}: DateTimeSelectorProps) {
+export default function 시간선택() {
+  const [fromDate, setFromDate] = useRecoilState(fromDateState);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
 
   // 날짜 선택 핸들러
   const handleDateChange = (event: any, date?: Date) => {
     if (date) {
-      const updatedDate = new Date(selectedDate);
+      const updatedDate = new Date(fromDate);
       updatedDate.setFullYear(
         date.getFullYear(),
         date.getMonth(),
         date.getDate(),
       ); // 날짜만 변경
-      onDateChange(updatedDate); // 기존 시간 유지
+      setFromDate(updatedDate); // 기존 시간 유지
     }
     setShowDatePicker(false);
   };
@@ -38,7 +33,7 @@ export default function 시간선택({
   const handleTimeChange = (event: any, time?: Date) => {
     if (time) {
       const now = new Date(); // 현재 시간 동적으로 가져오기
-      const updatedDate = new Date(selectedDate);
+      const updatedDate = new Date(fromDate);
       updatedDate.setHours(time.getHours(), time.getMinutes());
       // 선택한 시간이 현재 시간보다 과거인지 확인
       if (updatedDate < now) {
@@ -46,9 +41,10 @@ export default function 시간선택({
           "유효하지 않은 시간",
           "현재 시간보다 이전 시간은 선택할 수 없습니다.",
         );
+        setShowTimePicker(false);
         return;
       }
-      onDateChange(updatedDate);
+      setFromDate(updatedDate);
     }
     setShowTimePicker(false);
   };
@@ -62,7 +58,7 @@ export default function 시간선택({
           style={styles.box}
           onPress={() => setShowDatePicker(true)}
         >
-          <Text style={styles.text}>{selectedDate.toLocaleDateString()}</Text>
+          <Text style={styles.text}>{fromDate.toLocaleDateString()}</Text>
         </TouchableOpacity>
         {/* 시간 선택 버튼 */}
         <TouchableOpacity
@@ -70,7 +66,7 @@ export default function 시간선택({
           onPress={() => setShowTimePicker(true)}
         >
           <Text style={styles.text}>
-            {selectedDate.toLocaleTimeString([], {
+            {fromDate.toLocaleTimeString([], {
               hour: "2-digit",
               minute: "2-digit",
             })}
@@ -80,7 +76,7 @@ export default function 시간선택({
       {/* 날짜 선택기 */}
       {showDatePicker && (
         <DateTimePicker
-          value={selectedDate}
+          value={fromDate}
           mode="date"
           display="default"
           onChange={handleDateChange}
@@ -90,7 +86,7 @@ export default function 시간선택({
       {/* 시간 선택기 */}
       {showTimePicker && (
         <DateTimePicker
-          value={selectedDate}
+          value={fromDate}
           mode="time"
           display="default"
           onChange={handleTimeChange}

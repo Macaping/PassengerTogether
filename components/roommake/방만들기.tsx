@@ -1,6 +1,7 @@
-import { useUserData } from "@/hooks/useUserData";
+import { userDataState } from "@/atoms/userDataState";
 import { useEffect, useState } from "react";
 import { Alert, StyleSheet, Text, TouchableOpacity } from "react-native";
+import { useRecoilValue } from "recoil";
 
 interface CreateRoomButtonProps {
   onPress: () => void; // 버튼 클릭 시 호출할 함수
@@ -18,7 +19,7 @@ export default function CreateRoomButton({
   text,
   selectedDate,
 }: CreateRoomButtonProps) {
-  const { userData } = useUserData();
+  const userData = useRecoilValue(userDataState);
   const [isPastTime, setIsPastTime] = useState(false); // 선택된 시간이 과거인지 여부
 
   useEffect(() => {
