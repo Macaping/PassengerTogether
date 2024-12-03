@@ -1,11 +1,12 @@
+import { passengersState } from "@/atoms/passengersState";
 import { PartyHeader } from "@/components/my_party/party_header";
 import { roomstyles } from "@/components/my_party/room_styles";
 import { Separator } from "@/components/my_party/separator";
 import 이전 from "@/components/my_party/이전";
-import { usePassengers } from "@/hooks/usePassengers";
 import { Database } from "@/lib/supabase_type";
 import React from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
+import { useRecoilValue } from "recoil";
 
 type UserData = Database["public"]["Tables"]["users"]["Row"];
 
@@ -23,7 +24,8 @@ type UserData = Database["public"]["Tables"]["users"]["Row"];
  * @returns {React.ReactElement} 동승자 확인 화면 UI.
  */
 export default function CheckPassenger() {
-  const { passengers } = usePassengers(); // 동승자 목록 데이터 가져오기
+  // 동승자 데이터
+  const passengers = useRecoilValue(passengersState);
 
   // 동승자 목록이 없는 경우
   if (!passengers) {

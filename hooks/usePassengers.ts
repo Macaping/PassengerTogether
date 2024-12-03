@@ -1,9 +1,10 @@
 import { partyState } from "@/atoms/partyState";
+import { passengersState } from "@/atoms/passengersState";
 import { supabase } from "@/lib/supabase";
 import { Database } from "@/lib/supabase_type";
 import { fetchUserById } from "@/services/fetchUser";
-import { useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
+import { useEffect } from "react";
+import { useRecoilState, useRecoilValue } from "recoil";
 
 type UserData = Database["public"]["Tables"]["users"]["Row"];
 
@@ -27,8 +28,10 @@ type UserData = Database["public"]["Tables"]["users"]["Row"];
  * - 컴포넌트가 언마운트되면 자동으로 구독이 해제됩니다.
  */
 export function usePassengers() {
-  const partyData = useRecoilValue(partyState); // 현재 사용자의 파티 데이터 가져오기
-  const [passengers, setPassengers] = useState<UserData[]>([]); // 동승자의 데이터 상태
+  // 파티 데이터
+  const partyData = useRecoilValue(partyState);
+  // 동승자 데이터
+  const [passengers, setPassengers] = useRecoilState(passengersState);
 
   useEffect(() => {
     // 초기화
